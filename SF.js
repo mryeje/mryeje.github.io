@@ -39,7 +39,7 @@ function initGui() {
   var controls = document.getElementById('controls');
   var buttonsText = '';
   buttonsText += '<button id="show">Show</button>';
-  buttonsText += '<button id="hide">Hide</button>';
+  buttonsText += '<button id="hide">Remove top</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
