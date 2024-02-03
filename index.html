@@ -1,6 +1,56 @@
 <html><head><title>Sketchfab Test</title><link rel="stylesheet" href="sfcss.css">
     <script type="text/javascript" src="SF.js"></script>
     <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+    <script type="text/javascript> // Sketchfab Viewer API: Start/Stop the viewer
+var version = '1.12.1';
+var uid = 'a3c678b5da274d6fa62003e542802560';
+var iframe = document.getElementById('api-frame');
+var client = new window.Sketchfab(version, iframe);
+var error = function error() {
+  console.error('Sketchfab API error');
+};
+var success = function success(api) {
+  api.start(function () {
+    api.addEventListener('viewerready', function () {
+      api.getSceneGraph(function (err, result) {
+        if (err) {
+          console.log('Error getting nodes');
+          return;
+        }
+        // get the id from that log
+        console.log(result);
+      });
+      var id = 229;
+      document.getElementById('hide').addEventListener('click', function () {
+        api.hide(id);
+      });
+      document.getElementById('show').addEventListener('click', function () {
+        api.show(id);
+      });
+    });
+  });
+};
+client.init(uid, {
+  success: success,
+  error: error,
+  autostart: 1,
+  preload: 1
+});
+//////////////////////////////////
+// GUI Code
+//////////////////////////////////
+function initGui() {
+  var controls = document.getElementById('controls');
+  var buttonsText = '';
+  buttonsText += '<button id="show">Show</button>';
+  buttonsText += '<button id="hide">Hide</button>';
+  controls.innerHTML = buttonsText;
+}
+initGui();
+
+//////////////////////////////////
+// GUI Code end
+//////////////////////////////////</script>
 </head>
 <body><center><h1>Sketchfab Test 2</h1>
 <div class="sketchfab-embed-wrapper"> <iframe title="LG Dryer Test-NLA" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/a3c678b5da274d6fa62003e542802560/embed"> </iframe> <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/lg-dryer-test-nla-a3c678b5da274d6fa62003e542802560?utm_medium=embed&utm_campaign=share-popup&utm_content=a3c678b5da274d6fa62003e542802560" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> LG Dryer Test-NLA </a> by <a href="https://sketchfab.com/mryeje?utm_medium=embed&utm_campaign=share-popup&utm_content=a3c678b5da274d6fa62003e542802560" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> Jeremy Smith </a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=a3c678b5da274d6fa62003e542802560" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p></div>
