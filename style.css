@@ -227,9 +227,9 @@ button {
   outline: none;
   transition: background 0.2s;
   color: white;
-  background-color: #0d6efd;
-  height: 40px;
-  width: 80px;
+  background-color: #FFA500;
+  height: 35px;
+  width: 70px;
   font-size: 12px;
   vertical-align: middle;
 }
