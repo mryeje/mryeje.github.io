@@ -17,10 +17,11 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
-      var id = 53;
+      var id = 1140;
       var drumid = 4376;
       var baffelsid = 4390;
-      var cabid = 21;
+      var cabid = 1111;
+      var consoleid=21;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
@@ -37,6 +38,10 @@ var success = function success(api) {
           document.getElementById('hide3').addEventListener('click', function () {
         api.hide(cabid);
       });
+      // hide console
+          document.getElementById('hide3').addEventListener('click', function () {
+        api.hide(consoleid);
+      });
       // show lid
       document.getElementById('show').addEventListener('click', function () {
         api.show(id);
@@ -52,6 +57,10 @@ var success = function success(api) {
       // show cabinet
         document.getElementById('show3').addEventListener('click', function () {
         api.show(cabid);
+      });
+         // show console
+        document.getElementById('show3').addEventListener('click', function () {
+        api.show(consoleid);
       });
     });
   });
@@ -74,6 +83,8 @@ function initGui() {
   buttonsText += '<button id="hide2">Remove Drum</button>';
   buttonsText += '<button id="hide3">Remove Cabinet</button>';
   buttonsText += '<button id="show3">Show Cabinet</button>';
+  buttonsText += '<button id="hide3">Remove Console</button>';
+  buttonsText += '<button id="show3">Show Console</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
