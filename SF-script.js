@@ -17,7 +17,7 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
-      var id = 1849;
+      var id = 905;
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
       });
@@ -39,8 +39,8 @@ client.init(uid, {
 function initGui() {
   var controls = document.getElementById('controls');
   var buttonsText = '';
-  buttonsText += '<button id="show">Show</button>';
-  buttonsText += '<button id="hide">Hide</button>';
+  buttonsText += '<button id="show">Show Lid</button>';
+  buttonsText += '<button id="hide">Remove Lid</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
