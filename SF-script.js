@@ -20,7 +20,7 @@ var success = function success(api) {
       var id = 905;
       var drumid = 22;
       var baffelsid = 39;
-      var cab = 21;
+      var cabid = 21;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
@@ -35,7 +35,7 @@ var success = function success(api) {
       });
       // hide cabinet
           document.getElementById('hide3').addEventListener('click', function () {
-        api.hide(baffelsid);
+        api.hide(cabid);
       });
       // show lid
       document.getElementById('show').addEventListener('click', function () {
@@ -51,7 +51,7 @@ var success = function success(api) {
       });
       // show cabinet
         document.getElementById('show3').addEventListener('click', function () {
-        api.show(baffelsid);
+        api.show(cabid);
       });
     });
   });
