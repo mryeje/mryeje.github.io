@@ -39,7 +39,7 @@ var success = function success(api) {
         api.hide(cabid);
       });
       // hide console
-          document.getElementById('hide3').addEventListener('click', function () {
+          document.getElementById('hide4').addEventListener('click', function () {
         api.hide(consoleid);
       });
       // show lid
@@ -59,7 +59,7 @@ var success = function success(api) {
         api.show(cabid);
       });
          // show console
-        document.getElementById('show3').addEventListener('click', function () {
+        document.getElementById('show4').addEventListener('click', function () {
         api.show(consoleid);
       });
     });
@@ -83,8 +83,8 @@ function initGui() {
   buttonsText += '<button id="hide2">Remove Drum</button>';
   buttonsText += '<button id="hide3">Remove Cabinet</button>';
   buttonsText += '<button id="show3">Show Cabinet</button>';
-  buttonsText += '<button id="hide3">Remove Console</button>';
-  buttonsText += '<button id="show3">Show Console</button>';
+  buttonsText += '<button id="hide4">Remove Console</button>';
+  buttonsText += '<button id="show4">Show Console</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
