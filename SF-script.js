@@ -19,7 +19,7 @@ var success = function success(api) {
       });
       var id = 905;
       var drumid = 22;
-      var drumid = 49;
+      var bafflesid = 49;
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
       });
