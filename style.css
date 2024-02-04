@@ -218,7 +218,7 @@ button {
   border: 2px solid transparent;
   border-radius: 0.25rem !important;
   font-family: "Arial", sans-serif;
-  font-weight: 600;
+  font-weight: 400;
   text-align: center;
   text-shadow: none;
   text-transform: uppercase;
@@ -227,7 +227,7 @@ button {
   outline: none;
   transition: background 0.2s;
   color: white;
-  background-color: #FFA500;
+  background-color: #0d6efd;
   height: 35px;
   width: 70px;
   font-size: 12px;
