@@ -18,11 +18,18 @@ var success = function success(api) {
         console.log(result);
       });
       var id = 905;
+      var drumid = 22;
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
       });
+      document.getElementById('hide2').addEventListener('click', function () {
+        api.hide(drumid);
+      });
       document.getElementById('show').addEventListener('click', function () {
         api.show(id);
+      });
+      document.getElementById('show2').addEventListener('click', function () {
+        api.show(drumid);
       });
     });
   });
@@ -41,6 +48,8 @@ function initGui() {
   var buttonsText = '';
   buttonsText += '<button id="show">Show Lid</button>';
   buttonsText += '<button id="hide">Remove Lid</button>';
+  buttonsText += '<button id="show2">Show Lid</button>';
+  buttonsText += '<button id="hide2">Remove Lid</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
