@@ -18,8 +18,8 @@ var success = function success(api) {
         console.log(result);
       });
       var id = 905;
-      var drumid = 22;
-      var baffelsid = 39;
+      var drumid = 4376;
+      var baffelsid = 4390;
       var cabid = 21;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
