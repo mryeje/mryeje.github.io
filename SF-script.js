@@ -20,7 +20,7 @@ var success = function success(api) {
       var id = 905;
       var drumid = 22;
       var baffelsid = 39;
-      var cab = 1234;
+      var cab = 21;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
