@@ -19,17 +19,24 @@ var success = function success(api) {
       });
       var id = 905;
       var drumid = 22;
+      var drumid = 49;
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
       });
       document.getElementById('hide2').addEventListener('click', function () {
         api.hide(drumid);
       });
+      document.getElementById('hide2').addEventListener('click', function () {
+        api.hide(baffelsid);
+      });
       document.getElementById('show').addEventListener('click', function () {
         api.show(id);
       });
       document.getElementById('show2').addEventListener('click', function () {
         api.show(drumid);
+      });
+         document.getElementById('show2').addEventListener('click', function () {
+        api.show(baffelsid);
       });
     });
   });
@@ -48,8 +55,8 @@ function initGui() {
   var buttonsText = '';
   buttonsText += '<button id="show">Show Lid</button>';
   buttonsText += '<button id="hide">Remove Lid</button>';
-  buttonsText += '<button id="show2">Show Lid</button>';
-  buttonsText += '<button id="hide2">Remove Lid</button>';
+  buttonsText += '<button id="show2">Show Drum</button>';
+  buttonsText += '<button id="hide2">Remove Drum</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
