@@ -17,12 +17,12 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
-      var id = 1124;
-      var drumid = 4319;
-      var baffelsid = 4333;
-      var cabid = 1110;
-      var consoleid=78;
-      var conbrkid=3373;
+      var id = 1143;
+      var drumid = 4335;
+      var baffelsid = 4349;
+      var cabid = 1129;
+      var consoleid=84;
+      var conbrkid=3391;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
