@@ -1,6 +1,6 @@
 // Sketchfab Viewer API: Start/Stop the viewer
 var version = '1.12.1';
-var uid = '05f628525abb4ce3b5266725154e8bde';
+var uid = '0993ac8fb3e548b49460cd40186f0bbc';
 var iframe = document.getElementById('api-frame');
 var client = new window.Sketchfab(version, iframe);
 var error = function error() {
