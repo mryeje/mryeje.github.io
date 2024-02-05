@@ -22,6 +22,7 @@ var success = function success(api) {
       var baffelsid = 4390;
       var cabid = 1111;
       var consoleid=21;
+      var conbrkid=3447;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
@@ -41,6 +42,10 @@ var success = function success(api) {
       // hide console
           document.getElementById('hide4').addEventListener('click', function () {
         api.hide(consoleid);
+      });
+        // hide console bracket
+      document.getElementById('hide5').addEventListener('click', function () {
+      api.hide(conbrkid);
       });
       // show lid
       document.getElementById('show').addEventListener('click', function () {
@@ -85,6 +90,8 @@ function initGui() {
   buttonsText += '<button id="show3">Show Cabinet</button>';
   buttonsText += '<button id="hide4">Remove Console</button>';
   buttonsText += '<button id="show4">Show Console</button>';
+  buttonsText += '<button id="hide5">Remove Console bracket</button>';
+  buttonsText += '<button id="show5">Show Console bracket</button>';
   controls.innerHTML = buttonsText;
 }
 initGui();
