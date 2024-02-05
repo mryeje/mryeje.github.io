@@ -18,11 +18,11 @@ var success = function success(api) {
         console.log(result);
       });
       var id = 1140;
-      var drumid = 4376;
-      var baffelsid = 4390;
-      var cabid = 1111;
-      var consoleid=21;
-      var conbrkid=3447;
+      var drumid = 4319;
+      var baffelsid = 4333;
+      var cabid = 1110;
+      var consoleid=78;
+      var conbrkid=3373;
       // hide lid
       document.getElementById('hide').addEventListener('click', function () {
         api.hide(id);
