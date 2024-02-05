@@ -67,6 +67,10 @@ var success = function success(api) {
         document.getElementById('show4').addEventListener('click', function () {
         api.show(consoleid);
       });
+        // show console bracket
+        document.getElementById('show5').addEventListener('click', function () {
+        api.show(conbrkid);
+      });
     });
   });
 };
