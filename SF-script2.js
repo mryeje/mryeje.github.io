@@ -32,39 +32,39 @@ var success = function success(api) {
 	  
 	  checkbox1.addEventListener('change', function() {
 		if (this.checked) {
-			api.hide(id);
-		} else {
 			api.show(id);
+		} else {
+			api.hide(id);
 		}
 		});
 		checkbox2.addEventListener('change', function() {
 		if (this.checked) {
-			api.hide(drumid);
-			api.hide(baffelsid);
-		} else {
 			api.show(drumid);
 			api.show(baffelsid);
+		} else {
+			api.hide(drumid);
+			api.hide(baffelsid);
 		}
 		});
 		checkbox3.addEventListener('change', function() {
 		if (this.checked) {
-			api.hide(cabid);
-		} else {
 			api.show(cabid);
+		} else {
+			api.hide(cabid);
 		}
 		});
 		checkbox4.addEventListener('change', function() {
 		if (this.checked) {
-			api.hide(consoleid);
-		} else {
 			api.show(consoleid);
+		} else {
+			api.hide(consoleid);
 		}
 		});
 		checkbox5.addEventListener('change', function() {
 		if (this.checked) {
-			api.hide(conbrkid);
-		} else {
 			api.show(conbrkid);
+		} else {
+			api.hide(conbrkid);
 		}
 		});
 	  
@@ -93,23 +93,23 @@ function initGui() {
  buttonsText +=' </tr>';
   buttonsText +=' <tr>';
   buttonsText +='  <td><label class="switch">';
-  buttonsText +='<input id="hidex" name="checkbox1" type="checkbox">';
+  buttonsText +='<input id="hidex" name="checkbox1" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' <td><label class="switch">';
-  buttonsText +='<input id="hide2" name="checkbox2" type="checkbox">';
+  buttonsText +='<input id="hide2" name="checkbox2" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' <td><label class="switch">';
-  buttonsText +='<input id="hide3" name="checkbox3" type="checkbox">';
+  buttonsText +='<input id="hide3" name="checkbox3" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' <td><label class="switch">';
-  buttonsText +='<input id="hide3" name="checkbox4" type="checkbox">';
+  buttonsText +='<input id="hide3" name="checkbox4" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' <td><label class="switch">';
-  buttonsText +='<input id="hide3" name="checkbox5" type="checkbox">';
+  buttonsText +='<input id="hide3" name="checkbox5" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' </tr>';
