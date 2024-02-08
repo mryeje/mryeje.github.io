@@ -3,9 +3,9 @@ var version = '1.12.1';
 var uid = '87af546695994ece90e6406ed05e41c7';
 var iframe = document.getElementById('api-frame');
 var client = new window.Sketchfab(version, iframe);
-var id = 4;
-var uprearid = 54;
-var widthid = 46;
+var id = 272;
+var uprearid = 82;
+var doorid = 4;
 var error = function error() {
   console.error('Sketchfab API error');
 };
@@ -73,7 +73,8 @@ function initGui() {
  buttonsText +='<tr>';
  buttonsText +='<th>Cooktop</th>';
  buttonsText +='<th>Upper Rear cover</th>';
- buttonsText +='<th>     </th>';
+ buttonsText +='<th>Door</th>';
+ buttonsText +='<th>Lower Rear Panel</th>';
 
  buttonsText +=' </tr>';
   buttonsText +=' <tr>';
