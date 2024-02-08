@@ -3,10 +3,10 @@ var version = '1.12.1';
 var uid = '87af546695994ece90e6406ed05e41c7';
 var iframe = document.getElementById('api-frame');
 var client = new window.Sketchfab(version, iframe);
-var id = 49;
+var id = 4;
 //var lenid = 29;
 //var widthid = 46;
-//var error = function error() {
+var error = function error() {
   console.error('Sketchfab API error');
 };
 var success = function success(api) {
@@ -58,7 +58,8 @@ function initGui() {
  buttonsText +=' <table style="width:100%">';
  buttonsText +=' <tr>';
  buttonsText +='  <th>Cooktop</th>';
-
+ buttonsText +='  <th>  </th>';
+ buttonsText +='  <th>  </th>';
  buttonsText +=' </tr>';
   buttonsText +=' <tr>';
   buttonsText +='  <td><label class="switch">';
