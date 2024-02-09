@@ -3,9 +3,10 @@ var version = '1.12.1';
 var uid = '87af546695994ece90e6406ed05e41c7';
 var iframe = document.getElementById('api-frame');
 var client = new window.Sketchfab(version, iframe);
-var id = 272;
-var uprearid = 82;
-var doorid = 4;
+var id = 838;
+var uprearid = 590;
+var lowerid = 605;
+var doorid = 167;
 var error = function error() {
   console.error('Sketchfab API error');
 };
@@ -28,6 +29,7 @@ var success = function success(api) {
 	  var checkbox1 = document.querySelector("input[name=checkbox1]");
 	  var checkbox2 = document.querySelector("input[name=checkbox2]");
 	  var checkbox3 = document.querySelector("input[name=checkbox3]");
+	  var checkbox4 = document.querySelector("input[name=checkbox4]");
 
 	  
 	  checkbox1.addEventListener('change', function() {
@@ -49,6 +51,14 @@ var success = function success(api) {
 			api.show(doorid);
 		} else {
 			api.hide(doorid);
+		}
+		});
+		
+		checkbox4.addEventListener('change', function() {
+		if (this.checked) {
+			api.show(lowerid);
+		} else {
+			api.hide(lowerid);
 		}
 		});
 		
@@ -87,7 +97,11 @@ function initGui() {
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
     buttonsText +='  <td><label class="switch">';
-  buttonsText +='<input id="hide2" name="checkbox3" type="checkbox" checked>';
+  buttonsText +='<input id="hide3" name="checkbox3" type="checkbox" checked>';
+  buttonsText +=' <span class="slider round"></span>';
+  buttonsText +='</label></td>';
+      buttonsText +='  <td><label class="switch">';
+  buttonsText +='<input id="hide4" name="checkbox4" type="checkbox" checked>';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
 
