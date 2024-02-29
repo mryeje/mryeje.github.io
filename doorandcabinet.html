@@ -1,1 +1,104 @@
-<div class="sketchfab-embed-wrapper"> <iframe title="Door and Cabinet" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share width="1280" height="860" src="https://sketchfab.com/models/78d6466c320a419a9fc9fdf6531021a2/embed"> </iframe> <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/door-and-cabinet-78d6466c320a419a9fc9fdf6531021a2?utm_medium=embed&utm_campaign=share-popup&utm_content=78d6466c320a419a9fc9fdf6531021a2" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> Door and Cabinet </a> by <a href="https://sketchfab.com/PTHome?utm_medium=embed&utm_campaign=share-popup&utm_content=78d6466c320a419a9fc9fdf6531021a2" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> PTHome </a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=78d6466c320a419a9fc9fdf6531021a2" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p></div>
+<head>
+  
+
+  <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+	  
+
+<style>
+		.switch {
+		  position: relative;
+		  display: inline-block;
+		  width: 60px;
+		  height: 34px;
+		}
+
+		.switch input { 
+		  opacity: 0;
+		  width: 0;
+		  height: 0;
+		}
+
+		.slider {
+		  position: absolute;
+		  cursor: pointer;
+		  top: 0;
+		  left: 0;
+		  right: 0;
+		  bottom: 0;
+		  background-color: #ccc;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+		}
+
+		.slider:before {
+		  position: absolute;
+		  content: "";
+		  height: 26px;
+		  width: 26px;
+		  left: 4px;
+		  bottom: 4px;
+		  background-color: white;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+		}
+
+		input:checked + .slider {
+		  background-color: #2196F3;
+		}
+
+		input:focus + .slider {
+		  box-shadow: 0 0 1px #2196F3;
+		}
+
+		input:checked + .slider:before {
+		  -webkit-transform: translateX(26px);
+		  -ms-transform: translateX(26px);
+		  transform: translateX(26px);
+		}
+
+		/* Rounded sliders */
+		.slider.round {
+		  border-radius: 34px;
+		}
+
+		.slider.round:before {
+		  border-radius: 50%;
+		}
+		.controls{
+		 position: absolute;
+		 width: 100%;
+		 bottom: 4px;
+		}
+		.iframe-container{
+		  position: relative;
+			width: 100%;
+			flex: 1;
+			display: flex;
+		}
+		#api-frame {
+		  width: 100%;
+		  height: 80vh;
+		  max-width: 100vw;
+		  border: 1;
+		  padding: 0;
+		  margin: 0;
+		  }
+		 #logo{width: 250px;}
+</style>
+</head>
+
+  <body>
+    <div class="container">
+        <div class="iframe-container">
+            <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
+         </div>
+         <div class="controls" id="controls">
+           <pre id="Info"></pre>
+				       
+         </div>
+    
+    </div>
+	<div id="logo"><img src="ps-header-logo.svg"></div>
+  </body>
+
+    <script src="doorcab_script.js"></script>  
