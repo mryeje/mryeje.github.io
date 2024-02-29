@@ -17,53 +17,9 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
-      var id = 14;
-      var drumid = 762;
-      var controlpid = 1376;
-	  var bracketID = 1915;
-     
+
 	  
-	  var checkbox1 = document.querySelector("input[name=checkbox1]");
-	  var checkbox2 = document.querySelector("input[name=checkbox2]");
-	  var checkbox3 = document.querySelector("input[name=checkbox3]");
-	  //var checkbox4 = document.querySelector("input[name=checkbox4]");
-	 // var checkbox5 = document.querySelector("input[name=checkbox5]");
-	  
- checkbox1.addEventListener('change', function() {
-		if (this.checked) {
-			api.show(id);
-			api.hide(drumid);
-			api.hide(controlpid);
-		} else {
-			//api.hide(id);
-			api.show(drumid);
-			api.show(controlpid);
-		}
-		});
-		checkbox2.addEventListener('change', function() {
-		if (this.checked) {
-			api.show(drumid);
-			api.hide(controlpid);
-			api.hide(id);
-		} else {
-			//api.hide(drumid);
-			api.show(id);
-			api.show(controlpid);
-		}
-		});
-			checkbox3.addEventListener('change', function() {
-		if (this.checked) {
-			api.show(controlpid);
-			api.hide(bracketID);
-			api.hide(id);
-			api.hide(drumid);
-		} else {
-			//api.hide(controlpid);
-			api.show(id);
-			api.show(drumid);
-			api.show(bracketID);
-		}
-		});
+
 		
 				  
     });
