@@ -73,8 +73,8 @@ var success = function success(api) {
 client.init(uid, {
   success: success,
   error: error,
-  autostart: 1,
-  preload: 1
+  autostart: 0,
+  preload: 0
 });
 //////////////////////////////////
 // GUI Code
