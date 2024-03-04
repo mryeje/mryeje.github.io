@@ -72,9 +72,16 @@
 		 text-align: center; /* Center the toggle switches */
 		}
 		#orbit {
+			position: fixed;
 			display: block;
 			margin: auto; /* Center the span */
 			width: fit-content; /* Set the width based on the content */
+			top: 0;
+			left: 0;
+			right: 0;
+			text-align: center;
+			z-index: 9999; /* Ensure it appears above other elements */
+			/*visibility: hidden;  Initially hidden */
 			}
 
 		#orbit img {
