@@ -121,6 +121,6 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigat
   
 }else{
   // false for not mobile device
-  //x.style.visibility = 'Hidden';
+  x.style.visibility = 'Hidden';
   document.write("not mobile device");
 }
