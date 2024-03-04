@@ -100,13 +100,24 @@
 		  border: 1;
 		  padding: 0;
 		  margin: 0;
+		}
+	 #message {
+			position: absolute;
+			bottom: 10px; /* Adjust as needed */
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: rgba(255, 255, 255, 0.8);
+			padding: 10px;
+			border-radius: 5px;
+			z-index: 9999;
+			}
 </style>
 </head>
 
   <body>
 	<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
-        <div class="iframe-container">
+        <div class="iframe-container"><div id="message">Click below to see specific section</div>
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
          </div>
          <div class="controls" id="controls">
