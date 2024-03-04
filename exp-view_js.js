@@ -116,7 +116,7 @@ client.init(uid, {
   autostart: 0,
   preload: 1,
   max_texture_size:512,
-  transparent:1,
+  transparent:0,
   ui_watermark:0,
   ui_infos:0,
   ui_inspector:0
