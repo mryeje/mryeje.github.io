@@ -102,6 +102,7 @@ var success = function success(api) {
 			api.show(full_drum);
 			api.show(bracketID);
 			api.hide(console_exp);
+			api.show(door_intact);
 		}
 		});
 		
