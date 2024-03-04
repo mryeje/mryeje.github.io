@@ -74,7 +74,7 @@ client.init(uid, {
   success: success,
   error: error,
   autostart: 0,
-  preload: 0
+  preload: 1
 });
 //////////////////////////////////
 // GUI Code
