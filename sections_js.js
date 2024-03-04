@@ -74,7 +74,12 @@ client.init(uid, {
   success: success,
   error: error,
   autostart: 0,
-  preload: 1
+  preload: 1,
+  max_texture_size:512,
+  transparent:1,
+  ui_watermark:0,
+  ui_infos:0,
+  ui_inspector:0
 });
 //////////////////////////////////
 // GUI Code
