@@ -117,10 +117,10 @@ x=document.getElementById("orbit");
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
   // true for mobile device
   x.style.visibility = 'visible';
-  document.write("mobile device");
+  //document.write("mobile device");
   
 }else{
   // false for not mobile device
   x.style.visibility = 'Hidden';
-  document.write("not mobile device");
+ // document.write("not mobile device");
 }
