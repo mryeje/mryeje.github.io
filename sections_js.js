@@ -82,7 +82,7 @@ client.init(uid, {
 function initGui() {
   var controls = document.getElementById('controls');
   var buttonsText = '';
- buttonsText +='<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>';
+// buttonsText +='<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>';
  buttonsText +=' <table style="width:100%">';
  buttonsText +=' <tr>';
  buttonsText +='  <th>Cabinet & Door Assembly</th>';
