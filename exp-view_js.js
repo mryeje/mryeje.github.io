@@ -119,6 +119,7 @@ client.init(uid, {
   transparent:0,
   ui_watermark:0,
   ui_infos:0,
+  ui_controls:0,
   ui_inspector:0
 });
 
