@@ -17,6 +17,11 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
+	document.getElementById('resetcam').addEventListener('click', function () {
+        api.focusOnVisibleGeometries(function (err) {
+          if (err) return;
+        });
+      });  
       var id = 4;
       var drumid = 972;
       var controlpid = 291;
@@ -108,6 +113,9 @@ function initGui() {
   buttonsText +='<input id="hide3" name="checkbox3" type="checkbox">';
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
+  buttonsText +=' </tr>';
+  buttonsText +=' <tr>';
+  buttonsText += '<td></td><td><button id="resetcam">reset view</button></td>';
   buttonsText +=' </tr>';
   buttonsText +='</table>';
   
