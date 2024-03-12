@@ -20,7 +20,7 @@ var success = function success(api) {
       var id = 4;
       var drumid = 972;
       var controlpid = 291;
-	  var bracketID = 794;
+      var bracketID = 794;
      
 	  
 	  var checkbox1 = document.querySelector("input[name=checkbox1]");
@@ -79,6 +79,7 @@ client.init(uid, {
   transparent:1,
   ui_watermark:0,
   ui_infos:0,
+  ui_controls:0,
   ui_inspector:0
 });
 //////////////////////////////////
