@@ -57,6 +57,7 @@
 		  -webkit-transform: translateX(26px);
 		  -ms-transform: translateX(26px);
 		  transform: translateX(26px);
+	          left: calc(100% - 60px); /* Adjust 30px to half the width of the slider button */
 		}
 
 		/* Rounded sliders */
@@ -141,7 +142,7 @@
   <body>
 	<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
-        <div class="iframe-container"><div id="message">Click below to see a specific section</div>
+        <div class="iframe-container"><div id="message">Click below to isolate a specific section</div>
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
          </div>
          <div class="controls" id="controls">
