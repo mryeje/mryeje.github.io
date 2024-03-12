@@ -4,7 +4,7 @@ var uid = '4e23eadc76844c0ebf6582699c9c25b2';
 var iframe = document.getElementById('api-frame');
 var client = new window.Sketchfab(version, iframe);
 var error = function error() {
-  console.error('Sketchfab API error');
+    console.error('Sketchfab API error');
 };
 var success = function success(api) {
   api.start(function () {
@@ -17,15 +17,27 @@ var success = function success(api) {
         // get the id from that log
         console.log(result);
       });
+	  
 	document.getElementById('resetcam').addEventListener('click', function () {
         api.focusOnVisibleGeometries(function (err) {
           if (err) return;
         });
       });  
-      var id = 4;
-      var drumid = 972;
-      var controlpid = 291;
-      var bracketID = 794;
+	  
+      var cabinet_id = 4;
+      var full_drum = 1674;
+      var controlpid = 993;
+	  var bracketID = 1496;
+	  var door_intact=822;
+	  var door_exp=603;
+	  var blower_exp=2096;
+	  var bulkhead = 2303;
+	  var console_exp=100;
+	  
+	  api.hide(blower_exp);
+	  api.hide(door_exp);
+	  api.hide(console_exp);
+	  
      
 	  
 	  var checkbox1 = document.querySelector("input[name=checkbox1]");
@@ -34,47 +46,83 @@ var success = function success(api) {
 	  //var checkbox4 = document.querySelector("input[name=checkbox4]");
 	 // var checkbox5 = document.querySelector("input[name=checkbox5]");
 	  
- checkbox1.addEventListener('change', function() {
+		checkbox1.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(id);
-			api.hide(drumid);
+			api.show(cabinet_id);
+			api.show(door_exp);
+			api.hide(door_intact);
+			api.hide(full_drum);
+			api.hide(blower_exp);
+			api.hide(bulkhead);
 			api.hide(controlpid);
 			api.hide(bracketID);
+			api.hide(full_drum);
+			api.hide(console_exp);
+			checkbox2.checked = false;
+			checkbox3.checked = false;
 		} else {
-			//api.hide(id);
-			api.show(drumid);
+			//api.hide(cabinet_id);
+			api.show(full_drum);
 			api.show(controlpid);
+			api.hide(door_exp);
+			api.show(door_intact);
+			
 		}
 		});
 		checkbox2.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(drumid);
+			api.show(full_drum);
+			api.hide(bulkhead);
+			api.show(door_exp);
+			api.hide(door_intact);
 			api.hide(controlpid);
-			api.hide(id);
+			api.hide(cabinet_id);
+			api.show(blower_exp);
+			api.hide(door_exp);
+			api.hide(console_exp);
+			checkbox1.checked = false;
+			checkbox3.checked = false;
+			
 		} else {
-			//api.hide(drumid);
-			api.show(id);
+			
+			api.show(cabinet_id);
 			api.show(controlpid);
+			api.show(door_intact);
+			api.hide(blower_exp);
+			
 		}
 		});
 			checkbox3.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(controlpid);
+			api.show(console_exp);
+			api.hide(controlpid);
 			api.hide(bracketID);
-			api.hide(id);
-			api.hide(drumid);
+			api.hide(blower_exp);
+			api.hide(cabinet_id);
+			api.hide(bulkhead);
+			api.hide(full_drum);
+			api.hide(door_exp);
+			api.hide(door_intact);
+			checkbox1.checked = false;
+			checkbox2.checked = false;
 		} else {
 			//api.hide(controlpid);
-			api.show(id);
-			api.show(drumid);
+			api.show(cabinet_id);
+			api.show(controlpid);
+			api.show(full_drum);
 			api.show(bracketID);
+			api.hide(console_exp);
+			api.show(door_intact);
 		}
 		});
 		
 				  
     });
   });
+
 };
+
+
 client.init(uid, {
   success: success,
   error: error,
@@ -84,16 +132,26 @@ client.init(uid, {
   transparent:1,
   ui_watermark:0,
   ui_infos:0,
-  ui_controls:0,
+  ui_controls:1,
+  ui_annotations:1,
+  ui_settings:0,
+  ui_ar_qrcode:0,
+  ui_ar_help:0,
+  ui_help:0,
+  ui_ar:0,
+  ui_vr:0,
+  ui_fullscreen:0,
   ui_inspector:0
 });
+
+
 //////////////////////////////////
 // GUI Code
 //////////////////////////////////
 function initGui() {
   var controls = document.getElementById('controls');
   var buttonsText = '';
-// buttonsText +='<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>';
+  //buttonsText +='<span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>';
  buttonsText +=' <table style="width:100%">';
  buttonsText +=' <tr>';
  buttonsText +='  <th>Cabinet & Door Assembly</th>';
@@ -114,27 +172,26 @@ function initGui() {
   buttonsText +=' <span class="slider round"></span>';
   buttonsText +='</label></td>';
   buttonsText +=' </tr>';
-  buttonsText +=' <tr>';
-  buttonsText += '<td></td><td><button id="resetcam">reset view</button></td>';
-  buttonsText +=' </tr>';
   buttonsText +='</table>';
   
   
   controls.innerHTML = buttonsText;
 }
+function showOrbit() {
+  var x = document.getElementById("orbit");
+  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (isMobile) {
+    x.style.visibility = 'visible';
+  } else {
+    x.style.visibility = 'hidden';
+  }
+}
+
+showOrbit(); // Call the function to initially set the visibility
 initGui();
 
 //////////////////////////////////
 // GUI Code end
 //////////////////////////////////
-x=document.getElementById("orbit");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-  // true for mobile device
-  x.style.visibility = 'visible';
-  //document.write("mobile device");
-  
-}else{
-  // false for not mobile device
-  x.style.visibility = 'Hidden';
- // document.write("not mobile device");
-}
+
