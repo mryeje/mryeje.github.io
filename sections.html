@@ -93,12 +93,7 @@
 		 
 		 top: 82vh; /* Adjust the vertical position as needed */
 		}
-		@media (min-width: 768px) {
-		  .controls {
-			bottom: auto;
-			top: calc(80vh + 10px); /* Adjust this value as needed */
-		  }
-		}
+		
 		#orbit {
 			position: fixed;
 			display: block;
@@ -163,7 +158,7 @@
 			border-radius: 5px;
 			z-index: 9999;
 			}
-		@media only screen and (max-width: 767px) {#hint{left: 10%;}}
+		
 			table {
 			  width: 100%;
 			  border-collapse: collapse;
@@ -188,6 +183,15 @@
 				  border-radius: 5px;
 				  cursor: pointer;
 }
+	@media (min-width: 768px) {
+		  .controls {
+			bottom: auto;
+			top: calc(80vh + 10px); /* Adjust this value as needed */
+		  }
+		   #hint {
+			 left: 10%;
+		   }
+		}
 		  
 </style>
 </head>
