@@ -18,7 +18,11 @@ var success = function success(api) {
         console.log(result);
       });
 	  
-	  
+	document.getElementById('resetcam').addEventListener('click', function () {
+        api.focusOnVisibleGeometries(function (err) {
+          if (err) return;
+        });
+      });  
 	  
       var cabinet_id = 4;
       var full_drum = 1674;
@@ -54,6 +58,8 @@ var success = function success(api) {
 			api.hide(bracketID);
 			api.hide(full_drum);
 			api.hide(console_exp);
+			checkbox2.checked = false;
+			checkbox3.checked = false;
 		} else {
 			//api.hide(cabinet_id);
 			api.show(full_drum);
@@ -74,6 +80,8 @@ var success = function success(api) {
 			api.show(blower_exp);
 			api.hide(door_exp);
 			api.hide(console_exp);
+			checkbox1.checked = false;
+			checkbox3.checked = false;
 			
 		} else {
 			
@@ -95,6 +103,8 @@ var success = function success(api) {
 			api.hide(full_drum);
 			api.hide(door_exp);
 			api.hide(door_intact);
+			checkbox1.checked = false;
+			checkbox2.checked = false;
 		} else {
 			//api.hide(controlpid);
 			api.show(cabinet_id);
@@ -109,17 +119,28 @@ var success = function success(api) {
 				  
     });
   });
+
 };
+
+
 client.init(uid, {
   success: success,
   error: error,
   autostart: 0,
   preload: 1,
   max_texture_size:512,
-  transparent:0,
+  transparent:1,
   ui_watermark:0,
   ui_infos:0,
-  ui_controls:0,
+  ui_controls:1,
+  ui_annotations:1,
+  ui_settings:0,
+  ui_ar_qrcode:0,
+  ui_ar_help:0,
+  ui_help:0,
+  ui_ar:0,
+  ui_vr:0,
+  ui_fullscreen:0,
   ui_inspector:0
 });
 
