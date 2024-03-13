@@ -128,6 +128,11 @@
 		  padding: 0;
 		  margin: 0;
 		  }
+			  @media only screen and (max-width: 767px) {
+            #message {
+                bottom: 25%;
+            }
+        }
 		  #message {
 			position: absolute;
 			bottom: 3%; /* Adjust as needed */
@@ -185,7 +190,7 @@
     <div class="container">
         <div class="iframe-container"><div id="hint">Click here for a list of parts--></div>
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
-         </div><div id="message">Click a slider above to see a specific section</div>
+         </div><div id="message">Click a slider above to isolate a specific section</div>
 		  <button id="resetcam">Reset View</button>
          <div class="controls" id="controls">
            <pre id="Info"></pre>
