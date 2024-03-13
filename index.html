@@ -19,19 +19,19 @@
 		}
 
 		.slider {
-		  position: absolute;
-		  cursor: pointer;
-		  top: 0;
-		  left: 50%; /* Center the slider horizontally */
-		  transform: translateX(-50%); /* Adjust to center the slider */
-		  bottom: 0;
-		  border-radius: 34px;
-		  background-color: #ccc;
-		  -webkit-transition: .4s;
-		  transition: .4s;
-		  width: 40%; /* Set the width to 50% for half coverage */
-		  height: 40px; /* Maintain the desired height */
-		}
+	  position: absolute;
+	  cursor: pointer;
+	  top: 0;
+	  left: 50%; /* Center the slider horizontally */
+	  transform: translateX(-50%); /* Adjust to center the slider */
+	  bottom: 0;
+	  border-radius: 34px;
+	  background-color: #ccc;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	  width: 40%; /* Set the width to 50% for half coverage */
+	  height: 40px; /* Maintain the desired height */
+	}
 		
 		
 
@@ -48,6 +48,11 @@
 		  -webkit-transition: .4s;
 		  transition: .4s;
 		}
+			input:checked + .slider:before {
+			-webkit-transform: translateX(100%);
+			-ms-transform: translateX(100%);
+			transform: translateX(100%);
+	}
 
 		input:checked + .slider {
 		  background-color: #2196F3;
@@ -61,17 +66,22 @@
 		  -webkit-transform: translateX(26px);
 		  -ms-transform: translateX(26px);
 		  transform: translateX(26px);
-	          left: calc(100% - 60px); /* Adjust 30px to half the width of the slider button */
+		  left: calc(100% - 60px); /* Adjust 30px to half the width of the slider button */
+
 		}
+		
+		
 
 		/* Rounded sliders */
 		.slider.round {
 		  border-radius: 34px;
+		  
 		}
 
 		.slider.round:before {
 		  border-radius: 50%;
 		}
+		
 		.controls{
 		 position: absolute;
 		 width: 100%;
@@ -120,12 +130,12 @@
 		  }
 		  #message {
 			position: absolute;
-			bottom: 50px; /* Adjust as needed */
+			bottom: 10px; /* Adjust as needed */
 			left: 50%;
 			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
 			font-size: 18px; /* Adjust the font size as needed */
 			transform: translateX(-50%);
-			background-color: rgba(255, 255, 255, 0.8);
+			background-color:#ccc;
 			padding: 10px;
 			border-radius: 5px;
 			z-index: 9999;
@@ -142,6 +152,19 @@
 			  padding: 8px;
 			  border:none;
 			}
+			#resetcam {
+				  position: absolute;
+				  top: 40%;
+				  left: calc(20% - 75px); /* Adjust as needed */
+				  transform: translateY(-50%);
+				  background-color: #2196F3;
+				  color: white;
+				  font-size: 20px;
+				  padding: 10px 20px;
+				  border: none;
+				  border-radius: 5px;
+				  cursor: pointer;
+}
 		  
 </style>
 </head>
@@ -149,9 +172,10 @@
   <body>
    <span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
-        <div class="iframe-container"><div id="message">Click below to isolate a specific section</div>
+        <div class="iframe-container">
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
-         </div>
+         </div><div id="message">Click above to see a specific section</div>
+		  <button id="resetcam">Reset View</button>
          <div class="controls" id="controls">
            <pre id="Info"></pre>
 		    
