@@ -24,19 +24,12 @@ var success = function success(api) {
         });
       });  
 	  
-      var cabinet_id = 4;
-      var full_drum = 1674;
-      var controlpid = 993;
-	  var bracketID = 1496;
-	  var door_intact=822;
-	  var door_exp=603;
-	  var blower_exp=2096;
-	  var bulkhead = 2303;
-	  var console_exp=100;
+		var id = 4;
+      var drumid = 972;
+      var controlpid = 291;
+	  var bracketID = 794;
 	  
-	  api.hide(blower_exp);
-	  api.hide(door_exp);
-	  api.hide(console_exp);
+	 
 	  
      
 	  
@@ -48,71 +41,71 @@ var success = function success(api) {
 	  
 		checkbox1.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(cabinet_id);
-			api.show(door_exp);
-			api.hide(door_intact);
-			api.hide(full_drum);
-			api.hide(blower_exp);
-			api.hide(bulkhead);
+			api.show(id);
+			//api.show(door_exp);
+			//api.hide(door_intact);
+			api.hide(drumid);
+			//api.hide(blower_exp);
+			//api.hide(bulkhead);
 			api.hide(controlpid);
 			api.hide(bracketID);
-			api.hide(full_drum);
-			api.hide(console_exp);
+			api.hide(drumid);
+			//api.hide(console_exp);
 			checkbox2.checked = false;
 			checkbox3.checked = false;
 		} else {
-			//api.hide(cabinet_id);
-			api.show(full_drum);
+			api.hide(id);
+			api.show(drumid);
 			api.show(controlpid);
-			api.hide(door_exp);
-			api.show(door_intact);
+			//api.hide(door_exp);
+			//api.show(door_intact);
 			
 		}
 		});
 		checkbox2.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(full_drum);
-			api.hide(bulkhead);
-			api.show(door_exp);
-			api.hide(door_intact);
+			api.show(drumid);
+			//api.hide(bulkhead);
+			//api.show(door_exp);
+			//api.hide(door_intact);
 			api.hide(controlpid);
-			api.hide(cabinet_id);
-			api.show(blower_exp);
-			api.hide(door_exp);
-			api.hide(console_exp);
+			api.hide(id);
+			//api.show(blower_exp);
+			//api.hide(door_exp);
+			//api.hide(console_exp);
 			checkbox1.checked = false;
 			checkbox3.checked = false;
 			
 		} else {
 			
-			api.show(cabinet_id);
+			api.show(id);
 			api.show(controlpid);
-			api.show(door_intact);
-			api.hide(blower_exp);
+			//api.show(door_intact);
+			//api.hide(blower_exp);
 			
 		}
 		});
 			checkbox3.addEventListener('change', function() {
 		if (this.checked) {
-			api.show(console_exp);
-			api.hide(controlpid);
-			api.hide(bracketID);
-			api.hide(blower_exp);
-			api.hide(cabinet_id);
-			api.hide(bulkhead);
-			api.hide(full_drum);
-			api.hide(door_exp);
-			api.hide(door_intact);
+			//api.show(console_exp);
+			api.show(controlpid);
+			api.show(bracketID);
+			//api.hide(blower_exp);
+			api.hide(id);
+			//api.hide(bulkhead);
+			api.hide(drumid);
+			//api.hide(door_exp);
+			//api.hide(door_intact);
 			checkbox1.checked = false;
 			checkbox2.checked = false;
 		} else {
 			//api.hide(controlpid);
-			api.show(cabinet_id);
+			api.show(id);
 			api.show(controlpid);
-			api.show(full_drum);
-			api.show(bracketID);
-			api.hide(console_exp);
-			api.show(door_intact);
+			api.show(drumid);
+			//api.hide(bracketID);
+			//api.hide(console_exp);
+			//api.show(door_intact);
 		}
 		});
 		
@@ -194,4 +187,3 @@ initGui();
 //////////////////////////////////
 // GUI Code end
 //////////////////////////////////
-
