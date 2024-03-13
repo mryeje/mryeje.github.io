@@ -140,7 +140,18 @@
 			border-radius: 5px;
 			z-index: 9999;
 			}
-			
+		#hint {
+			position: absolute;
+			bottom: 10px; /* Adjust as needed */
+			left: 30%;
+			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
+			font-size: 18px; /* Adjust the font size as needed */
+			transform: translateX(-50%);
+			background-color:#ccc;
+			padding: 10px;
+			border-radius: 5px;
+			z-index: 9999;
+			}
 			table {
 			  width: 100%;
 			  border-collapse: collapse;
@@ -154,8 +165,8 @@
 			}
 			#resetcam {
 				  position: absolute;
-				  top: 8%;
-				  left: calc(15% - 75px); /* Adjust as needed */
+				  top: 20%;
+				  left: calc(5% - 75px); /* Adjust as needed */
 				  transform: translateY(-50%);
 				  background-color: #2196F3;
 				  color: white;
@@ -172,18 +183,17 @@
   <body>
    <span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
-        <div class="iframe-container">
+        <div class="iframe-container"><div id="hint">Click here for a list of parts--></div>
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
-         </div><div id="message">Click above to isolate a specific section</div>
+         </div><div id="message">Click a slider above to see a specific section</div>
 		  <button id="resetcam">Reset View</button>
          <div class="controls" id="controls">
            <pre id="Info"></pre>
-		    
-		   
-				       
-         </div>
+     </div>
     
     </div>
+	
+  </body>
 	
   </body>
 
