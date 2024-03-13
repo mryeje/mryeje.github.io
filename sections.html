@@ -198,20 +198,43 @@
 </head>
 
   <body>
-   <span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
-        <div class="iframe-container"><div id="hint">Click here for a list of parts--></div>
+        <div class="iframe-container">
+            <div id="hint">Click here for a list of parts--></div>
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
-         </div><div id="message">Click a slider above to isolate a specific section</div>
-		  <button id="resetcam">Reset View</button>
-         <div class="controls" id="controls">
-           <pre id="Info"></pre>
-     </div>
-    
+        </div>
+        <div class="controls" id="controls">
+            <pre id="Info"></pre>
+            <!-- Toggle sliders -->
+            <table style="width:100%">
+                <tr>
+                    <th>Cabinet & Door Assembly</th>
+                    <th>Drum & Motor Assembly</th>
+                    <th>Control panel</th>
+                </tr>
+                <tr>
+                    <td><label class="switch">
+                        <input id="hidex" name="checkbox1" type="checkbox">
+                        <span class="slider round"></span>
+                    </label></td>
+                    <td><label class="switch">
+                        <input id="hide2" name="checkbox2" type="checkbox">
+                        <span class="slider round"></span>
+                    </label></td>
+                    <td><label class="switch">
+                        <input id="hide3" name="checkbox3" type="checkbox">
+                        <span class="slider round"></span>
+                    </label></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Move the message div here -->
+        <div id="message">Click a slider above to see a specific section</div>
     </div>
+    <button id="resetcam">Reset View</button>
 	
   </body>
 	
-  </body>
+  
 
     <script src="sections_js.js"></script>  
