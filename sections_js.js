@@ -54,7 +54,7 @@ var success = function success(api) {
 			checkbox2.checked = false;
 			checkbox3.checked = false;
 		} else {
-			api.hide(id);
+			api.show(id);
 			api.show(drumid);
 			api.show(controlpid);
 			//api.hide(door_exp);
