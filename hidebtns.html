@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hide/Show Sketchfab Models</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hide/Show Sketchfab Models</h1>
+        <div>
+            <label for="hideIds">Enter IDs to Hide (comma-separated):</label>
+            <input type="text" id="hideIds">
+            <button onclick="hideModels()">Hide</button>
+        </div>
+        <div>
+            <label for="showIds">Enter IDs to Show (comma-separated):</label>
+            <input type="text" id="showIds">
+            <button onclick="showModels()">Show</button>
+        </div>
+        <div>
+            <label for="uidInput">Enter Model UID:</label>
+            <input type="text" id="uidInput" placeholder="Enter Model UID">
+            <button onclick="loadModel()">Load Model</button>
+        </div>
+    </div>
+
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+    <script>
+        var version = '1.12.1';
+        var api;
+        var UID = "";
+
+        function hideModels() {
+            var hideIdsInput = document.getElementById('hideIds');
+            var hideIds = hideIdsInput.value.trim().split(',');
+
+            hideIds.forEach(function(id) {
+                api.hide(id.trim());
+            });
+
+            // Clear input field after hiding
+            hideIdsInput.value = '';
+        }
+
+        function showModels() {
+            var showIdsInput = document.getElementById('showIds');
+            var showIds = showIdsInput.value.trim().split(',');
+
+            showIds.forEach(function(id) {
+                api.show(id.trim());
+            });
+
+            // Clear input field after showing
+            showIdsInput.value = '';
+        }
+
+        function loadModel() {
+            var uidInput = document.getElementById('uidInput');
+            UID = uidInput.value.trim();
+            initializeViewer(UID);
+        }
+
+        function initializeViewer(uid) {
+            var iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            document.body.appendChild(iframe);
+            var client = new window.Sketchfab(version, iframe);
+            var error = function error() {
+                console.error('Sketchfab API error');
+            };
+            var success = function success(sketchfabApi) {
+                api = sketchfabApi;
+                api.start();
+            };
+
+            // Initialize Sketchfab client
+            client.init(uid, {
+                success: success,
+                error: error,
+                autostart: 1,
+                preload: 1
+            });
+        }
+    </script>
+</body>
+</html>
