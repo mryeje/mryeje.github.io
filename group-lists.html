@@ -3,157 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Read Text File and Create Hide Buttons</title>
+    <title>Sketchfab Model Information</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f0f0f0;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
-            background-color: #2d2d2d;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 36px;
-            margin: 0;
-        }
-
-        .content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        input[type="file"] {
-            margin-bottom: 20px;
+        input[type="text"] {
+            width: calc(100% - 10px);
             padding: 10px;
-            width: 100%;
+            margin-bottom: 10px;
+            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
         }
 
-        #buttons {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
         button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
             background-color: #007bff;
             color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         button:hover {
             background-color: #0056b3;
         }
 
-        #codeContainer {
+        #mesh-info {
+            margin-top: 20px;
+            padding: 10px;
             background-color: #fff;
-            padding: 20px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        #codeContainer textarea {
-            width: 100%;
-            height: 200px;
-            margin-top: 10px;
+        #mesh-info p {
+            margin: 0;
+            padding: 5px 0;
         }
 
-        #copyButton {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 10px;
+        #dropdown-container {
+            margin-top: 20px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #copyButton:hover {
-            background-color: #0056b3;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Read Text File and Create Hide Buttons</h1>
-        </div>
-        <div class="content">
-            <input type="file" id="fileInput">
-            <div id="buttons"></div>
-            <button id="copyCodeButton">Copy Code</button>
-            <div id="codeContainer">
-                <textarea id="codeTextarea" readonly></textarea>
-                <button id="copyButton">Copy Code</button>
-            </div>
-        </div>
+        <h1>Sketchfab Model Information</h1>
+        <input type="text" id="uidInput" placeholder="Enter Model UID">
+        <button onclick="fetchModelInfo()">Fetch Model Info</button>
+        <div id="mesh-info"></div> <!-- Add a div for displaying mesh info -->
+        <button onclick="saveMeshInfo()">Save Mesh Info</button> <!-- Add button to save mesh info -->
     </div>
 
     <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
     <script>
         var version = '1.12.1';
         var api;
+        var meshGroups;
 
-        // Function to handle file input change
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            var reader = new FileReader();
+        // Function to display mesh IDs for each prefix
+        function displayMeshInfo(sceneGraph) {
+            var meshInfoContainer = document.getElementById('mesh-info');
+            meshInfoContainer.innerHTML = ''; // Clear previous content
+            
+            // Group meshes by prefix
+            meshGroups = {};
+            traverse(sceneGraph, '');
 
-            reader.onload = function(e) {
-                var content = e.target.result;
-                var modelName = file.name.split('.')[0]; // Get model name from file name
-                embedModel(modelName); // Embed model using file name as UID
-                createButtons(content);
-            };
+            function traverse(node, prefix) {
+                // Check if the node represents a mesh
+                if (node.instanceID && node.name) {
+                    var prefixIndex = node.name.indexOf('_');
+                    if (prefixIndex !== -1) {
+                        var groupPrefix = node.name.substring(0, prefixIndex);
+                        if (!meshGroups[groupPrefix]) {
+                            meshGroups[groupPrefix] = [];
+                        }
+                        meshGroups[groupPrefix].push(node.instanceID);
+                    }
+                }
 
-            reader.readAsText(file);
-        });
+                // Traverse child nodes
+                if (node.children) {
+                    node.children.forEach(function(child, index) {
+                        var childPrefix = prefix + '_' + index;
+                        traverse(child, childPrefix);
+                    });
+                }
+            }
 
-        // Function to embed model using Sketchfab API
-        function embedModel(uid) {
-            var iframeContainer = document.createElement('div');
-            iframeContainer.id = 'sketchfab-iframe-container';
-            document.body.appendChild(iframeContainer);
+            // Display mesh IDs for each group
+            for (var prefix in meshGroups) {
+                if (meshGroups.hasOwnProperty(prefix)) {
+                    meshInfoContainer.innerHTML += '<h2>' + prefix + '</h2>';
+                    meshInfoContainer.innerHTML += '<p>' + meshGroups[prefix].join(', ') + '</p>';
+                }
+            }
+        }
 
+        // Function to hide a mesh by ID
+        function hideMesh(id) {
+            api.hide(id);
+        }
+
+        // Function to fetch model information
+        function fetchModelInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
             var iframe = document.createElement('iframe');
             iframe.style.width = '100%';
             iframe.style.height = '600px';
-            iframeContainer.appendChild(iframe);
-
+            document.body.appendChild(iframe);
             var client = new window.Sketchfab(version, iframe);
             var error = function error() {
                 console.error('Sketchfab API error');
             };
             var success = function success(sketchfabApi) {
                 api = sketchfabApi;
-                api.start();
+                api.start(function () {
+                    api.addEventListener('viewerready', function () {
+                        api.getSceneGraph(function (err, result) {
+                            if (err) {
+                                console.log('Error getting nodes');
+                                return;
+                            }
+                            // Display mesh IDs for each prefix
+                            displayMeshInfo(result);
+                        });
+                    });
+                });
             };
 
-            client.init(uid, {
+            // Initialize Sketchfab client
+            client.init(modelUid, {
                 success: success,
                 error: error,
                 autostart: 1,
@@ -161,60 +165,32 @@
             });
         }
 
-        // Function to create hide buttons
-        function createButtons(content) {
-            var buttonContainer = document.getElementById('buttons');
-            buttonContainer.innerHTML = ''; // Clear previous buttons
-            
-            // Split content by lines
-            var lines = content.split('\n');
+        // Function to save mesh info to a text file
+        function saveMeshInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var filename = modelUid + '.txt';
+            var textContent = '';
 
-            lines.forEach(function(line) {
-                // Extract group name and numbers
-                var colonIndex = line.indexOf(':');
-                var groupName = line.substring(0, colonIndex).trim();
-                var numbers = line.substring(colonIndex + 1).trim().split(',');
-
-                // Create button element
-                var button = document.createElement('button');
-                button.textContent = groupName;
-
-                // Add click event listener to hide numbers associated with the group
-                button.addEventListener('click', function() {
-                    hideNumbers(numbers);
-                });
-
-                // Append button to container
-                buttonContainer.appendChild(button);
-            });
-        }
-
-        // Function to hide numbers using Sketchfab API
-        function hideNumbers(numbers) {
-            if (!api) {
-                console.error('Sketchfab API is not initialized.');
-                return;
+            // Construct text content
+            for (var prefix in meshGroups) {
+                if (meshGroups.hasOwnProperty(prefix)) {
+                    textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\n';
+                }
             }
 
-            numbers.forEach(function(number) {
-                var trimmedNumber = number.trim();
-                api.hide(trimmedNumber);
-            });
+            // Create a blob containing the text content
+            var blob = new Blob([textContent], { type: 'text/plain' });
+
+            // Create a link element to trigger the download
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = window.URL.createObjectURL(blob);
+
+            // Trigger the download
+            link.click();
         }
-
-        // Function to copy code to the code container
-        document.getElementById('copyCodeButton').addEventListener('click', function() {
-            var codeTextarea = document.getElementById('codeTextarea');
-            var code = document.documentElement.outerHTML;
-            codeTextarea.value = code;
-        });
-
-        // Function to copy code from the code container
-        document.getElementById('copyButton').addEventListener('click', function() {
-            var codeTextarea = document.getElementById('codeTextarea');
-            codeTextarea.select();
-            document.execCommand('copy');
-        });
     </script>
+
+    <div id="dropdown-container"></div>
 </body>
 </html>
