@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Read Text File and Create Toggle Switches</title>
+    <title>Read Text File and Add buttons</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,6 +37,9 @@
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         input[type="file"] {
@@ -48,72 +51,50 @@
             box-sizing: border-box;
         }
 
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .toggle-label {
-            margin-right: 10px;
-        }
-
-        .toggle-button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            background-color: #ccc;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .toggle-button.active {
-            background-color: #2196F3;
-            color: #fff;
-        }
-
-        .code-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .code-container textarea {
+        .sketchfab-container {
             width: 100%;
-            height: 200px;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
-        .copy-button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        table {
+            border-collapse: collapse; /* Collapse table borders */
+            width: 100%;
         }
 
-        .copy-button:hover {
-            background-color: #0056b3;
+        table td {
+            border: none; /* Remove table cell borders */
+            padding: 5px; /* Add padding for better spacing */
         }
+
+		  .toggle-button {
+		padding: 10px 20px;
+		margin-right: 10px;
+		background-color: #ccc;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		}
+		.toggle-button.active {
+    background-color: #2196F3; /* Change background color for active state */
+    color: #fff; /* Change text color for active state */
+	}
+
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Read Text File and Create Toggle Switches</h1>
+            <h1>Read Text File and Add buttons</h1>
         </div>
         <div class="content">
             <input type="file" id="fileInput">
-            <div id="buttons" class="horizontal"></div>
-            <button class="copy-button" id="copyCodeButton">Copy Code</button>
-            <div class="code-container">
-                <textarea id="codeTextarea" readonly></textarea>
-                <button class="copy-button" id="copyButton">Copy Code</button>
-            </div>
+            <div class="sketchfab-container" id="sketchfabContainer"></div>
+            <table id="buttonTable">
+                <tr>
+                    <!-- Generated buttons will be added here -->
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -141,7 +122,7 @@
         function embedModel(uid) {
             var iframeContainer = document.createElement('div');
             iframeContainer.id = 'sketchfab-iframe-container';
-            document.body.appendChild(iframeContainer);
+            document.getElementById('sketchfabContainer').appendChild(iframeContainer);
 
             var iframe = document.createElement('iframe');
             iframe.style.width = '100%';
@@ -167,8 +148,8 @@
 
         // Function to create toggle buttons
         function createToggleSwitches(content) {
-            var buttonContainer = document.getElementById('buttons');
-            buttonContainer.innerHTML = ''; // Clear previous buttons
+            var buttonTable = document.getElementById('buttonTable');
+            var buttonRow = buttonTable.insertRow(); // Create a new row in the table
             
             // Split content by lines
             var lines = content.split('\n');
@@ -179,18 +160,15 @@
                 var groupName = line.substring(0, colonIndex).trim();
                 var numbers = line.substring(colonIndex + 1).trim().split(',');
 
-                // Create toggle container
-                var toggleContainer = document.createElement('div');
-                toggleContainer.classList.add('toggle-container');
-
+                // Create a new cell for each button
+                var cell = buttonRow.insertCell();
+                
                 // Create button for toggle
                 var toggleButton = document.createElement('button');
                 toggleButton.textContent = groupName;
                 toggleButton.classList.add('toggle-button');
-                toggleContainer.appendChild(toggleButton);
-
-                // Append toggle container to button container
-                buttonContainer.appendChild(toggleContainer);
+                toggleButton.classList.add('active'); // Add 'active' class here
+                cell.appendChild(toggleButton);
 
                 // Add event listener to toggle button
                 toggleButton.addEventListener('click', function() {
@@ -202,6 +180,9 @@
                         hideNumbers(numbers);
                     }
                 });
+
+                // Initially show the numbers
+                showNumbers(numbers);
             });
         }
 
@@ -230,20 +211,6 @@
                 api.show(trimmedNumber);
             });
         }
-
-        // Function to copy code to the code container
-        document.getElementById('copyCodeButton').addEventListener('click', function() {
-            var codeTextarea = document.getElementById('codeTextarea');
-            var code = document.documentElement.outerHTML;
-            codeTextarea.value = code;
-        });
-
-        // Function to copy code from the code container
-        document.getElementById('copyButton').addEventListener('click', function() {
-            var codeTextarea = document.getElementById('codeTextarea');
-            codeTextarea.select();
-            document.execCommand('copy');
-        });
     </script>
 </body>
 </html>
