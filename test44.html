@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sketchfab Model Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .suggestion-box {
+            position: absolute;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        #annotation-count {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sketchfab Model Information</h1>
+        <input type="text" id="uidInput" placeholder="Enter Model UID">
+        <button onclick="fetchModelInfo()">Fetch Model Info</button>
+        <input type="text" id="searchInput" placeholder="Search Parts">
+        <div class="suggestion-box" id="suggestionBox"></div>
+        <div id="annotation-count">Annotations count: <span id="count">0</span></div>
+        <div id="annotation-buttons"></div>
+    </div>
+
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+    <script>
+        var version = '1.12.1';
+        var api;
+        var annotationCount = 0;
+        var annotationsData = [];
+
+        // Function to fetch model information
+        function fetchModelInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            document.body.appendChild(iframe);
+            var client = new window.Sketchfab(version, iframe);
+            var success = function success(sketchfabApi) {
+                api = sketchfabApi;
+                api.start(function () {
+                    api.addEventListener('viewerready', function () {
+                        api.getAnnotationList(function(err, annotations) {
+                            if (!err) {
+                                annotationCount = annotations.length;
+                                document.getElementById('count').textContent = annotationCount;
+                                annotationsData = annotations;
+                            }
+                        });
+                    });
+                });
+            };
+
+            // Initialize Sketchfab client
+            client.init(modelUid, {
+                success: success,
+                autostart: 1,
+                preload: 1
+            });
+        }
+
+        // Function to filter annotations based on search input
+        function filterAnnotations() {
+            var searchInput = document.getElementById('searchInput').value.toLowerCase();
+            var suggestionBox = document.getElementById('suggestionBox');
+            suggestionBox.innerHTML = ''; // Clear previous suggestions
+            var suggestions = annotationsData.filter(function(annotation) {
+                return annotation.name.toLowerCase().includes(searchInput);
+            });
+            suggestions.forEach(function(annotation) {
+                var suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = annotation.name;
+                suggestionItem.onclick = function() {
+                    document.getElementById('searchInput').value = annotation.name;
+                    suggestionBox.innerHTML = ''; // Clear suggestion box after selection
+                    showAnnotationByName(annotation.name);
+                };
+                suggestionBox.appendChild(suggestionItem);
+            });
+        }
+
+        // Function to show annotation by name
+        function showAnnotationByName(annotationName) {
+            var index = annotationsData.findIndex(function(annotation) {
+                return annotation.name === annotationName;
+            });
+            if (index !== -1) {
+                api.showAnnotation(index);
+                createButton(annotationName); // Create a button corresponding to the annotation
+            }
+        }
+
+        // Function to create a button corresponding to the annotation
+        function createButton(annotationName) {
+            var annotationButtons = document.getElementById('annotation-buttons');
+            var button = document.createElement('button');
+            button.textContent = annotationName;
+            button.onclick = function() {
+                showAnnotationByName(annotationName); // Show the annotation when the button is clicked
+            };
+            annotationButtons.appendChild(button);
+        }
+
+        // Event listener for search input
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterAnnotations();
+        });
+    </script>
+</body>
+</html>
