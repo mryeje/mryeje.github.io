@@ -8,10 +8,10 @@ var error = function error() {
 };
 
 var annotationsData = []; // Store annotations data
-var api; // Variable to store the Sketchfab API instance
+var api; // Define api variable
 
-var success = function success(sketchfabApi) {
-    api = sketchfabApi;
+var success = function success(apiInstance) {
+    api = apiInstance; // Assign the api instance to the global variable
     api.start(function () {
         api.addEventListener('viewerready', function () {
             api.getAnnotationList(function (err, annotations) {
@@ -47,55 +47,70 @@ client.init(uid, {
 });
 
 // Function to filter annotations based on search input
-function filterAnnotations() {
+function filterAnnotations(api) {
+    console.log('Filtering annotations...');
     var searchInput = document.getElementById('searchInput').value.toLowerCase();
     var suggestionBox = document.getElementById('suggestionBox');
     suggestionBox.innerHTML = ''; // Clear previous suggestions
-    var suggestions = annotationsData.filter(function (annotation) {
+    var filteredAnnotations = annotationsData.filter(function (annotation) {
         return annotation.name.toLowerCase().includes(searchInput);
     });
-    suggestions.forEach(function (annotation) {
+    filteredAnnotations.forEach(function (annotation, index) {
         var suggestionItem = document.createElement('div');
         suggestionItem.classList.add('suggestion-item');
-        suggestionItem.textContent = annotation.name;
+        suggestionItem.textContent = annotation.name + ' (Annotation ' + (index + 1) + ')';
         suggestionItem.onclick = function () {
+            console.log('Selected annotation:', annotation.name);
             document.getElementById('searchInput').value = annotation.name;
             suggestionBox.innerHTML = ''; // Clear suggestion box after selection
-            showAnnotationByName(annotation.name);
+            gotoAnnotationByName(annotation.name, api); // Pass api object as an argument
+            createButton(annotation.name); // Create button corresponding to the selected annotation
         };
         suggestionBox.appendChild(suggestionItem);
     });
 }
 
-// Function to show annotation by name
-function showAnnotationByName(annotationName) {
+// Function to goto annotation by name
+function gotoAnnotationByName(annotationName, api) {
+    console.log('Navigating to annotation:', annotationName);
     var index = annotationsData.findIndex(function (annotation) {
         return annotation.name === annotationName;
     });
     if (index !== -1) {
-        api.showAnnotation(index);
-        createButton(annotationName); // Create a button corresponding to the annotation
+        api.gotoAnnotation(index, { preventCameraAnimation: false, preventCameraMove: false }, function(err, index) {
+            if (!err) {
+                console.log('Successfully navigated to annotation:', index + 1);
+            } else {
+                console.error('Error navigating to annotation:', err);
+            }
+        });
+    } else {
+        console.error('Annotation not found:', annotationName);
     }
 }
 
 // Function to create a button corresponding to the annotation
 function createButton(annotationName) {
+    console.log('Creating button for annotation:', annotationName);
     var annotationButtons = document.getElementById('annotation-buttons');
     var button = document.createElement('button');
     button.textContent = annotationName;
     button.onclick = function () {
-        showAnnotationByName(annotationName); // Show the annotation when the button is clicked
+        console.log('Button clicked for annotation:', annotationName);
+        gotoAnnotationByName(annotationName, api); // Go to the annotation when the button is clicked
     };
     annotationButtons.appendChild(button);
 }
 
 // Event listener for search input
 document.getElementById('searchInput').addEventListener('input', function () {
-    filterAnnotations();
+    console.log('Search input changed.');
+    filterAnnotations(api); // Pass api object as an argument
 });
 
 // GUI code for generating hide/show buttons
 function initGui() {
+    console.log('Initializing GUI...');
     var controls = document.getElementById('controls');
     var buttonsText = '';
     buttonsText += '<table style="width:100%">';
@@ -121,6 +136,7 @@ function initGui() {
     buttonsText += '</table>';
 
     controls.innerHTML = buttonsText;
+    console.log('GUI initialized.');
 }
 
 // Call the function to initialize GUI
