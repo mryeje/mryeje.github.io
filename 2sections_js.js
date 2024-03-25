@@ -112,6 +112,11 @@ document.getElementById('searchInput').addEventListener('input', function () {
 function initGui() {
     console.log('Initializing GUI...');
     var controls = document.getElementById('controls');
+    if (!controls) {
+        console.error('Controls element not found.');
+        return;
+    }
+
     var buttonsText = '';
     buttonsText += '<table style="width:100%">';
     buttonsText += '<tr>';
@@ -137,35 +142,86 @@ function initGui() {
 
     controls.innerHTML = buttonsText;
     console.log('GUI initialized.');
+
+    // Add event listeners for toggle switches
+    var toggleSwitches = document.querySelectorAll('.switch input[type="checkbox"]');
+    if (toggleSwitches.length === 0) {
+        console.error('Toggle switches not found.');
+        return;
+    }
+
+    toggleSwitches.forEach(function (toggle) {
+        toggle.addEventListener('change', function () {
+            // Reset all toggles to default except the current one
+            document.querySelectorAll('.switch input[type="checkbox"]').forEach(function (otherToggle) {
+                if (otherToggle !== toggle) {
+                    otherToggle.checked = false;
+                }
+            });
+
+            // Perform the corresponding action based on the toggle
+            if (toggle.checked) {
+                // Toggle is checked, perform action
+                var toggleId = toggle.getAttribute('id');
+                var annotationId;
+                switch (toggleId) {
+                    case 'hide1':
+                        annotationId = 4;
+                        break;
+                    case 'hide2':
+                        annotationId = 972;
+                        break;
+                    case 'hide3':
+                        annotationId = 291;
+                        break;
+                    default:
+                        annotationId = null;
+                }
+                if (annotationId !== null) {
+                    api.show(annotationId);
+                }
+            } else {
+                // Toggle is unchecked, perform corresponding action (optional)
+                // For example, if you want to hide the annotation when unchecked
+                var toggleId = toggle.getAttribute('id');
+                var annotationId;
+                switch (toggleId) {
+                    case 'hide1':
+                        annotationId = 4;
+                        break;
+                    case 'hide2':
+                        annotationId = 972;
+                        break;
+                    case 'hide3':
+                        annotationId = 291;
+                        break;
+                    default:
+                        annotationId = null;
+                }
+                if (annotationId !== null) {
+                    api.hide(annotationId);
+                }
+            }
+        });
+    });
+
+    // Event listener for the reset view button
+    var resetViewButton = document.getElementById('resetViewButton');
+    if (resetViewButton) {
+        resetViewButton.addEventListener('click', function () {
+            // Recenter the camera
+            api.recenterCamera(function (err) {
+                if (!err) {
+                    console.log('Camera recentered');
+                } else {
+                    console.error('Error recentering camera:', err);
+                }
+            });
+        });
+    } else {
+        console.error('Reset view button not found.');
+    }
 }
 
 // Call the function to initialize GUI
 initGui();
-
-// Event listeners for original hide/show buttons
-document.getElementById('hide1').addEventListener('change', function () {
-    var id = 4;
-    if (this.checked) {
-        api.show(id);
-    } else {
-        api.hide(id);
-    }
-});
-
-document.getElementById('hide2').addEventListener('change', function () {
-    var drumid = 972;
-    if (this.checked) {
-        api.show(drumid);
-    } else {
-        api.hide(drumid);
-    }
-});
-
-document.getElementById('hide3').addEventListener('change', function () {
-    var controlpid = 291;
-    if (this.checked) {
-        api.show(controlpid);
-    } else {
-        api.hide(controlpid);
-    }
-});
