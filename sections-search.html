@@ -133,25 +133,25 @@
 			bottom: auto;
 			top: calc(80vh + 10px); /* Adjust this value as needed */
 		  }
-		#orbit {
-    position: fixed;
-    display: block;
-    margin: auto; /* Center the span */
-    top: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 9999; /* Ensure it appears above other elements */
-    visibility: hidden; /* Initially hidden */
-}
-
-		#orbit img {
-		    display: inline-block; /* Ensure the images are displayed inline */
-		    max-width: 100%; /* Ensure the images don't exceed their original size */
-		    width: auto; /* Allow the images to adjust their width */
-		    max-height: 80px; /* Set maximum height to maintain consistency */
-		    margin-right: 10px; /* Add some margin between images */
-		}
+			#orbit {
+			    position: fixed;
+			    display: block;
+			    margin: auto; /* Center the span */
+			    top: 0;
+			    left: 0;
+			    right: 0;
+			    text-align: center;
+			    z-index: 9999; /* Ensure it appears above other elements */
+			    visibility: hidden; /* Initially hidden */
+			}
+			
+			#orbit img {
+			    display: inline-block; /* Ensure the images are displayed inline */
+			    width: 20%; /* Set the width to 20% of the viewport width */
+			    max-width: 100%; /* Ensure the images don't exceed their original size */
+			    height: auto; /* Allow the height to adjust proportionally */
+			    margin: 0 5px; /* Add some margin around the images */
+			}
 		#api-frame {
 		  width: 100%;
 		  height: 80vh;
@@ -200,7 +200,7 @@
 				  top: 20%;
 				  left: calc(10% - 50px); /* Adjust as needed */
 				  transform: translateY(-50%);
-				  background-color:blue;
+				  background-color:yellow;
 				  color: white;
 				  font-size: 20px;
 				  padding: 10px 20px;
