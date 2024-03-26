@@ -112,7 +112,7 @@
 		    max-width: 800px;
 		    margin: 20px auto;
 		    padding: 20px;
-		    background-color:#ccc;
+		    background-color:#eee;
 		    border-radius: 5px;
 		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 		}
@@ -128,11 +128,7 @@
 		 
 		 top: 82vh; /* Adjust the vertical position as needed */
 		}
-		@media (min-width: 768px) {
-		  .controls {
-			bottom: auto;
-			top: calc(80vh + 10px); /* Adjust this value as needed */
-		  }
+		
 		#orbit {
 			    position: fixed;
 			    display: block;
@@ -241,7 +237,7 @@
 </head>
 
   <body>
-   
+    <span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
     <div class="container">
         <div class="iframe-container">
             <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
