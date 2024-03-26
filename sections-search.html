@@ -133,27 +133,22 @@
 			bottom: auto;
 			top: calc(80vh + 10px); /* Adjust this value as needed */
 		  }
-		#orbit {
-			position: fixed;
-			display: block;
-			margin: auto; /* Center the span */
-			width: fit-content; /* Set the width based on the content */
-			top: 0;
-			left: 0;
-			right: 0;
-			text-align: center;
-			z-index: 9999; /* Ensure it appears above other elements */
-			visibility: hidden; /* Initially hidden */
+			#orbit {
+		    position: fixed;
+		    display: block;
+		    margin: auto; /* Center the span */
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    text-align: center;
+		    z-index: 9999; /* Ensure it appears above other elements */
+		    visibility: hidden; /* Initially hidden */
 		}
-
+		
 		#orbit img {
-		display: inline-block; /* Ensure the images are displayed inline */
-		}
-		.iframe-container{
-		  position: relative;
-			width: 100%;
-			flex: 1;
-			display: flex;
+		    display: inline-block; /* Ensure the images are displayed inline */
+		    width: 15vw; /* Set the width as a percentage of the viewport width */
+		    max-width: 100%; /* Ensure the images don't exceed their original size */
 		}
 		#api-frame {
 		  width: 100%;
@@ -203,7 +198,7 @@
 				  top: 20%;
 				  left: calc(10% - 50px); /* Adjust as needed */
 				  transform: translateY(-50%);
-				  background-color:#2196F3;
+				  background-color:red;
 				  color: white;
 				  font-size: 20px;
 				  padding: 10px 20px;
