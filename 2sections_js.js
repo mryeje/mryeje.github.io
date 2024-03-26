@@ -58,13 +58,13 @@ function filterAnnotations(api) {
     filteredAnnotations.forEach(function (annotation, index) {
         var suggestionItem = document.createElement('div');
         suggestionItem.classList.add('suggestion-item');
-        suggestionItem.textContent = annotation.name + ' (Annotation ' + (index + 1) + ')';
+        suggestionItem.textContent = annotation.name;
         suggestionItem.onclick = function () {
             console.log('Selected annotation:', annotation.name);
             document.getElementById('searchInput').value = annotation.name;
             suggestionBox.innerHTML = ''; // Clear suggestion box after selection
             gotoAnnotationByName(annotation.name, api); // Pass api object as an argument
-            createButton(annotation.name); // Create button corresponding to the selected annotation
+            //createButton(annotation.name); // Create button corresponding to the selected annotation
         };
         suggestionBox.appendChild(suggestionItem);
     });
