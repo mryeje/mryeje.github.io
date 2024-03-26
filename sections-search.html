@@ -195,28 +195,46 @@
 			  padding: 8px;
 			  border:none;
 			}
-		       @media (max-width: 767px) {
-			  #api-frame {
-			    position: relative; /* Change position to relative */
-			    width: 100%; /* Set width to 100% */
-			    margin-top: 20px; /* Add margin-top to create space below container2 */
-			    top: 0; /* Ensure top is 0 to position it below container2 */
-			    left: 0; /* Ensure left is 0 to align with the left edge */
-			  }
-			}
-			
-			#resetViewButton {
+
+					#resetViewButton {
 				  position: absolute;
 				  top: 20%;
 				  left: calc(10% - 50px); /* Adjust as needed */
 				  transform: translateY(-50%);
-				  background-color:green;
+				  background-color:purple;
 				  color: white;
 				  font-size: 20px;
 				  padding: 10px 20px;
 				  border: none;
 				  border-radius: 5px;
-				  cursor: pointer;
+				  cursor: pointer;}
+			
+					   @media (min-width: 768px) {
+					  .controls {
+						/*bottom: auto;
+						top: calc(80vh + 10px); /* Adjust this value as needed */
+					  }
+					   #hint {
+						 left: 20%;
+					   }
+					 #message {
+						 	position: fixed;
+						 	top: auto;
+							bottom: 8px; /* Adjust as needed */
+					               
+					               
+							color:blue;
+					                left: 50%;
+					                transform: translateX(-50%);
+			            			}
+					}
+				@media screen and (max-device-width: 767px) and (-webkit-min-device-pixel-ratio: 2) {
+			    #message {
+			        bottom: -1vh;
+			    }
+			}
+			
+		
 }
 		  
 </style>
