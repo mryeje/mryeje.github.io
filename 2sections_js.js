@@ -158,6 +158,10 @@ function initGui() {
                     otherToggle.checked = false;
                 }
             });
+			  var Cabid = 4;
+			  var drumid = 972;
+			  var controlpid = 291;
+			  var bracketID = 794;
 
             // Perform the corresponding action based on the toggle
             if (toggle.checked) {
@@ -167,12 +171,24 @@ function initGui() {
                 switch (toggleId) {
                     case 'hide1':
                         annotationId = 4;
+						api.show(Cabid);
+						api.hide(drumid);
+						api.hide(controlpid);
+						api.hide(bracketID);
                         break;
                     case 'hide2':
                         annotationId = 972;
+						api.hide(Cabid);
+						api.show(drumid);
+						api.hide(controlpid);
+						api.hide(bracketID);
                         break;
                     case 'hide3':
                         annotationId = 291;
+						api.hide(Cabid);
+						api.hide(drumid);
+						api.show(controlpid);
+						api.hide(bracketID);
                         break;
                     default:
                         annotationId = null;
@@ -187,13 +203,24 @@ function initGui() {
                 var annotationId;
                 switch (toggleId) {
                     case 'hide1':
-                        annotationId = 4;
+                        api.show(Cabid);
+						api.show(drumid);
+						api.show(controlpid);
+						api.show(bracketID);
                         break;
                     case 'hide2':
                         annotationId = 972;
+						api.show(Cabid);
+						api.show(drumid);
+						api.show(controlpid);
+						api.show(bracketID);
                         break;
                     case 'hide3':
                         annotationId = 291;
+						api.show(Cabid);
+						api.show(drumid);
+						api.show(controlpid);
+						api.show(bracketID);
                         break;
                     default:
                         annotationId = null;
