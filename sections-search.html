@@ -28,67 +28,211 @@
 	
 
 <style>
-	/* Reset default styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+.switch {
+		  position: relative;
+		  display: inline-block;
+		  width: 100%;
+		  height: 34px;
+		}
 
-body {
-    font-family: Arial, sans-serif; /* Use a web-safe font similar to the one on partselect.com */
-    color: #333; /* Adjust the color to match the primary text color of partselect.com */
-    background-color: #f5f5f5; /* Adjust the background color to match partselect.com */
-}
+		.switch input { 
+		  opacity: 0;
+		  width: 0;
+		  height: 0;
+		}
 
-.container2 {
-    position: relative;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff; /* Adjust the background color */
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+		.slider {
+	  position: absolute;
+	  cursor: pointer;
+	  top: 0;
+	  left: 50%; /* Center the slider horizontally */
+	  transform: translateX(-50%); /* Adjust to center the slider */
+	  bottom: 0;
+	  border-radius: 34px;
+	  background-color: #ccc;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	  width: 40%; /* Set the width to 50% for half coverage */
+	  height: 40px; /* Maintain the desired height */
+	}
+		
+		
 
-.container2 input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
+		.slider:before {
+		  position: absolute;
+		  content: "";
+		  height: 26px;
+		  width: 26px;
+		  left: 4px;
+		  bottom: 4px;
+		   /* Added border-radius */
+		  border-radius: 50%;
+		  background-color: white;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+		}
+			input:checked + .slider:before {
+			-webkit-transform: translateX(100%);
+			-ms-transform: translateX(100%);
+			transform: translateX(100%);
+	}
 
-#annotation-count {
-    font-size: 14px;
-    color: #666; /* Adjust text color */
-    margin-bottom: 10px;
-}
+		input:checked + .slider {
+		  background-color: #2196F3;
+		}
 
-#resetViewButton {
-    background-color: #007bff; /* Adjust button background color */
-    color: #fff; /* Adjust button text color */
-    font-size: 16px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-}
+		input:focus + .slider {
+		  box-shadow: 0 0 1px #2196F3;
+		}
 
-#resetViewButton:hover {
-    background-color: #0056b3; /* Adjust button background color on hover */
-}
+		input:checked + .slider:before {
+		  -webkit-transform: translateX(26px);
+		  -ms-transform: translateX(26px);
+		  transform: translateX(26px);
+		  left: calc(100% - 60px); /* Adjust 30px to half the width of the slider button */
 
-/* Adjust other styles as needed */
+		}
+		
+		
 
-/* Media queries for responsiveness */
-@media (min-width: 768px) {
-    .container2 {
-        padding: 30px;
-    }
+		/* Rounded sliders */
+		.slider.round {
+		  border-radius: 34px;
+		  
+		}
+
+		.slider.round:before {
+		  border-radius: 50%;
+		}
+		.container2 {
+		    position: absolute;
+		    top: 5%; /* Position from the top */
+		    left: 50%; /* Position from the left */
+		    transform: translate(-50%, -50%); /* Center horizontally and vertically */
+		    max-width: 800px;
+		    margin: 20px auto;
+		    padding: 20px;
+		    background-color:#eee;
+		    border-radius: 5px;
+		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		}
+		
+		.controls{
+		 position: absolute;
+		 width: 100%;
+		 bottom: 10px;
+		 margin-top: 10px;
+		 text-align: center; /* Center the toggle switches */
+		 bottom: 10px; /* Adjust as needed */
+		 z-index: 9999; /* Ensure it's above other elements */
+		 
+		 top: 82vh; /* Adjust the vertical position as needed */
+		}
+		
+		#orbit {
+			    position: fixed;
+			    display: block;
+			    margin: auto; /* Center the span */
+			    top: 0;
+			    left: 0;
+			    right: 0;
+			    text-align: center;
+			    z-index: 9999; /* Ensure it appears above other elements */
+			    visibility: hidden; /* Initially hidden */
+			}
+			
+			#orbit img {
+			    display: inline-block; /* Ensure the images are displayed inline */
+			    width: 10px; /* Set the width to 50% of the viewport width */
+			    max-width: 100%; /* Ensure the images don't exceed their original size */
+			    height: auto; /* Allow the height to adjust proportionally */
+			    margin: 0 25px; /* Add some margin around the images */
+			}
+		#api-frame {
+		  width: 100%;
+		  height: 80vh;
+		  max-width: 100vw;
+		  border: 1;
+		  padding: 0;
+		  margin: 0;
+		  }
+		  #message {
+			position: absolute;
+			bottom: 2%; /* Adjust as needed */
+			left: 50%;
+			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
+			font-size: 18px; /* Adjust the font size as needed */
+			transform: translateX(-50%);
+			background-color:#ccc;
+			padding: 10px;
+			border-radius: 5px;
+			z-index: 9999;
+			}
+			#hint {
+			position: absolute;
+			bottom: 10px; /* Adjust as needed */
+			left: 30%;
+			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
+			font-size: 18px; /* Adjust the font size as needed */
+			transform: translateX(-50%);
+			background-color:#ccc;
+			padding: 10px;
+			border-radius: 5px;
+			z-index: 9999;
+			}
+			table {
+			  width: 100%;
+			  border-collapse: collapse;
+			}
+
+			th, td {
+			  width: 33.33%; /* Divide by the number of columns for equal width */
+			  text-align: center;
+			  padding: 8px;
+			  border:none;
+			}
+
+					#resetViewButton {
+				  position: absolute;
+				  top: 20%;
+				  left: calc(10% - 50px); /* Adjust as needed */
+				  transform: translateY(-50%);
+				  background-color:purple;
+				  color: white;
+				  font-size: 20px;
+				  padding: 10px 20px;
+				  border: none;
+				  border-radius: 5px;
+				  cursor: pointer;}
+			
+					   @media (min-width: 768px) {
+					  .controls {
+						/*bottom: auto;
+						top: calc(80vh + 10px); /* Adjust this value as needed */
+					  }
+					   #hint {
+						 left: 20%;
+					   }
+					 #message {
+						 	position: fixed;
+						 	top: auto;
+							bottom: 8px; /* Adjust as needed */
+					               
+					               
+							color:blue;
+					                left: 50%;
+					                transform: translateX(-50%);
+			            			}
+					}
+				@media screen and (max-device-width: 767px) and (-webkit-min-device-pixel-ratio: 2) {
+			    #message {
+			        bottom: -1vh;
+			    }
+			}
+			
+		
 }
+		  
 	
 </style>
 </head>
