@@ -4,17 +4,19 @@
   <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
 	
 	
-	<script>// Event listener for search input
-			document.getElementById('searchInput').addEventListener('click', function (event) {
-			    // Check if the device is a mobile device
-			    if (/Mobi|Android/i.test(navigator.userAgent)) {
-			        // Prevent the default behavior on mobile devices
-			        event.preventDefault();
-			
-			        // Focus on the search input field
-			        this.focus();
-			    }
-			});
+	<script>// // Event listener for search input
+		document.getElementById('searchInput').addEventListener('click', function (event) {
+		    // Check if the device is a mobile device
+		    if (/Mobi|Android/i.test(navigator.userAgent)) {
+		        // Prevent the default behavior on mobile devices
+		        event.preventDefault();
+		
+		        // Focus on the search input field after a slight delay (100ms)
+		        setTimeout(function() {
+		            document.getElementById('searchInput').focus();
+		        }, 100);
+		    }
+		});
 	</script>
 	
 
@@ -194,7 +196,7 @@
 				  top: 20%;
 				  left: calc(5% - 50px); /* Adjust as needed */
 				  transform: translateY(-50%);
-				  background-color: purple;
+				  background-color: green;
 				  color: white;
 				  font-size: 20px;
 				  padding: 10px 20px;
