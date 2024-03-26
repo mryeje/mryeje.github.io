@@ -25,6 +25,23 @@ var success = function success(apiInstance) {
     });
 };
 
+// set zoom speed
+client.init(presentationConfig, {
+    success: function onSuccess(api) {
+        api.start(); // Start the viewer
+        api.addEventListener('viewerready', function() {
+            // Access the camera controls
+            var cameraControls = api.getCameraControls();
+
+            // Set the zoom speed (adjust as needed)
+            cameraControls.setZoomSpeed(0.5); // You can adjust the value to control the zoom speed
+        });
+    },
+    error: function onError() {
+        console.log('Viewer error');
+    }
+});
+
 client.init(uid, {
     success: success,
     error: error,
