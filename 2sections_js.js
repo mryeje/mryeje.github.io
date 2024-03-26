@@ -27,44 +27,26 @@ var success = function success(apiInstance) {
 
 
 
-function initializeSketchfabViewer(zoomSpeed) {
-    var iframe = document.getElementById('api-frame');
-    var version = '1.12.1'; // Update to the version you're using
-    var client = new Sketchfab(version, iframe);
-
-    client.init(uid, {
-        success: function onSuccess(api) {
-            api.start(); // Start the viewer
-            api.addEventListener('viewerready', function() {
-                // Access the camera controls
-                var cameraControls = api.getCameraControls();
-
-                // Set the zoom speed
-                cameraControls.setZoomSpeed(zoomSpeed);
-            });
-        },
-        error: function onError() {
-            console.log('Viewer error');
-        },
-        autostart: 0,
-        preload: 1,
-        max_texture_size: 512,
-        transparent: 1,
-        ui_watermark: 0,
-        ui_infos: 0,
-        ui_controls: 1,
-        ui_annotations: 1,
-        ui_settings: 0,
-        ui_ar_qrcode: 0,
-        ui_ar_help: 0,
-        ui_help: 0,
-        ui_ar: 0,
-        ui_vr: 0,
-        ui_fullscreen: 0,
-        ui_inspector: 0
-    });
-}
-initializeSketchfabViewer(.1);
+client.init(uid, {
+    success: success,
+    error: error,
+    autostart: 0,
+    preload: 1,
+    max_texture_size: 512,
+    transparent: 1,
+    ui_watermark: 0,
+    ui_infos: 0,
+    ui_controls: 1,
+    ui_annotations: 1,
+    ui_settings: 0,
+    ui_ar_qrcode: 0,
+    ui_ar_help: 0,
+    ui_help: 0,
+    ui_ar: 0,
+    ui_vr: 0,
+    ui_fullscreen: 0,
+    ui_inspector: 0
+});
 
 // Function to filter annotations based on search input
 function filterAnnotations(api) {
