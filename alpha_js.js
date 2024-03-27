@@ -233,7 +233,6 @@ function initGui() {
             document.querySelectorAll('.switch input[type="checkbox"]').forEach(function (otherToggle) {
                 if (otherToggle !== toggle) {
                     otherToggle.checked = false;
-					showAllAnnotations(api);
                 }
             });
 			  var Cabid = 4;
