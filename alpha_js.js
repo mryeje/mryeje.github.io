@@ -17,7 +17,7 @@ var success = function success(apiInstance) {
             api.getAnnotationList(function (err, annotations) {
                 if (!err) {
                     var annotationCount = annotations.length;
-                    document.getElementById('count').textContent = annotationCount;
+                    //document.getElementById('count').textContent = annotationCount;
                     annotationsData = annotations;
                 }
             });
