@@ -116,13 +116,13 @@ function showSpecificAnnotation(api, annotationIndex, option) {
     var allowedIndices = [];
     switch (option) {
         case 1:
-            allowedIndices = [24, 25, 26, 27, 28];
+            allowedIndices = [23, 24, 25, 26, 27, 28];
             break;
         case 2:
             allowedIndices =  [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
             break;
         case 3:
-            allowedIndices = [1, 2, 20, 21, 22, 25, 29];
+            allowedIndices = [19, 20, 21, 22, 25, 29];
             break;
         default:
             console.error('Invalid option:', option);
