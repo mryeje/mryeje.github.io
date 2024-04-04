@@ -153,36 +153,46 @@
         }
     }
 
-    // Function to filter annotations based on search input
-    function filterAnnotations(api, annotationsData) {
-        console.log('Filtering annotations...');
-        var searchInput = document.getElementById('searchInput');
-        var suggestionBox = document.getElementById('suggestionBox');
+   // Function to filter annotations based on search input and display limited number of suggestions
+function filterAnnotations(api, annotationsData) {
+    console.log('Filtering annotations...');
+    var searchInput = document.getElementById('searchInput');
+    var suggestionBox = document.getElementById('suggestionBox');
 
+    // Function to handle displaying suggestions
+    function displaySuggestions(filteredAnnotations) {
         // Clear previous suggestions
         suggestionBox.innerHTML = '';
 
-        // Event listener for search input change
-        searchInput.addEventListener('input', function() {
-            var searchValue = this.value.toLowerCase();
-            var filteredAnnotations = annotationsData.filter(function(annotation) {
-                return annotation.name.toLowerCase().includes(searchValue);
-            });
+        // Limit the number of suggestions to display
+        const maxSuggestions = 5; // For example, limit to 5 suggestions
 
-            filteredAnnotations.forEach(function(annotation, index) {
-                var suggestionItem = document.createElement('div');
-                suggestionItem.classList.add('suggestion-item');
-                suggestionItem.textContent = annotation.name;
-                suggestionItem.onclick = function() {
-                    console.log('Selected annotation:', annotation.name);
-                    searchInput.value = annotation.name;
-                    suggestionBox.innerHTML = ''; // Clear suggestion box after selection
-                    navigateToAnnotation(annotation.name); // Navigate to the selected annotation
-                };
-                suggestionBox.appendChild(suggestionItem);
-            });
+        // Display limited number of suggestions
+        filteredAnnotations.slice(0, maxSuggestions).forEach(function(annotation, index) {
+            var suggestionItem = document.createElement('div');
+            suggestionItem.classList.add('suggestion-item');
+            suggestionItem.textContent = annotation.name;
+            suggestionItem.onclick = function() {
+                console.log('Selected annotation:', annotation.name);
+                searchInput.value = annotation.name;
+                suggestionBox.innerHTML = ''; // Clear suggestion box after selection
+                navigateToAnnotation(annotation.name); // Navigate to the selected annotation
+            };
+            suggestionBox.appendChild(suggestionItem);
         });
     }
+
+    // Improved event listener for search input change to support continuous search
+    searchInput.addEventListener('input', function() {
+        var searchValue = this.value.toLowerCase();
+        var filteredAnnotations = annotationsData.filter(function(annotation) {
+            return annotation.name.toLowerCase().includes(searchValue);
+        });
+
+        displaySuggestions(filteredAnnotations);
+    });
+}
+
 
     // Function to navigate to the annotation
     function navigateToAnnotation(annotationName) {
