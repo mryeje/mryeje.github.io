@@ -20,7 +20,7 @@
             #viewer-container {
                 width: 100%;
                 max-width: 800px;
-                height: 50%;
+                height: 600px;
                 position: relative;
                 background-color: #ccc; /* Adjust the background color */
                 border-radius: 5px;
@@ -34,7 +34,7 @@
             }
             #partSelect, #searchInput {
                 margin-top: 20px;
-                padding: 10px;
+                padding: 2px;
                 font-size: 16px;
                 width: 100%;
                 border: 1px solid #ccc; /* Add border for input fields */
@@ -69,11 +69,11 @@
             }
               #annotationContainer {
         position: absolute;
-        top: 10%; /* Keep the same vertical position */
+        top: 5%; /* Keep the same vertical position */
         left: 50%; /* Keep the same horizontal position */
         transform: translate(-50%, -50%); /* Center horizontally and vertically */
         max-width: 400px; /* Adjust the max-width as needed */
-        padding: 2px;
+        padding: 50px;
         background-color: #f9f9f9; /* Light gray background */
         border-radius: 10px; /* Rounded corners */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
@@ -130,7 +130,7 @@
     }
 
     // Parts data
-    var parts = {"GLTF": [7], "Cabinet": [8, 9, 68, 69, 83, 84], "Collection": [51, 52, 306, 307, 320, 321], "compressor": [98, 99, 733, 734, 785, 786, 813, 814], "Freezer Door": [112, 113], "Freezer Shelves": [139, 140], "Fridge door": [154, 155, 156], "Fridge shelves": [182, 183, 199, 200, 213, 214, 247, 248, 262, 263, 277, 278], "Refrigeration Unit": [289, 290, 334, 335, 366, 367, 383, 384, 424, 425, 453, 454, 467, 468, 481, 482, 519, 520, 533, 534, 547, 548, 549, 562, 563, 600, 601, 638, 639, 655, 656, 702, 703, 719, 720, 747, 748, 799, 800, 827, 829, 830, 845, 846, 859, 860, 873, 874, 887, 888, 904, 905, 918, 919, 932, 933, 946, 947, 960, 961, 974, 975, 991, 992], "Bone": [843]};
+    var parts = {"Cabinet": [3, 4, 63, 64, 78, 79, 93, 94], "Collection": [46, 47, 365, 366, 379, 380], "Evaporator cover": [108, 109], "Freezer Door": [123, 124], "Freezer Shelves": [150, 151, 165, 166, 180, 181], "Fridge door": [195, 196, 197], "Fridge shelves": [223, 224, 240, 241, 254, 255, 288, 289, 303, 304, 318, 319], "rear cover": [330, 331], "Refrigeration Unit": [348, 349, 393, 394, 425, 426, 442, 443, 483, 484, 512, 513, 526, 527, 540, 541, 578, 579, 595, 596, 609, 610, 623, 624, 637, 638, 684, 685, 701, 702, 729, 730, 781, 782, 809, 810, 823, 824, 840, 841, 854, 855, 856, 869, 870, 907, 908, 945, 946, 959, 960, 973, 974, 987, 988, 1004, 1005, 1018, 1019, 1032, 1033, 1046, 1047], "compressor": [715, 716, 767, 768, 795, 796]};
 
     // Function to populate the dropdown menu
     function populateDropdown() {
@@ -153,7 +153,7 @@
         }
     }
 
-   // Function to filter annotations based on search input and display limited number of suggestions
+    // Function to filter annotations based on search input and display limited number of suggestions
 function filterAnnotations(api, annotationsData) {
     console.log('Filtering annotations...');
     var searchInput = document.getElementById('searchInput');
@@ -273,6 +273,7 @@ function filterAnnotations(api, annotationsData) {
         } else {
             api.hide();
             parts[selectedPart].forEach(hideout);
+            
         }
     });
 
@@ -281,7 +282,7 @@ function filterAnnotations(api, annotationsData) {
         var selectedPart = document.getElementById("partSelect").value;
         if (selectedPart !== "All Parts") {
             api.hide();
-            //showSpecificAnnotation(api, 0,1);
+            showSpecificAnnotation(api, 0,1);
             console.log(selectedPart);
             parts[selectedPart].forEach(hideout);
             switch (selectedPart) {
@@ -291,8 +292,14 @@ function filterAnnotations(api, annotationsData) {
                     case 'Freezer Door':
                       showSpecificAnnotation(api, 0,2);
                         break;
-                    case 'Blower':
+                    case 'Refrigeration Unit':
                         showSpecificAnnotation(api, 0,3);
+                        break;
+                    case 'Fridge shelves':
+                        showSpecificAnnotation(api, 0,4);
+                        break;
+                    case 'Freezer Shelves':
+                        showSpecificAnnotation(api, 0,5);
                         break;
                     default:
                          console.log(selectedPart);}
@@ -311,9 +318,12 @@ function filterAnnotations(api, annotationsData) {
 
     // Reset view button event listener
     document.getElementById('resetViewButton').addEventListener('click', function() {
+        var selectedPart = document.getElementById("partSelect").value;
         api.recenterCamera(function(err) {
             if (!err) {
                 console.log('Camera recentered');
+                showAllAnnotations(api);
+                parts[selectedPart].forEach(showdown);
             } else {
                 console.error('Error recentering camera:', err);
             }
@@ -325,14 +335,20 @@ function showSpecificAnnotation(api, annotationIndex, option) {
     // Define the allowedIndices arrays for each possibility
     var allowedIndices = [];
     switch (option) {
-        case 1:
-            allowedIndices = [2,3,4,5,6,7,8,9,10,11,12,13,14];
+   case 1:
+            allowedIndices = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
             break;
         case 2:
-            allowedIndices =  [0,1,4,5,6,7,8,9,10,11,12,13,14];
+            allowedIndices =  [0,1,4,5,6,7,8,9,10,11,12,13,14,15,16];
             break;
         case 3:
-            allowedIndices = [5,6,7];
+            allowedIndices = [0,1,2,3,4,10,11,12,13,14,15,16];
+            break;
+        case 4:
+            allowedIndices = [0,1,2,3,4,5,6,7,8,9,10,15,16];
+            break;
+        case 5:
+            allowedIndices = [0,1,2,3,4,5,6,7,8,9,10,15];
             break;
         default:
             console.error('Invalid option:', option);
