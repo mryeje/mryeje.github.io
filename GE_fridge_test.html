@@ -286,24 +286,39 @@ function filterAnnotations(api, annotationsData) {
             console.log(selectedPart);
             parts[selectedPart].forEach(hideout);
             switch (selectedPart) {
-                    case 'Fridge door':
-                        showSpecificAnnotation(api, 0,1);
-                        break;
-                    case 'Freezer Door':
-                      showSpecificAnnotation(api, 0,2);
-                        break;
-                    case 'Refrigeration Unit':
-                        showSpecificAnnotation(api, 0,3);
-                        break;
-                    case 'Fridge shelves':
-                        showSpecificAnnotation(api, 0,4);
-                        break;
-                    case 'Freezer Shelves':
-                        showSpecificAnnotation(api, 0,5);
-                        break;
-                    default:
-                         console.log(selectedPart);}
-        }
+							case 'Cabinet':
+								showSpecificAnnotation(api, 0, 1);
+								break;
+							case 'Collection':
+								showSpecificAnnotation(api, 0, 2);
+								break;
+							case 'Evaporator cover':
+								showSpecificAnnotation(api, 0, 3);
+								break;
+							case 'Freezer Door':
+								showSpecificAnnotation(api, 0, 4);
+								break;
+							case 'Freezer Shelves':
+								showSpecificAnnotation(api, 0, 5);
+								break;
+							case 'Fridge door':
+								showSpecificAnnotation(api, 0, 6);
+								break;
+							case 'Fridge shelves':
+								showSpecificAnnotation(api, 0, 7);
+								break;
+							case 'rear cover':
+								showSpecificAnnotation(api, 0, 8);
+								break;
+							case 'Refrigeration Unit':
+								showSpecificAnnotation(api, 0, 9);
+								break;
+							case 'compressor':
+								showSpecificAnnotation(api, 0, 10);
+								break;
+							default:
+								 console.log(selectedPart);}
+							}
     });
 
     // Event listener for show button
@@ -334,26 +349,41 @@ function filterAnnotations(api, annotationsData) {
 function showSpecificAnnotation(api, annotationIndex, option) {
     // Define the allowedIndices arrays for each possibility
     var allowedIndices = [];
-    switch (option) {
-   case 1:
-            allowedIndices = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-            break;
-        case 2:
-            allowedIndices =  [0,1,4,5,6,7,8,9,10,11,12,13,14,15,16];
-            break;
-        case 3:
-            allowedIndices = [0,1,2,3,4,10,11,12,13,14,15,16];
-            break;
-        case 4:
-            allowedIndices = [0,1,2,3,4,5,6,7,8,9,10,15,16];
-            break;
-        case 5:
-            allowedIndices = [0,1,2,3,4,5,6,7,8,9,10,15];
-            break;
-        default:
-            console.error('Invalid option:', option);
-            return; // Exit the function if the option is invalid
-    }
+ switch (option) {
+    case 1:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    case 2:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    case 3:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+        break;
+    case 4:
+        allowedIndices = [1,2,5,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    case 5:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+        break;
+    case 6:
+        allowedIndices = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    case 7:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,16,17];
+        break;
+    case 8:
+        allowedIndices = [1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    case 9:
+        allowedIndices = [1,2,3,4,5,7,9,10,11,12,13,14,15,17];
+        break;
+    case 10:
+        allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+        break;
+    default:
+        console.error('Invalid option:', option);
+        return;
+}
 
     // Ensure that annotationIndex is a valid number
     if (isNaN(annotationIndex) || annotationIndex < 0 || annotationIndex >= allowedIndices.length) {
