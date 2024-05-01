@@ -355,7 +355,7 @@
     }
 
     function navigateToAnnotation(annotationName) {
-        var index = annotationsData.findIndex(annotation == annotationName);
+       var index = annotationsData.findIndex(annotation => annotation.name.toLowerCase() === annotationName.toLowerCase());
         if (index !== -1) {
             api.gotoAnnotation(index, {}, function(err) {
                 if (!err) {
