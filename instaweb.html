@@ -151,14 +151,14 @@
 
             var icon = document.createElement("img");
             icon.className = "icon";
-            icon.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+            icon.src = "/icons/open_eye.png";
             item.appendChild(icon);
 
             (function(selectedPart, iconElement, itemElement) {
                 itemElement.onclick = function() {
                     if (itemElement.classList.contains("selected")) {
                         itemElement.classList.remove("selected");
-                        iconElement.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+                        iconElement.src = "/icons/open_eye.png";
                         parts[selectedPart].forEach(showup);
                     } else {
                         api.hide();
@@ -184,7 +184,7 @@
 
                         parts[selectedPart].forEach(hideout);
                         itemElement.classList.add("selected");
-                        iconElement.src = "C:/Users/jsmith/Blender/User interface/icons/closed-eye.png";
+                        iconElement.src = "/icons/closed-eye.png";
                     }
                 };
             })(part, icon, item);
