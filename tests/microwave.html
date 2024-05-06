@@ -43,7 +43,7 @@
        #searchInput {
             position: absolute;
             top: 25px;
-            right:18%;
+            right:25%;
             width: 35%;
             padding: 3px;
             font-size: 16px;
@@ -66,7 +66,7 @@
         #playIconButton {
             position: absolute;
             top: 16px;
-            left: 67px;
+            left: 70px;
             width: 6.7%;
             cursor: pointer;
             z-index: 1000;
@@ -90,7 +90,7 @@
         #thirdIconButton {
             position: absolute;
             top: 9px;
-            left: 115px;
+            left: 120px;
             width: 8.3%;
             cursor: pointer;
             z-index: 1000;
@@ -172,16 +172,16 @@
 </head>
 <body>
     <div id="viewer-container">
-        <img src="../icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
+        <img src=" /icons/PT_CA_Vert_Logo_595x247_no_artboard.png" id="placeholder-image" alt="Placeholder Image">
         <iframe src="" id="api-frame"></iframe>
-        <img src="../icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+        <img src=" /icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
         <div class="tooltip" style="display: none;"> <!-- Initially hidden -->
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
             <p>Click here to hide a certain part</p>
         </div>
 
-        <img src="../icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
-        <img src="../icons/web-icon.png" id="thirdIconButton" class="icon" draggable="false" title="View this Model online">
+        <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
+        <img src=" /icons/web-icon.png" id="thirdIconButton" class="icon" draggable="false" title="View this Model online">
         <div id="popup-container" style="display:none; position: fixed; top: 25%; left: 29%; width: 42%; height: 42%; background-color: white; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1002;">
             <iframe src="" id="popup-iframe" style="width: 75%; height: 75%; border: none;"></iframe>
             <button id="close-popup" style="position: absolute; top: 5px; right: 5px; background-color: #f00; color: #fff; border: none; cursor: pointer;">X</button>
@@ -194,7 +194,7 @@
     
     <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
     <script type="text/javascript">
-    var parts = {"Base": [3, 4, 35, 36, 61, 62, 95, 96, 124, 125, 156, 157], "Cabinet": [181, 182, 196, 197, 213, 214, 245, 246], "Cabinet right side": [260, 261], "Control Panel": [275, 276], "Door": [290, 291, 307, 308], "Inner box": [322, 323, 340, 341, 355, 356, 373, 374, 402, 403, 434, 435, 460, 461, 486, 487], "Interior": [501, 502, 527, 528, 589, 590, 606, 607, 653, 654, 697, 698, 711, 712, 725, 726, 751, 752, 765, 766, 791, 792, 884, 885, 931, 932, 948, 949, 992, 993, 1004, 1005, 1018, 1019, 1104, 1105, 1121, 1122, 1135, 1136, 1149, 1150], "Motor": [1163, 1164], "Top": [1219, 1220]};
+    var parts = {"Base": [3, 4, 37, 38, 71, 72, 100, 101, 132, 133, 157, 158], "Cabinet": [183, 184, 198, 199, 215, 216, 249, 250], "Cabinet right side": [264, 265], "Control Panel": [279, 280], "Door": [294, 295, 311, 312], "Inner box": [326, 327, 344, 345, 359, 360, 377, 378, 406, 407, 438, 439, 464, 465, 490, 491], "Interior": [505, 506, 531, 532, 593, 594, 610, 611, 657, 658, 701, 702, 715, 716, 729, 730, 755, 756, 769, 770, 795, 796, 895, 896, 942, 943, 959, 960, 1003, 1004, 1015, 1016, 1029, 1030, 1115, 1116, 1132, 1133, 1146, 1147, 1160, 1161], "Motor": [1174, 1175], "Top": [1230, 1231]};
     var menuOpen = false;
 
     function populateMenu() {
@@ -208,52 +208,52 @@
 
             var icon = document.createElement("img");
             icon.className = "icon";
-            icon.src = "../icons/open_eye.png";
+            icon.src = "/icons/open_eye.png";
             item.appendChild(icon);
 
             (function(selectedPart, iconElement, itemElement) {
                 itemElement.onclick = function() {
                     if (itemElement.classList.contains("selected")) {
                         itemElement.classList.remove("selected");
-                        iconElement.src = "../icons/open_eye.png";
+                        iconElement.src = "/icons/open_eye.png";
                         parts[selectedPart].forEach(showup);
                     } else {
                         api.hide();
-                       switch (selectedPart) {
-                                    case 'Base':
-                                        showSpecificAnnotation(api, 0, 1);
-                                        break;
-                                    case 'Cabinet':
-                                        showSpecificAnnotation(api, 0, 2);
-                                        break;
-                                    case 'Cabinet right side':
-                                        showSpecificAnnotation(api, 0, 3);
-                                        break;
-                                    case 'Control Panel':
-                                        showSpecificAnnotation(api, 0, 4);
-                                        break;
-                                    case 'Door':
-                                        showSpecificAnnotation(api, 0, 5);
-                                        break;
-                                    case 'Inner box':
-                                        showSpecificAnnotation(api, 0, 6);
-                                        break;
-                                    case 'Interior':
-                                        showSpecificAnnotation(api, 0, 7);
-                                        break;
-                                    case 'Motor':
-                                        showSpecificAnnotation(api, 0, 8);
-                                        break;
-                                    case 'Top':
-                                        showSpecificAnnotation(api, 0, 9);
-                                        break;
-                                    default:
-                                         console.log(selectedPart);
-                                }
+                      switch (selectedPart) {
+                            case 'Base':
+                                showSpecificAnnotation(api, 0, 1);
+                                break;
+                            case 'Cabinet':
+                                showSpecificAnnotation(api, 0, 2);
+                                break;
+                            case 'Cabinet right side':
+                                showSpecificAnnotation(api, 0, 3);
+                                break;
+                            case 'Control Panel':
+                                showSpecificAnnotation(api, 0, 4);
+                                break;
+                            case 'Door':
+                                showSpecificAnnotation(api, 0, 5);
+                                break;
+                            case 'Inner box':
+                                showSpecificAnnotation(api, 0, 6);
+                                break;
+                            case 'Interior':
+                                showSpecificAnnotation(api, 0, 7);
+                                break;
+                            case 'Motor':
+                                showSpecificAnnotation(api, 0, 8);
+                                break;
+                            case 'Top':
+                                showSpecificAnnotation(api, 0, 9);
+                                break;
+                            default:
+                                 console.log(selectedPart);
+                        }
 
                         parts[selectedPart].forEach(hideout);
                         itemElement.classList.add("selected");
-                        iconElement.src = "../icons/closed-eye.png";
+                        iconElement.src = "/icons/closed-eye.png";
                     }
                 };
             })(part, icon, item);
@@ -279,7 +279,7 @@
   function showSpecificAnnotation(api, annotationIndex, option) {
     var allowedIndices = [];
 
-    switch (option) {
+  switch (option) {
     case 1:
         allowedIndices = [1,2,3,4,5,6,7,8,9,12,13,14,15,16,17,18,19,21,22];
         break;
@@ -359,7 +359,7 @@
             },
             autostart: 0,
             preload: 1,
-            max_texture_size: 2048,
+            max_texture_size: 512,
             transparent: 1,
             ui_watermark: 0,
             ui_infos: 0,
@@ -412,7 +412,7 @@
         document.getElementById("thirdIconButton").addEventListener("click", function() {
             var popup = document.getElementById("popup-container");
             var iframe = document.getElementById("popup-iframe");
-            iframe.src = "https://www.partselect.com/Models/JVM3160DF8BB/";
+            iframe.src = "https://www.partselect.com/Models/GFE26GMKFES/";
             popup.style.display = "block";
         });
         
