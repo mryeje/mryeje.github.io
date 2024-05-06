@@ -123,7 +123,7 @@
             background-color: #fff;
             cursor: pointer;
         }
-            .tooltip {
+                  .tooltip {
             position: absolute;
             top: 12%; /* Position as specified */
             left: 0px; /* Align to the left */
@@ -136,15 +136,17 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
-        .tooltip::before {
+        /* Remove or comment out this entire section if you no longer want the triangle */
+         .tooltip::before {
             content: "";
             position: absolute;
             top: -10px; /* Position it above the tooltip */
-            left: 20px; /* Adjust this to position the triangle relative to the tooltip */
-            border-width: 10px 10px 0 10px; /* Creates an upward pointing triangle */
+            left: 20px; /* Positioning it on the left side */
+            border-width: 0 10px 10px 10px; /* Creates a triangle */
             border-style: solid;
-            border-color: #fbbc29 transparent transparent transparent; /* Top border colored, others transparent */
-        }
+            border-color: transparent transparent #fbbc29 transparent; /* Bottom border is the same color as the tooltip */
+        } 
+
 
 
 
