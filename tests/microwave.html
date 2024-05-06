@@ -126,16 +126,19 @@
             background-color: #fff;
             cursor: pointer;
         }
-          .tooltip {
-        position: relative;
-        display: inline-block;
+        .tooltip {
+        position: absolute;
+        top: 50px; /* Adjust this to position 50px from the top of the iframe */
+        left: 0; /* Start at the left edge of the iframe */
+        display: block; /* Ensure the tooltip is initially visible for positioning */
         border: 1px solid #ccc;
         background-color: #f9f9f9;
         border-radius: 5px;
         padding: 10px;
         text-align: center;
+        z-index: 100; /* Ensure it's above other content */
     }
-
+    
     .tooltip .closebtn {
         position: absolute;
         top: 0;
@@ -143,7 +146,7 @@
         font-size: 20px;
         cursor: pointer;
     }
-
+    
     .tooltip::after {
         content: " ";
         position: absolute;
@@ -152,8 +155,9 @@
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: transparent transparent #f9f9f9 transparent;
+        border-color: #f9f9f9 transparent transparent transparent;
     }
+
         .icon {
             width: 13%;
             margin-right: 5px;
@@ -172,6 +176,15 @@
 </head>
 <body>
     <div id="viewer-container">
+                <div id="viewer-container">
+            <iframe src="" id="api-frame"></iframe>
+            <div class="tooltip">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <p>Click here to hide a certain part</p>
+            </div>
+            <!-- Other elements -->
+        </div>
+
         <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
         <iframe src="" id="api-frame"></iframe>
         <img src=" /icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
