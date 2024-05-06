@@ -181,16 +181,21 @@
     </style>
 </head>
 <body>
- <div id="viewer-container">
+  <div id="viewer-container">
+        <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
+        <iframe src="" id="api-frame"></iframe>
+        <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+                <div class="tooltip" style="display: block;"> <!-- This ensures the tooltip is visible by default -->
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <p>Click here to hide a certain part</p>
+        </div>
     <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
     <iframe src="" id="api-frame"></iframe>
     <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
-    <div class="tooltip" style="display: block;">
+    <div class="tooltip" style="display: block;"> <!-- Tooltip with the new triangle -->
         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
         <p>Click here to hide a certain part</p>
     </div>
-    <!-- Other elements -->
-</div>
 
 
         <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
