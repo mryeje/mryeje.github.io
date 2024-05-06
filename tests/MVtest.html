@@ -123,19 +123,29 @@
             background-color: #fff;
             cursor: pointer;
         }
-                  .tooltip {
+                    .tooltip {
             position: absolute;
-            top: 12%; /* Adjust based on the button's position */
-            left: 0px; /* Position to the left of the button */
-            display: block; /* Make sure it's visible */
-            border: 1px solid #ccc;
-            background-color: #fbbc29;
+            top: 12%; /* Position as specified */
+            left: 0px; /* Align to the left */
+            display: block; /* Visible by default */
+            background-color: #fbbc29; /* Background color as specified */
             border-radius: 5px;
             padding: 10px;
             text-align: center;
-            z-index: 1000;
+            z-index: 1000; /* High z-index to stay on top */
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+
+        .tooltip::before {
+            content: "";
+            position: absolute;
+            top: -10px; /* Position it above the tooltip */
+            left: 20px; /* Positioning it on the left side */
+            border-width: 0 10px 10px 10px; /* Creates a triangle */
+            border-style: solid;
+            border-color: transparent transparent #fbbc29 transparent; /* Bottom border is the same color as the tooltip */
+        }
+
 
         .tooltip .closebtn {
             position: absolute;
