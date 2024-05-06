@@ -123,17 +123,18 @@
             background-color: #fff;
             cursor: pointer;
         }
-               .tooltip {
+                  .tooltip {
             position: absolute;
-            top: 10%; /* Adjust to ensure it's visible 50px from the top */
-            left: 0; /* Align to the left */
-            display: block; /* Visible by default */
+            top: 10px; /* Adjust based on the button's position */
+            left: 75px; /* Position to the left of the button */
+            display: block; /* Make sure it's visible */
             border: 1px solid #ccc;
-            background-color: #fbbc29;
+            background-color: #f9f9f9;
             border-radius: 5px;
             padding: 10px;
             text-align: center;
-            z-index: 1000; /* High z-index to stay on top */
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .tooltip .closebtn {
@@ -143,15 +144,15 @@
             font-size: 20px;
             cursor: pointer;
         }
-        .tooltip::after {
+               .tooltip::after {
             content: "";
             position: absolute;
-            bottom: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
+            top: 50%; /* Center the triangle vertically along the tooltip */
+            right: -10px; /* Negative value to pull it outside the box */
+            margin-top: -5px; /* Shift it up by half its height to center it */
+            border-width: 10px;
             border-style: solid;
-            border-color: #f9f9f9 transparent transparent transparent;
+            border-color: transparent transparent transparent #f9f9f9; /* Right pointing triangle */
         }
         .icon {
             width: 13%;
@@ -171,13 +172,13 @@
 </head>
 <body>
     <div id="viewer-container">
-        <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
-        <iframe src="" id="api-frame"></iframe>
-        <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
-                <div class="tooltip" style="display: block;"> <!-- This ensures the tooltip is visible by default -->
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            <p>Click here to hide a certain part</p>
-        </div>
+    <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
+    <iframe src="" id="api-frame"></iframe>
+    <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+    <div class="tooltip" style="display: block;"> <!-- Tooltip with the new triangle -->
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <p>Click here to hide a certain part</p>
+    </div>
 
         <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
         <img src="/icons/web-icon.png" id="thirdIconButton" class="icon" draggable="false" title="View this Model online">
