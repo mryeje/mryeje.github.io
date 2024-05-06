@@ -175,28 +175,20 @@
     </style>
 </head>
 <body>
-   <div id="viewer-container">
-    <iframe src="" id="api-frame"></iframe>
-    <div class="tooltip">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        <p>Click here to hide a certain part</p>
-    </div>
-
+ <div id="viewer-container">
         <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
         <iframe src="" id="api-frame"></iframe>
-        <img src=" /icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
-        <div class="tooltip" style="display: none;"> <!-- Initially hidden -->
+        <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+        <div class="tooltip" style="display: none;"> <!-- Tooltip added here -->
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
             <p>Click here to hide a certain part</p>
         </div>
-
         <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
-        <img src=" /icons/web-icon.png" id="thirdIconButton" class="icon" draggable="false" title="View this Model online">
+        <img src="/icons/web-icon.png" id="thirdIconButton" class="icon" draggable="false" title="View this Model online">
         <div id="popup-container" style="display:none; position: fixed; top: 25%; left: 29%; width: 42%; height: 42%; background-color: white; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1002;">
             <iframe src="" id="popup-iframe" style="width: 75%; height: 75%; border: none;"></iframe>
             <button id="close-popup" style="position: absolute; top: 5px; right: 5px; background-color: #f00; color: #fff; border: none; cursor: pointer;">X</button>
         </div>
-        
         <div id="partMenuContainer"></div>
         <input type="text" id="searchInput" placeholder="Search Parts">
         <div id="suggestionBox"></div>
