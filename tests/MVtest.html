@@ -123,10 +123,11 @@
             background-color: #fff;
             cursor: pointer;
         }
-                  .tooltip {
-            position: absolute;
+        .tooltip {
+           position: absolute;
             top: 12%; /* Position as specified */
-            left: 0px; /* Align to the left */
+            left: 2%; /* Align to the left */
+            color: white;
             display: block; /* Visible by default */
             background-color: #fbbc29; /* Background color as specified */
             border-radius: 5px;
@@ -138,7 +139,7 @@
         
         /* Remove or comment out this entire section if you no longer want the triangle */
          .tooltip::before {
-            content: "";
+           content: "";
             position: absolute;
             top: -10px; /* Position it above the tooltip */
             left: 20px; /* Positioning it on the left side */
@@ -157,18 +158,10 @@
             top: 0;
             right: 5px;
             font-size: 20px;
+            color: white;
             cursor: pointer;
         }
-               .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 50%; /* Center the triangle vertically along the tooltip */
-            right: -10px; /* Negative value to pull it outside the box */
-            margin-top: -5px; /* Shift it up by half its height to center it */
-            border-width: 10px;
-            border-style: solid;
-            border-color: transparent transparent transparent #f9f9f9; /* Right pointing triangle */
-        }
+             
         .icon {
             width: 13%;
             margin-right: 5px;
