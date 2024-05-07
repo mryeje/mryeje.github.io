@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sketchfab Model Information</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #mesh-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #mesh-info p {
+            margin: 0;
+            padding: 5px 0;
+        }
+
+        #dropdown-container {
+            margin-top: 20px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sketchfab Model Information</h1>
+        <input type="text" id="uidInput" placeholder="Enter Model UID">
+        <button onclick="fetchModelInfo()">Fetch Model Info</button>
+        <div id="mesh-info"></div> <!-- Add a div for displaying mesh info -->
+        <button onclick="saveMeshInfo()">Save Mesh Info</button> <!-- Add button to save mesh info -->
+    </div>
+
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+    <script>
+        var version = '1.12.1';
+        var api;
+        var meshGroups;
+
+        // Function to display mesh IDs for each prefix
+        function displayMeshInfo(sceneGraph) {
+            var meshInfoContainer = document.getElementById('mesh-info');
+            meshInfoContainer.innerHTML = ''; // Clear previous content
+            
+            // Group meshes by prefix
+            meshGroups = {};
+            traverse(sceneGraph, '');
+
+            function traverse(node, prefix) {
+                // Check if the node represents a mesh
+                if (node.instanceID && node.name) {
+                    var prefixIndex = node.name.indexOf('_');
+                    if (prefixIndex !== -1) {
+                        var groupPrefix = node.name.substring(0, prefixIndex);
+                        if (!meshGroups[groupPrefix]) {
+                            meshGroups[groupPrefix] = [];
+                        }
+                        meshGroups[groupPrefix].push(node.instanceID);
+                    }
+                }
+
+                // Traverse child nodes
+                if (node.children) {
+                    node.children.forEach(function(child, index) {
+                        var childPrefix = prefix + '_' + index;
+                        traverse(child, childPrefix);
+                    });
+                }
+            }
+
+            // Display mesh IDs for each group
+            for (var prefix in meshGroups) {
+                if (meshGroups.hasOwnProperty(prefix)) {
+                    meshInfoContainer.innerHTML += '<h2>' + prefix + '</h2>';
+                    meshInfoContainer.innerHTML += '<p>' + meshGroups[prefix].join(', ') + '</p>';
+                }
+            }
+        }
+
+        // Function to hide a mesh by ID
+        function hideMesh(id) {
+            api.hide(id);
+        }
+
+        // Function to fetch model information
+        function fetchModelInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            document.body.appendChild(iframe);
+            var client = new window.Sketchfab(version, iframe);
+            var error = function error() {
+                console.error('Sketchfab API error');
+            };
+            var success = function success(sketchfabApi) {
+                api = sketchfabApi;
+                api.start(function () {
+                    api.addEventListener('viewerready', function () {
+                        api.getSceneGraph(function (err, result) {
+                            if (err) {
+                                console.log('Error getting nodes');
+                                return;
+                            }
+                            // Display mesh IDs for each prefix
+                            displayMeshInfo(result);
+                        });
+                    });
+                });
+            };
+
+            // Initialize Sketchfab client
+            client.init(modelUid, {
+                success: success,
+                error: error,
+                autostart: 1,
+                preload: 1
+            });
+        }
+
+        // Function to save mesh info to a text file
+        function saveMeshInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var filename = modelUid + '.txt';
+            var textContent = '';
+
+            // Construct text content
+            for (var prefix in meshGroups) {
+                if (meshGroups.hasOwnProperty(prefix)) {
+                    textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\n';
+                }
+            }
+
+            // Create a blob containing the text content
+            var blob = new Blob([textContent], { type: 'text/plain' });
+
+            // Create a link element to trigger the download
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = window.URL.createObjectURL(blob);
+
+            // Trigger the download
+            link.click();
+        }
+    </script>
+
+    <div id="dropdown-container"></div>
+</body>
+</html>
