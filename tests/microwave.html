@@ -426,6 +426,15 @@
                 iframe.src = "https://docs.google.com/gview?url=https://partselectca-dsfph5cffxaaesb6.z01.azurefd.net/assets/manuals/EBF4AEBB8D1FC994820343DF54BFFE6BD3BA063D.pdf&embedded=true";
                 popup.style.display = "block";
             });
+            document.getElementById("popup-iframe").onload = function() {
+                // Check if the iframe body is empty
+                if (this.contentDocument && this.contentDocument.body.innerHTML.trim() === "") {
+                    console.error("Failed to load the PDF. Retrying...");
+                    this.src = this.src; // Retry loading the PDF
+                } else {
+                    console.log("PDF loaded successfully.");
+                }
+            };
 
             document.getElementById("close-popup").addEventListener("click", function() {
                 var popup = document.getElementById("popup-container");
