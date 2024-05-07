@@ -126,14 +126,18 @@
             background-color: #fff;
             cursor: pointer;
         }
-          .tooltip {
-        position: relative;
-        display: inline-block;
-        border: 1px solid #ccc;
-        background-color: #f9f9f9;
-        border-radius: 5px;
-        padding: 10px;
-        text-align: center;
+    .tooltip {
+         position: absolute;
+            top: 12%; /* Position as specified */
+            left: 2%; /* Align to the left */
+            color: white;
+            display: block; /* Visible by default */
+            background-color: #fbbc29; /* Background color as specified */
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000; /* High z-index to stay on top */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     .tooltip .closebtn {
@@ -144,16 +148,15 @@
         cursor: pointer;
     }
 
-    .tooltip::after {
-        content: " ";
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent transparent #f9f9f9 transparent;
-    }
+   .tooltip::before {
+            content: "";
+            position: absolute;
+            top: -10px; /* Position it above the tooltip */
+            left: 20px; /* Positioning it on the left side */
+            border-width: 0 10px 10px 10px; /* Creates a triangle */
+            border-style: solid;
+            border-color: transparent transparent #fbbc29 transparent; /* Bottom border is the same color as the tooltip */
+        }
         .icon {
             width: 13%;
             margin-right: 5px;
