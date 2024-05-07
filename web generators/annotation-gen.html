@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dataset Annotations</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            background-color: #9ACD32; /* Yellow Green */
+            color: #8A2BE2; /* Blue Violet */
+            padding: 20px;
+        }
+        input[type="file"] {
+            border: 2px solid #6495ED; /* Cornflower Blue */
+            background-color: #F0E68C; /* Khaki */
+            color: #6495ED;
+            font-weight: bold;
+        }
+        form {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #FFD700; /* Gold */
+            border: 3px dashed #8A2BE2; /* Blue Violet */
+        }
+        div {
+            margin-bottom: 15px;
+        }
+        input, button {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: 16px;
+        }
+        input[type="text"], input[type="number"] {
+            border: 2px solid #6495ED; /* Cornflower Blue */
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        button {
+            border: none;
+            padding: 10px 20px;
+            background-color: #6495ED; /* Cornflower Blue */
+            color: #FFFFFF;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #B0C4DE; /* Light Steel Blue */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="fileInput">
+    <form id="annotationForm">
+        <!-- Dynamic inputs will be generated here -->
+    </form>
+    <div id="results">
+        <!-- Results will be displayed here -->
+    </div>
+    <textarea id="resultFunction" style="width:100%;height:200px;"></textarea>
+    <textarea id="adjustedFunction" style="width:100%;height:200px;"></textarea>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const dataSetNames = content.split('\n').map(line => {
+                    const match = line.match(/^([^:]+):/);
+                    return match ? match[1] : null;
+                }).filter(Boolean);
+
+                generateForm(dataSetNames);
+                generateAdjustedSwitchCases(dataSetNames);
+            };
+            reader.readAsText(file);
+        }
+
+        function generateForm(dataSetNames) {
+            const form = document.getElementById('annotationForm');
+            form.innerHTML = `<div><label for="totalAnnotations">How many annotations in total?</label>
+                                <input type="number" id="totalAnnotations" name="totalAnnotations"></div>`;
+
+            dataSetNames.forEach(name => {
+                form.innerHTML += `<div><label for="${name}">Input comma separated numbers for annotations related to ${name}</label>
+                                    <input type="text" id="${name}" name="${name}"></div>`;
+            });
+
+            form.innerHTML += `<div><button type="submit">Submit</button></div>`;
+            form.onsubmit = handleFormSubmit;
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            const totalAnnotations = parseInt(data.totalAnnotations, 10);
+            delete data.totalAnnotations;
+
+            const totalList = Array.from({ length: totalAnnotations }, (_, i) => i + 1);
+            let unusedNumbersForDatasets = {};
+
+            for (const [name, annotations] of Object.entries(data)) {
+                const usedNumbers = annotations.split(',').map(Number);
+                const unusedNumbers = totalList.filter(n => !usedNumbers.includes(n));
+                unusedNumbersForDatasets[name] = unusedNumbers;
+            }
+
+            displayUnusedNumbers(unusedNumbersForDatasets);
+            generateSwitchCases(unusedNumbersForDatasets);
+        }
+
+        function generateSwitchCases(unusedNumbersForDatasets) {
+            let switchCasesString = "switch (option) {\n";
+            let caseNumber = 1;
+
+            for (const [name, unusedNumbers] of Object.entries(unusedNumbersForDatasets)) {
+                switchCasesString += `    case ${caseNumber}:\n`;
+                switchCasesString += `        allowedIndices = ${JSON.stringify(unusedNumbers)};\n`;
+                switchCasesString += "        break;\n";
+                caseNumber++;
+            }
+
+            switchCasesString += "    default:\n";
+            switchCasesString += "        console.error('Invalid option:', option);\n";
+            switchCasesString += "        return;\n";
+            switchCasesString += "}";
+
+            document.getElementById('resultFunction').value = switchCasesString;
+        }
+
+        function generateAdjustedSwitchCases(dataSetNames) {
+            let switchCasesString = "switch (selectedPart) {\n";
+
+            dataSetNames.forEach((name, index) => {
+                switchCasesString += `    case '${name}':\n`;
+                switchCasesString += `        showSpecificAnnotation(api, 0, ${index + 1});\n`;
+                switchCasesString += "        break;\n";
+            });
+
+            switchCasesString += "    default:\n";
+            switchCasesString += "         console.log(selectedPart);\n";
+            switchCasesString += "}";
+
+            document.getElementById('adjustedFunction').value = switchCasesString;
+        }
+
+        function displayUnusedNumbers(unusedNumbersForDatasets) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            for (const [name, unusedNumbers] of Object.entries(unusedNumbersForDatasets)) {
+                const element = document.createElement('div');
+                element.innerText = `${name} unused numbers: ${unusedNumbers.join(', ')}`;
+                resultsDiv.appendChild(element);
+            }
+        }
+    </script>
+</body>
+</html>

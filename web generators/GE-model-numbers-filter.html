@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Text Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 16px;
+        }
+        button {
+            background-color: #005A9C;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #003D7C;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .title {
+            text-align: center;
+            color: #333;
+        }
+        .urls-list a {
+            display: block;
+            margin-bottom: 5px;
+            color: #005A9C;
+            text-decoration: none;
+        }
+        .urls-list a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="title">PS GE model number purger</h2>
+    <textarea id="inputBox" rows="10" placeholder="Paste your text here..."></textarea><br>
+    <button onclick="convertText()">Convert</button>
+    
+    <textarea id="resultBox" rows="10" placeholder="Filtered Result..."></textarea>
+    <button onclick="removeDuplicates()">Remove Duplicates</button>
+    <textarea id="dedupBox" rows="10" placeholder="Deduplicated Result..."></textarea>
+    <button onclick="generateURLs()">Generate URLs</button>
+    <div id="urlsList" class="urls-list"></div>
+</div>
+
+<script>
+    const englishWords = [
+        'Washer', 'Dryer', 'Dishwasher', 'ELECTRIC', 'DRYER', 'Combo', 'LAUNDRY', 'Gas', 'General Electric', 'Electric', 'Parts',
+        'Model', 'Machine', 'GE', 'Washing', 'Hotpoint', 'Residential', 'HOME', 'COMBO', 'Cooktop', 'Range', 'Counter', 'Unit', 'Top', 'GAS', 'COOKTOP', 
+        'StoveOven', 'DUAL', 'RANGE', 'FUEL', 'Thermador', 'Bosch', 'StoveOven', 'FREESTANDING', 'STANDING', 'StoveOven', 'FREE', 'Dacor', 'DISHWASHER',
+		'WASHER', 'BUILTIN', 'OVEN', 'WMICROWAVE', 'Wall', 'BUILTIN', 'WMICROWAVE', 'Refrigerator', 'Fingerprint', 'Resistant', 'Profile', 'BuiltIn',
+		'Knob', 'Control', 'Touch', 'BuiltIn', 'Monogram', 'BuiltIn', 'Customstyle', 'Professional', 'Smart', 'Dispenser', 'Depth', 'SideBySide', 'Cu Ft',
+		'Caf�', 'Series', 'With', 'MICROWAVE', 'Microwave', 'Advantium', 'BuiltIn', 'Cafe', 'Or', 'HOOD', 'Hood', 'Freestanding', 'Dual Fuel', 'freezer', 'Freezer',
+		'Mount', 'International', 'REBATE', 'MODEL'
+		
+    ];
+
+    const manuf = ['GE', 'Bosch'];
+
+    function convertText() {
+        let text = document.getElementById('inputBox').value;
+        
+        englishWords.forEach(word => {
+            const regex = new RegExp("\\b" + word + "\\b", "g");
+            text = text.replace(regex, '');
+        });
+
+        text = text.replace(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/g, '');
+        text = text.replace(/\s{2,}/g, ' ').trim();
+
+        document.getElementById('resultBox').value = text;
+    }
+
+    function removeDuplicates() {
+        let text = document.getElementById('resultBox').value;
+        let words = text.split(' ');
+        let uniquePrefixes = new Set();
+        let deduplicatedWords = [];
+
+        words.forEach(word => {
+            let prefix = word.substring(0, 3);
+            if (!uniquePrefixes.has(prefix)) {
+                uniquePrefixes.add(prefix);
+                deduplicatedWords.push(word);
+            }
+        });
+
+        document.getElementById('dedupBox').value = deduplicatedWords.join(' ');
+    }
+
+     // Assuming the initial setup remains the same
+
+function generateURLs() {
+    const ge_url = "https://www.geappliances.com/shop?search_query=";
+    const dedupWords = document.getElementById('dedupBox').value.split(/\s+/);
+    const inputText = document.getElementById('inputBox').value;
+    const urlsListDiv = document.getElementById('urlsList');
+
+    // Check if 'General Electric' is mentioned in the input text
+    // This approach checks the entire input text for the substring 'General Electric'
+    const isGEProduct = inputText.includes('General Electric');
+
+    // Clear existing URLs or buttons
+    urlsListDiv.innerHTML = '';
+
+    dedupWords.forEach(word => {
+        if (word.trim() !== '') {
+            if (isGEProduct) {
+                // Generate URLs for GE products
+                const url = ge_url + encodeURIComponent(word);
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = "_blank";
+                link.textContent = url;
+                link.style.textDecoration = "none";
+                
+                link.addEventListener('click', function() {
+                    this.innerHTML += " &#10003;";
+                    this.style.pointerEvents = "none";
+                    this.style.color = "green";
+                });
+                urlsListDiv.appendChild(link);
+            } else {
+                // Create a button for model numbers that copies the word to the clipboard
+                const button = document.createElement('button');
+                button.textContent = word; // Button displays the model number
+                button.style.backgroundColor = "#005A9C"; // Default background color
+                button.onclick = function() {
+                    navigator.clipboard.writeText(word).then(() => {
+                        button.textContent = "Copied: " + word;
+                        button.style.backgroundColor = "gray"; // Button turns gray after click
+                        button.disabled = true; // Disable button to prevent further clicks
+                        setTimeout(() => {
+                            button.textContent = word; // Optionally reset button text
+                            button.style.backgroundColor = "#f0f0f0"; // Optionally reset button color
+                            button.disabled = false; // Re-enable the button
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                };
+                urlsListDiv.appendChild(button);
+            }
+        }
+    });
+}
+
+
+
+
+</script>
+
+</body>
+</html>
