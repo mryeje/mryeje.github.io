@@ -66,7 +66,7 @@
         #playIconButton {
             position: absolute;
             top: 16px;
-            left: 68px;
+            left: 8%;
             width: 6.7%;
             cursor: pointer;
             z-index: 1000;
@@ -180,7 +180,7 @@
                 width: 20%;
             }
             #thirdIconButton { width: 17%; left: 29.5%; }
-            #playIconButton { width: 15%; }
+            #playIconButton { width: 15%; left: 16.5%; }
             #partMenuButton { width: 15%; }
             #searchInput { right:16%;}
             #popup-container {
@@ -281,7 +281,7 @@
 
                         parts[selectedPart].forEach(hideout);
                         itemElement.classList.add("selected");
-                        iconElement.src = "icons/closed-eye.png";
+                        iconElement.src = "/icons/closed-eye.png";
                     }
                 };
             })(part, icon, item);
@@ -379,6 +379,8 @@
                                 filterAnnotations(api, annotations);
                             }
                         });
+                        api.setCameraZoomSpeed(0); // Adjust the zoom speed (0 is slowest, 1 is fastest)
+                        api.setCameraOrbitSpeed(0); // Adjust the orbit speed (0 is slowest, 1 is fastest)
                     });
                 });
             },
@@ -387,7 +389,7 @@
             },
             autostart: 0,
             preload: 1,
-            max_texture_size: 512,
+            max_texture_size: 2048,
             transparent: 1,
             ui_watermark: 0,
             ui_infos: 0,
@@ -419,7 +421,7 @@
             });
         });
 
-        var searchInput = document.getElementById('searchInput');
+          var searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
             var searchValue = this.value.toLowerCase();
             var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
@@ -435,6 +437,18 @@
                 suggestionItem.onclick = () => navigateToAnnotation(annotation.name);
                 suggestionBox.appendChild(suggestionItem);
             });
+
+            // Show or hide suggestion box based on the number of filtered results
+            suggestionBox.style.display = filteredAnnotations.length ? "block" : "none";
+        });
+
+        document.addEventListener('click', function(event) {
+            var searchInput = document.getElementById("searchInput");
+            var suggestionBox = document.getElementById("suggestionBox");
+            
+            if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+                suggestionBox.style.display = "none";
+            }
         });
 
         document.getElementById("thirdIconButton").addEventListener("click", function() {
