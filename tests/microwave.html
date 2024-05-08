@@ -419,7 +419,7 @@
             });
         });
 
-        var searchInput = document.getElementById('searchInput');
+          var searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
             var searchValue = this.value.toLowerCase();
             var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
@@ -435,6 +435,18 @@
                 suggestionItem.onclick = () => navigateToAnnotation(annotation.name);
                 suggestionBox.appendChild(suggestionItem);
             });
+
+            // Show or hide suggestion box based on the number of filtered results
+            suggestionBox.style.display = filteredAnnotations.length ? "block" : "none";
+        });
+
+        document.addEventListener('click', function(event) {
+            var searchInput = document.getElementById("searchInput");
+            var suggestionBox = document.getElementById("suggestionBox");
+            
+            if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+                suggestionBox.style.display = "none";
+            }
         });
 
         document.getElementById("thirdIconButton").addEventListener("click", function() {
