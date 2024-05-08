@@ -357,53 +357,80 @@
 }
 
 
-    window.onload = function() {
-        var placeholder = document.getElementById("placeholder-image");
-        var iframe = document.getElementById("api-frame");
-        iframe.onload = function() {
-            placeholder.style.display = "none";
-        };
-        
-        populateMenu();
+ function getMaxTextureSize() {
+        // Default value
+        let maxTextureSize = 1024;
 
-        var uid = '47e04fc81df94c6489da048516832b1a';
-        var client = new Sketchfab(iframe);
-        client.init(uid, {
-            success: function(apiInstance) {
-                api = apiInstance;
-                api.start(function() {
-                    api.addEventListener('viewerready', function() {
-                        api.getAnnotationList(function(err, annotations) {
-                            if (!err) {
-                                annotationsData = annotations;
-                                filterAnnotations(api, annotations);
-                            }
-                        });
-                        api.setCameraZoomSpeed(0); // Adjust the zoom speed (0 is slowest, 1 is fastest)
-                        api.setCameraOrbitSpeed(0); // Adjust the orbit speed (0 is slowest, 1 is fastest)
+        // Adjust based on device capabilities (adjust values as needed)
+        if (navigator.deviceMemory) {
+            const memory = navigator.deviceMemory;
+            console.log(`Detected device memory: ${memory} GB`);
+            if (memory <= 2) {
+                maxTextureSize = 512; // Low memory devices
+            } else if (memory <= 4) {
+                maxTextureSize = 1024; // Moderate memory devices
+            } else {
+                maxTextureSize = 2048; // High memory devices
+            }
+        } else {
+            // Fallback option based on user agent or screen width
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+            maxTextureSize = isMobile ? 512 : 1024;
+            console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
+        }
+
+        console.log(`Set max_texture_size: ${maxTextureSize}px`);
+        return maxTextureSize;
+    }
+
+
+    window.onload = function() {
+    var placeholder = document.getElementById("placeholder-image");
+    var iframe = document.getElementById("api-frame");
+    iframe.onload = function() {
+        placeholder.style.display = "none";
+    };
+
+    var uid = '47e04fc81df94c6489da048516832b1a'; // Replace with your model UID
+    var maxTextureSize = getMaxTextureSize();
+    var client = new Sketchfab(iframe);
+    client.init(uid, {
+        success: function(apiInstance) {
+            api = apiInstance;
+            api.start(function() {
+                api.addEventListener('viewerready', function() {
+                    api.getAnnotationList(function(err, annotations) {
+                        if (!err) {
+                            annotationsData = annotations;
+                            filterAnnotations(api, annotations);
+                        }
                     });
+                    api.setCameraZoomSpeed(0); // Adjust the zoom speed (0 is slowest, 1 is fastest)
+                    api.setCameraOrbitSpeed(0); // Adjust the orbit speed (0 is slowest, 1 is fastest)
                 });
-            },
-            error: function(err) {
-                console.error('Sketchfab API error:', err);
-            },
-            autostart: 0,
-            preload: 1,
-            max_texture_size: 4096,
-            transparent: 1,
-            ui_watermark: 0,
-            ui_infos: 0,
-            ui_controls: 1,
-            ui_annotations: 1,
-            ui_settings: 0,
-            ui_ar_qrcode: 0,
-            ui_ar_help: 0,
-            ui_help: 0,
-            ui_ar: 0,
-            ui_vr: 0,
-            ui_fullscreen: 0,
-            ui_inspector: 0
-        });
+            });
+        },
+        error: function(err) {
+            console.error('Sketchfab API error:', err);
+        },
+        autostart: 0,
+        preload: 1,
+        max_texture_size: maxTextureSize, // Adjust based on memory
+        transparent: 1,
+        ui_watermark: 0,
+        ui_infos: 0,
+        ui_controls: 1,
+        ui_annotations: 1,
+        ui_settings: 0,
+        ui_ar_qrcode: 0,
+        ui_ar_help: 0,
+        ui_help: 0,
+        ui_ar: 0,
+        ui_vr: 0,
+        ui_fullscreen: 0,
+        ui_inspector: 0
+    });
         
         document.getElementById("partMenuButton").addEventListener("click", function() {
             toggleMenu();
