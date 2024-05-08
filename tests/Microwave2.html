@@ -409,7 +409,7 @@
             toggleMenu();
         });
 
-        document.getElementById("playIconButton").addEventListener("click", function() {
+          document.getElementById("playIconButton").addEventListener("click", function() {
             api.recenterCamera(function(err) {
                 if (!err) {
                     Object.keys(parts).forEach(function(part) {
@@ -417,9 +417,23 @@
                             api.show(item);
                         });
                     });
+                    resetMenu(); // Reset the dropdown menu
                 }
             });
         });
+        
+        function resetMenu() {
+            var menuContainer = document.getElementById("partMenuContainer");
+            var menuItems = menuContainer.getElementsByClassName("menu-item");
+
+            for (var i = 0; i < menuItems.length; i++) {
+                var item = menuItems[i];
+                var icon = item.getElementsByTagName("img")[0];
+                item.classList.remove("selected");
+                icon.src = "/icons/open_eye.png";
+            }
+        }
+
 
           var searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
