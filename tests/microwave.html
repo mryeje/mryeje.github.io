@@ -89,7 +89,7 @@
         }
         #thirdIconButton {
             position: absolute;
-            top: 13px;
+            top: 14px;
             left: 14.2%;
             width: 7.4%;
             cursor: pointer;
@@ -101,14 +101,17 @@
          #thirdIconButton:hover {
            transform: scale(1.1);
         }
-        #suggestionBox {
-         
+             #suggestionBox {
             position: absolute;
             top: 50px;
-            right:20px;
+            right: 20px;
             width: 50%;
-            padding: 3px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 16px;
+            z-index: 1001;
+            display: none;
         }
         .menu-item {
             display: inline-flex;
@@ -180,7 +183,7 @@
                 width: 20%;
             }
             #thirdIconButton { width: 17%; left: 29.5%; }
-            #playIconButton { width: 15%; left: 16.5%; }
+            #playIconButton { width: 15%; left: 16.5%;}
             #partMenuButton { width: 15%; }
             #searchInput { right:16%;}
             #popup-container {
@@ -247,36 +250,24 @@
                         parts[selectedPart].forEach(showup);
                     } else {
                         api.hide();
-                            switch (selectedPart) {
-                            case 'Base':
+                        switch (selectedPart) {
+                            case 'Fridge door':
                                 showSpecificAnnotation(api, 0, 1);
                                 break;
-                            case 'Cabinet':
+                            case 'Freezer Door':
                                 showSpecificAnnotation(api, 0, 2);
                                 break;
-                            case 'Cabinet right side':
+                            case 'Refrigeration Unit':
                                 showSpecificAnnotation(api, 0, 3);
                                 break;
-                            case 'Control Panel':
+                            case 'Fridge shelves':
                                 showSpecificAnnotation(api, 0, 4);
                                 break;
-                            case 'Door':
+                            case 'Freezer Shelves':
                                 showSpecificAnnotation(api, 0, 5);
                                 break;
-                            case 'Inner box':
-                                showSpecificAnnotation(api, 0, 6);
-                                break;
-                            case 'Interior':
-                                showSpecificAnnotation(api, 0, 7);
-                                break;
-                            case 'Motor':
-                                showSpecificAnnotation(api, 0, 8);
-                                break;
-                            case 'Top':
-                                showSpecificAnnotation(api, 0, 9);
-                                break;
                             default:
-                                 console.log(selectedPart);
+                                console.log(selectedPart);
                         }
 
                         parts[selectedPart].forEach(hideout);
@@ -307,38 +298,26 @@
   function showSpecificAnnotation(api, annotationIndex, option) {
     var allowedIndices = [];
 
-          switch (option) {
-          case 1:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,12,13,14,15,16,17,18,19,21,22];
-              break;
-          case 2:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-              break;
-          case 3:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-              break;
-          case 4:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22];
-              break;
-          case 5:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22];
-              break;
-          case 6:
-              allowedIndices = [1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-              break;
-          case 7:
-              allowedIndices = [6,7,8,9,10,11,12,14,16,17,19,20,21,22];
-              break;
-          case 8:
-              allowedIndices = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22];
-              break;
-          case 9:
-              allowedIndices = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-              break;
-          default:
-              console.error('Invalid option:', option);
-              return;
-      }
+    switch (option) {
+        case 1:
+            allowedIndices = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 2:
+            allowedIndices = [0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 3:
+            allowedIndices = [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 4:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16];
+            break;
+        case 5:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15];
+            break;
+        default:
+            console.error('Invalid option:', option);
+            return;
+    }
 
     api.getAnnotationList(function (err, annotations) {
         if (err) {
@@ -356,60 +335,89 @@
     });
 }
 
+   function getMaxTextureSize() {
+        // Default value
+        let maxTextureSize = 512; // Start with 512 as default
+
+        // Adjust based on device capabilities (adjust values as needed)
+        if (navigator.deviceMemory) {
+            const memory = navigator.deviceMemory;
+            console.log(`Detected device memory: ${memory} GB`);
+            if (memory <= 2) {
+                maxTextureSize = 512; // Low memory devices
+            } else if (memory <= 4) {
+                maxTextureSize = 1024; // Moderate memory devices
+            } else if (memory <= 7) {
+                maxTextureSize = 2048; // High memory devices
+            } else {
+                maxTextureSize = 4096; // Very high memory devices (8+ GB)
+            }
+        } else {
+            // Fallback option based on user agent or screen width
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+            maxTextureSize = isMobile ? 512 : 1024;
+            console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
+        }
+
+        console.log(`Set max_texture_size: ${maxTextureSize}px`);
+        return maxTextureSize;
+    }
+
+
+
 
     window.onload = function() {
-        var placeholder = document.getElementById("placeholder-image");
-        var iframe = document.getElementById("api-frame");
-        iframe.onload = function() {
-            placeholder.style.display = "none";
-        };
-        
-        populateMenu();
+    var placeholder = document.getElementById("placeholder-image");
+    var iframe = document.getElementById("api-frame");
+    iframe.onload = function() {
+        placeholder.style.display = "none";
+    };
 
-        var uid = '47e04fc81df94c6489da048516832b1a';
-        var client = new Sketchfab(iframe);
-        client.init(uid, {
-            success: function(apiInstance) {
-                api = apiInstance;
-                api.start(function() {
-                    api.addEventListener('viewerready', function() {
-                        api.getAnnotationList(function(err, annotations) {
-                            if (!err) {
-                                annotationsData = annotations;
-                                filterAnnotations(api, annotations);
-                            }
-                        });
-                        api.setCameraZoomSpeed(0); // Adjust the zoom speed (0 is slowest, 1 is fastest)
-                        api.setCameraOrbitSpeed(0); // Adjust the orbit speed (0 is slowest, 1 is fastest)
+    var uid = '47e04fc81df94c6489da048516832b1a'; // Replace with your model UID
+    var maxTextureSize = getMaxTextureSize();
+    var client = new Sketchfab(iframe);
+    client.init(uid, {
+        success: function(apiInstance) {
+            api = apiInstance;
+            api.start(function() {
+                api.addEventListener('viewerready', function() {
+                    api.getAnnotationList(function(err, annotations) {
+                        if (!err) {
+                            annotationsData = annotations;
+                            filterAnnotations(api, annotations);
+                        }
                     });
+                    
                 });
-            },
-            error: function(err) {
-                console.error('Sketchfab API error:', err);
-            },
-            autostart: 0,
-            preload: 1,
-            max_texture_size: 512,
-            transparent: 1,
-            ui_watermark: 0,
-            ui_infos: 0,
-            ui_controls: 1,
-            ui_annotations: 1,
-            ui_settings: 0,
-            ui_ar_qrcode: 0,
-            ui_ar_help: 0,
-            ui_help: 0,
-            ui_ar: 0,
-            ui_vr: 0,
-            ui_fullscreen: 0,
-            ui_inspector: 0
-        });
-        
+            });
+        },
+        error: function(err) {
+            console.error('Sketchfab API error:', err);
+        },
+        autostart: 0,
+        preload: 1,
+        max_texture_size: maxTextureSize, // Adjust based on memory
+        transparent: 1,
+        ui_watermark: 0,
+        ui_infos: 0,
+        ui_controls: 1,
+        ui_annotations: 1,
+        ui_settings: 0,
+        ui_ar_qrcode: 0,
+        ui_ar_help: 0,
+        ui_help: 0,
+        ui_ar: 0,
+        ui_vr: 0,
+        ui_fullscreen: 0,
+        ui_inspector: 0
+    });
+        populateMenu();
         document.getElementById("partMenuButton").addEventListener("click", function() {
             toggleMenu();
         });
 
-           document.getElementById("playIconButton").addEventListener("click", function() {
+        document.getElementById("playIconButton").addEventListener("click", function() {
             api.recenterCamera(function(err) {
                 if (!err) {
                     Object.keys(parts).forEach(function(part) {
@@ -434,8 +442,9 @@
             }
         }
 
+        
 
-          var searchInput = document.getElementById('searchInput');
+               var searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
             var searchValue = this.value.toLowerCase();
             var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
@@ -464,7 +473,6 @@
                 suggestionBox.style.display = "none";
             }
         });
-
         document.getElementById("thirdIconButton").addEventListener("click", function() {
             var popup = document.getElementById("popup-container");
             var iframe = document.getElementById("popup-iframe");
