@@ -357,32 +357,33 @@
 }
 
 
- function getMaxTextureSize() {
-    // Default value
-    let maxTextureSize = 512; // Start with 512 as default
+function getMaxTextureSize() {
+        // Default value
+        let maxTextureSize = 512; // Start with 512 as default
 
-    // Adjust based on device capabilities (adjust values as needed)
-    if (navigator.deviceMemory) {
-        const memory = navigator.deviceMemory;
-        console.log(`Detected device memory: ${memory} GB`);
-        if (memory <= 2) {
-            maxTextureSize = 512; // Low memory devices
-        } else if (memory <= 4) {
-            maxTextureSize = 1024; // Moderate memory devices
+        // Adjust based on device capabilities (adjust values as needed)
+        if (navigator.deviceMemory) {
+            const memory = navigator.deviceMemory;
+            console.log(`Detected device memory: ${memory} GB`);
+            if (memory <= 2) {
+                maxTextureSize = 512; // Low memory devices
+            } else if (memory <= 4) {
+                maxTextureSize = 1024; // Moderate memory devices
+            } else {
+                maxTextureSize = 2048; // High memory devices
+            }
         } else {
-            maxTextureSize = 2048; // High memory devices
+            // Fallback option based on user agent or screen width
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+            maxTextureSize = isMobile ? 512 : 1024;
+            console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
         }
-    } else {
-        // Fallback option based on user agent or screen width
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
-        maxTextureSize = isMobile ? 512 : 1024;
-        console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
+
+        console.log(`Set max_texture_size: ${maxTextureSize}px`);
+        return maxTextureSize;
     }
 
-    console.log(`Set max_texture_size: ${maxTextureSize}px`);
-    return maxTextureSize;
-}
 
 
     window.onload = function() {
