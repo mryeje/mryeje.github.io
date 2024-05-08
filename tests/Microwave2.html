@@ -335,7 +335,7 @@
     });
 }
 
-    function getMaxTextureSize() {
+   function getMaxTextureSize() {
         // Default value
         let maxTextureSize = 512; // Start with 512 as default
 
@@ -347,8 +347,10 @@
                 maxTextureSize = 512; // Low memory devices
             } else if (memory <= 4) {
                 maxTextureSize = 1024; // Moderate memory devices
-            } else {
+            } else if (memory <= 7) {
                 maxTextureSize = 2048; // High memory devices
+            } else {
+                maxTextureSize = 4096; // Very high memory devices (8+ GB)
             }
         } else {
             // Fallback option based on user agent or screen width
@@ -361,6 +363,7 @@
         console.log(`Set max_texture_size: ${maxTextureSize}px`);
         return maxTextureSize;
     }
+
 
 
 
