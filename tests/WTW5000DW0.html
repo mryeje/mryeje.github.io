@@ -42,7 +42,7 @@
         #searchInput {
             position: absolute;
             top: 25px;
-            right:25%;
+            right: 25%;
             width: 35%;
             padding: 3px;
             font-size: 16px;
@@ -169,8 +169,9 @@
     <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
     <script type="text/javascript">
     var parts = {"Belt Cover": [51, 52], "Cabinet": [68, 69], "Console Cover": [115, 116], "Gear Box": [127, 128, 144, 145], "Inner Tub": [176, 177], "main": [205, 206, 233, 234, 310, 311, 324, 325, 338, 339, 370, 371, 384, 385, 446, 447, 472, 473, 486, 487, 500, 501, 514, 515, 531, 532, 572, 573, 586, 587, 600, 601, 614, 615, 628, 629, 654, 655, 680, 681, 766, 767], "Lid": [219, 220], "Outer Tub": [780, 781, 794, 795], "Top": [808, 809, 837, 838, 934, 935, 999, 1000, 1016, 1017, 1042, 1043, 1068, 1069, 1094, 1095, 1120, 1121], "Washing Plate": [1134, 1135]};
-    var uid = '46cd9efe0afc421f93e0bd25f138f59b'; // Dynamically set the model UID based on the file name
+    var uid = '6a756a8f0234499fba0e5f3def383971'; // Dynamically set the model UID based on the file name
     var menuOpen = false;
+    var annotationsData = [];
     var api;
 
     function populateMenu() {
@@ -388,7 +389,7 @@
         document.getElementById("thirdIconButton").addEventListener("click", function() {
             var popup = document.getElementById("popup-container");
             var iframe = document.getElementById("popup-iframe");
-            iframe.src = "https://docs.google.com/gview?url=https://mryeje.github.io/tests/1310472L.pdf&embedded=true";
+            iframe.src = "https://docs.google.com/gview?url=https://partselectca-dsfph5cffxaaesb6.z01.azurefd.net/assets/manuals/EBF4AEBB8D1FC994820343DF54BFFE6BD3BA063D.pdf&embedded=true";
             popup.style.display = "block";
         });
 
@@ -406,6 +407,35 @@
             var iframe = document.getElementById("popup-iframe");
             popup.style.display = "none";
             iframe.src = "";
+        });
+
+        var searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+            var searchValue = this.value.toLowerCase();
+            var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
+
+            var suggestionBox = document.getElementById('suggestionBox');
+            suggestionBox.innerHTML = '';
+
+            const maxSuggestions = 5;
+            filteredAnnotations.slice(0, maxSuggestions).forEach(annotation => {
+                var suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = annotation.name;
+                suggestionItem.onclick = () => navigateToAnnotation(annotation.name);
+                suggestionBox.appendChild(suggestionItem);
+            });
+
+            suggestionBox.style.display = filteredAnnotations.length ? "block" : "none";
+        });
+
+        document.addEventListener('click', function(event) {
+            var searchInput = document.getElementById("searchInput");
+            var suggestionBox = document.getElementById("suggestionBox");
+
+            if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+                suggestionBox.style.display = "none";
+            }
         });
     };
 
