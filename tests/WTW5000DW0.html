@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <title>Sketchfab Viewer API Example</title>
     <style>
@@ -39,10 +40,10 @@
             transform: translate(-50%, -50%);
             z-index: 1;
         }
-        #searchInput {
+       #searchInput {
             position: absolute;
             top: 25px;
-            right: 25%;
+            right:25%;
             width: 35%;
             padding: 3px;
             font-size: 16px;
@@ -56,10 +57,10 @@
             z-index: 1000;
             transition: all 0.3s ease;
         }
-        #partMenuButton:hover, #playIconButton:hover, #thirdIconButton:hover {
-            transform: scale(1.1);
+        #partMenuButton:hover, #playIconButton:hover {
+           transform: scale(1.1);
         }
-        #partMenuButton:active, #playIconButton:active, #thirdIconButton:active {
+        #partMenuButton:active, #playIconButton:active {
             transform: scale(0.9);
         }
         #playIconButton {
@@ -70,13 +71,9 @@
             cursor: pointer;
             z-index: 1000;
         }
-        #thirdIconButton {
-            position: absolute;
-            top: 14px;
-            left: 14.2%;
-            width: 7.4%;
-            cursor: pointer;
-            z-index: 1000;
+        #partMenuIcon {
+            width: 20px;
+            height: 20px;
         }
         #partMenuContainer {
             display: none;
@@ -90,7 +87,21 @@
             z-index: 1001;
             width: 150px;
         }
-        #suggestionBox {
+        #thirdIconButton {
+            position: absolute;
+            top: 14px;
+            left: 14.2%;
+            width: 7.4%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #thirdIconButton:active {
+            transform: scale(0.9);
+        }
+         #thirdIconButton:hover {
+           transform: scale(1.1);
+        }
+             #suggestionBox {
             position: absolute;
             top: 50px;
             right: 20px;
@@ -118,37 +129,78 @@
             background-color: #fff;
             cursor: pointer;
         }
+           .tooltip {
+            position: absolute;
+            top: 13%; /* Position as specified */
+            left: 1.5%; /* Align to the left */
+            color: white;
+            display: block; /* Visible by default */
+            background-color: #fbbc29; /* Background color as specified */
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000; /* High z-index to stay on top */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Remove or comment out this entire section if you no longer want the triangle */
+         .tooltip::before {
+            content: "";
+            position: absolute;
+            top: -10px; /* Position it above the tooltip */
+            left: 20px; /* Positioning it on the left side */
+            border-width: 0 10px 10px 10px; /* Creates a triangle */
+            border-style: solid;
+            border-color: transparent transparent #fbbc29 transparent; /* Bottom border is the same color as the tooltip */
+        }
+
+
+
+
+
+
+        .tooltip .closebtn {
+            position: absolute;
+            top: 0;
+            right: 5px;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+          
         .icon {
             width: 13%;
             margin-right: 5px;
         }
-        #popup-container {
-            display: none;
-            position: fixed;
-            top: 25%;
-            left: 29%;
-            width: 42%;
-            height: 42%;
-            background-color: white;
-            border: 2px solid #000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1002;
+            #popup-iframe {
+                width: 100%;
+                height: 100%;  // Make sure the height is sufficient to display the content
+                overflow: auto;  // Allows scrolling within the iframe
+                border: none;
+            }
+             @media only screen and (max-width: 480px) {
+            .icon {
+                width: 20%;
+            }
+            #thirdIconButton { width: 17%; left: 29.5%; }
+            #playIconButton { width: 15%; left: 16.5%;}
+            #partMenuButton { width: 15%; }
+            #searchInput { right:16%;}
+            #popup-container {
+                width: 88vw !important;
+                height: 60vh !important;
+                position: fixed !important;
+                top: 20% !important;
+                left: 6% !important;
+                -webkit-overflow-scrolling: touch;
+                overflow: auto;
+             }
+            #viewer-container { height: 500px; }
+            #popup-iframe { width: 100%; height: 100%; } /* Corrected */
+            .tooltip { top: 16%; left: 2.5%; } /* Corrected */
         }
-        #popup-iframe {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            border: none;
-        }
-        #close-popup {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: #f00;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+
+    }
     </style>
 </head>
 <body>
@@ -156,23 +208,25 @@
         <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
         <iframe src="" id="api-frame"></iframe>
         <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
-        <img src="/icons/reset.png" id="playIconButton" class="icon" alt="Reset View" draggable="false" title="Reset View">
-        <img src="/icons/manual.png" id="thirdIconButton" class="icon" alt="View user manual" draggable="false" title="View user manual">
-        <div id="popup-container">
-            <iframe src="" id="popup-iframe"></iframe>
-            <button id="close-popup">X</button>
+        <div class="tooltip" style="display: block;"> <!-- Set to display: block -->
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <p>Click here to hide a section</p>
+        </div>
+        <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
+        <img src="/icons/manual.png" id="thirdIconButton" class="icon" draggable="false" title="View user manual">
+        <div id="popup-container" style="display:none; position: fixed; top: 25%; left: 29%; width: 42%; height: 42%; background-color: white; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1002;">
+            <iframe src="" id="popup-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+            <button id="close-popup" style="position: absolute; top: 5px; right: 5px; background-color: #f00; color: #fff; border: none; cursor: pointer;">X</button>
         </div>
         <div id="partMenuContainer"></div>
         <input type="text" id="searchInput" placeholder="Search Parts">
         <div id="suggestionBox"></div>
     </div>
+    
     <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
     <script type="text/javascript">
-    var parts = {"Belt Cover": [51, 52], "Cabinet": [68, 69], "Console Cover": [115, 116], "Gear Box": [127, 128, 144, 145], "Inner Tub": [176, 177], "main": [205, 206, 233, 234, 310, 311, 324, 325, 338, 339, 370, 371, 384, 385, 446, 447, 472, 473, 486, 487, 500, 501, 514, 515, 531, 532, 572, 573, 586, 587, 600, 601, 614, 615, 628, 629, 654, 655, 680, 681, 766, 767], "Lid": [219, 220], "Outer Tub": [780, 781, 794, 795], "Top": [808, 809, 837, 838, 934, 935, 999, 1000, 1016, 1017, 1042, 1043, 1068, 1069, 1094, 1095, 1120, 1121], "Washing Plate": [1134, 1135]};
-    var uid = '6a756a8f0234499fba0e5f3def383971'; // Dynamically set the model UID based on the file name
+    var parts = {"Belt Cover": [51, 52], "Cabinet": [68, 69], "Console Cover": [115, 116], "Gear Box": [127, 128, 144, 145], "Inner Tub": [176, 177], "Lid": [219, 220], "Main": [205, 206, 233, 234, 310, 311, 324, 325, 338, 339, 370, 371, 384, 385, 446, 447, 472, 473, 486, 487, 500, 501, 514, 515, 531, 532, 572, 573, 586, 587, 600, 601, 614, 615, 628, 629, 654, 655, 680, 681, 766, 767], "Outer Tub": [780, 781, 794, 795], "Top": [808, 809, 837, 838, 934, 935, 999, 1000, 1016, 1017, 1042, 1043, 1068, 1069, 1094, 1095, 1120, 1121], "Washing Plate": [1134, 1135]};
     var menuOpen = false;
-    var annotationsData = [];
-    var api;
 
     function populateMenu() {
         var menuContainer = document.getElementById("partMenuContainer");
@@ -229,30 +283,8 @@
 
     function toggleMenu() {
         var menu = document.getElementById("partMenuContainer");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-        menuOpen = menu.style.display === "block";
-    }
-
-    document.addEventListener('click', function(event) {
-        var menu = document.getElementById("partMenuContainer");
-        var partMenuButton = document.getElementById("partMenuButton");
-
-        if (menu.style.display === "block" && !menu.contains(event.target) && !partMenuButton.contains(event.target)) {
-            menu.style.display = "none";
-            menuOpen = false;
-        }
-    });
-
-    function resetMenu() {
-        var menuContainer = document.getElementById("partMenuContainer");
-        var menuItems = menuContainer.getElementsByClassName("menu-item");
-
-        for (var i = 0; i < menuItems.length; i++) {
-            var item = menuItems[i];
-            var icon = item.getElementsByTagName("img")[0];
-            item.classList.remove("selected");
-            icon.src = "/icons/open_eye.png";
-        }
+        menu.style.display = menuOpen ? "none" : "block";
+        menuOpen = !menuOpen;
     }
 
     function hideout(item) {
@@ -263,115 +295,126 @@
         api.show(item);
     }
 
-    function showSpecificAnnotation(api, annotationIndex, option) {
-        var allowedIndices = [];
+  function showSpecificAnnotation(api, annotationIndex, option) {
+    var allowedIndices = [];
 
-        switch (option) {
-            case 1:
-                allowedIndices = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-                break;
-            case 2:
-                allowedIndices = [0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-                break;
-            case 3:
-                allowedIndices = [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16];
-                break;
-            case 4:
-                allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16];
-                break;
-            case 5:
-                allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15];
-                break;
-            default:
-                console.error('Invalid option:', option);
-                return;
-        }
-
-        api.getAnnotationList(function(err, annotations) {
-            if (err) {
-                console.error('Error getting annotations:', err);
-                return;
-            }
-
-            annotations.forEach((annotation, index) => {
-                if (allowedIndices.includes(index)) {
-                    api.showAnnotation(index);
-                } else {
-                    api.hideAnnotation(index);
-                }
-            });
-        });
+    switch (option) {
+        case 1:
+            allowedIndices = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 2:
+            allowedIndices = [0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 3:
+            allowedIndices = [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 4:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16];
+            break;
+        case 5:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15];
+            break;
+        default:
+            console.error('Invalid option:', option);
+            return;
     }
 
-    function getMaxTextureSize() {
-        let maxTextureSize = 512;
+    api.getAnnotationList(function (err, annotations) {
+        if (err) {
+            console.error('Error getting annotations:', err);
+            return;
+        }
 
+        annotations.forEach((annotation, index) => {
+            if (allowedIndices.includes(index)) {
+                api.showAnnotation(index);
+            } else {
+                api.hideAnnotation(index);
+            }
+        });
+    });
+}
+
+    function getMaxTextureSize() {
+        // Default value
+        let maxTextureSize = 512; // Start with 512 as default
+
+        // Adjust based on device capabilities (adjust values as needed)
         if (navigator.deviceMemory) {
             const memory = navigator.deviceMemory;
+            console.log(`Detected device memory: ${memory} GB`);
             if (memory <= 2) {
-                maxTextureSize = 512;
+                maxTextureSize = 512; // Low memory devices
             } else if (memory <= 4) {
-                maxTextureSize = 1024;
+                maxTextureSize = 1024; // Moderate memory devices
             } else if (memory <= 7) {
-                maxTextureSize = 2048;
+                maxTextureSize = 2048; // High memory devices
             } else {
-                maxTextureSize = 4096;
+                maxTextureSize = 4096; // Very high memory devices (8+ GB)
             }
         } else {
+            // Fallback option based on user agent or screen width
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
             maxTextureSize = isMobile ? 512 : 1024;
+            console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
         }
 
+        console.log(`Set max_texture_size: ${maxTextureSize}px`);
         return maxTextureSize;
     }
 
+
+
     window.onload = function() {
-        var placeholder = document.getElementById("placeholder-image");
-        var iframe = document.getElementById("api-frame");
-        iframe.onload = function() {
-            placeholder.style.display = "none";
-        };
+    var placeholder = document.getElementById("placeholder-image");
+    var iframe = document.getElementById("api-frame");
+    iframe.onload = function() {
+        placeholder.style.display = "none";
+    };
 
-        var maxTextureSize = getMaxTextureSize();
-        var client = new Sketchfab(iframe);
-        client.init(uid, {
-            success: function(apiInstance) {
-                api = apiInstance;
-                api.start(function() {
-                    api.addEventListener('viewerready', function() {
-                        api.getAnnotationList(function(err, annotations) {
-                            if (!err) {
-                                annotationsData = annotations;
-                                filterAnnotations(api, annotations);
-                            }
-                        });
+    var uid = 'f3438320314a4c929e7a105afe8dc79f'; // Replace with your model UID
+    var maxTextureSize = getMaxTextureSize();
+    var client = new Sketchfab(iframe);
+    client.init(uid, {
+        success: function(apiInstance) {
+            api = apiInstance;
+            api.start(function() {
+                api.addEventListener('viewerready', function() {
+                    api.getAnnotationList(function(err, annotations) {
+                        if (!err) {
+                            annotationsData = annotations;
+                            filterAnnotations(api, annotations);
+                        }
                     });
+                    
                 });
-            },
-            error: function(err) {
-                console.error('Sketchfab API error:', err);
-            },
-            autostart: 0,
-            preload: 1,
-            max_texture_size: maxTextureSize,
-            transparent: 1,
-            ui_watermark: 0,
-            ui_infos: 0,
-            ui_controls: 1,
-            ui_annotations: 1,
-            ui_settings: 0,
-            ui_ar_qrcode: 0,
-            ui_ar_help: 0,
-            ui_help: 0,
-            ui_ar: 0,
-            ui_vr: 0,
-            ui_fullscreen: 0,
-            ui_inspector: 0
-        });
-
+            });
+        },
+        error: function(err) {
+            console.error('Sketchfab API error:', err);
+        },
+        autostart: 0,
+        preload: 1,
+        max_texture_size: maxTextureSize, // Adjust based on memory
+        transparent: 1,
+        ui_watermark: 0,
+        ui_infos: 0,
+        ui_controls: 1,
+        ui_annotations: 1,
+        ui_settings: 0,
+        ui_ar_qrcode: 0,
+        ui_ar_help: 0,
+        ui_help: 0,
+        ui_ar: 0,
+        ui_vr: 0,
+        ui_fullscreen: 0,
+        ui_inspector: 0
+    });
         populateMenu();
-        document.getElementById("partMenuButton").addEventListener("click", toggleMenu);
+        document.getElementById("partMenuButton").addEventListener("click", function() {
+            toggleMenu();
+        });
 
         document.getElementById("playIconButton").addEventListener("click", function() {
             api.recenterCamera(function(err) {
@@ -381,35 +424,26 @@
                             api.show(item);
                         });
                     });
-                    resetMenu();
+                    resetMenu(); // Reset the dropdown menu
                 }
             });
         });
+        
+        function resetMenu() {
+            var menuContainer = document.getElementById("partMenuContainer");
+            var menuItems = menuContainer.getElementsByClassName("menu-item");
 
-        document.getElementById("thirdIconButton").addEventListener("click", function() {
-            var popup = document.getElementById("popup-container");
-            var iframe = document.getElementById("popup-iframe");
-            iframe.src = "https://docs.google.com/gview?url=mryeje.github.io/tests/1310472L.pdf&embedded=true";
-            popup.style.display = "block";
-        });
-
-        document.getElementById("popup-iframe").onload = function() {
-            if (this.contentDocument && this.contentDocument.body.innerHTML.trim() === "") {
-                console.error("Failed to load the PDF. Retrying...");
-                this.src = this.src;
-            } else {
-                console.log("PDF loaded successfully.");
+            for (var i = 0; i < menuItems.length; i++) {
+                var item = menuItems[i];
+                var icon = item.getElementsByTagName("img")[0];
+                item.classList.remove("selected");
+                icon.src = "/icons/open_eye.png";
             }
-        };
+        }
 
-        document.getElementById("close-popup").addEventListener("click", function() {
-            var popup = document.getElementById("popup-container");
-            var iframe = document.getElementById("popup-iframe");
-            popup.style.display = "none";
-            iframe.src = "";
-        });
+        
 
-        var searchInput = document.getElementById('searchInput');
+               var searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
             var searchValue = this.value.toLowerCase();
             var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
@@ -426,15 +460,48 @@
                 suggestionBox.appendChild(suggestionItem);
             });
 
+            // Show or hide suggestion box based on the number of filtered results
             suggestionBox.style.display = filteredAnnotations.length ? "block" : "none";
         });
 
         document.addEventListener('click', function(event) {
             var searchInput = document.getElementById("searchInput");
             var suggestionBox = document.getElementById("suggestionBox");
-
+            
             if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
                 suggestionBox.style.display = "none";
+            }
+        });
+        document.getElementById("thirdIconButton").addEventListener("click", function() {
+            var popup = document.getElementById("popup-container");
+            var iframe = document.getElementById("popup-iframe");
+           iframe.src = "https://docs.google.com/gview?url=mryeje.github.io/tests/1310472L.pdf&embedded=true";
+            popup.style.display = "block";
+        });
+        
+        document.getElementById("popup-iframe").onload = function() {
+            // Check if the iframe body is empty
+            if (this.contentDocument && this.contentDocument.body.innerHTML.trim() === "") {
+                console.error("Failed to load the PDF. Retrying...");
+                this.src = this.src; // Retry loading the PDF
+            } else {
+                console.log("PDF loaded successfully.");
+            }
+        };
+
+        
+        
+        document.getElementById("close-popup").addEventListener("click", function() {
+            var popup = document.getElementById("popup-container");
+            var iframe = document.getElementById("popup-iframe");
+            popup.style.display = "none";
+            iframe.src = "";
+        });
+
+        document.addEventListener('click', function(event) {
+            var menu = document.getElementById("partMenuContainer");
+            if (menu.style.display == "block" && !menu.contains(event.target) && !document.getElementById("partMenuButton").contains(event.target)) {
+                toggleMenu();
             }
         });
     };
