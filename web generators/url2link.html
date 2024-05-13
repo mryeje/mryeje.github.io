@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Modifier and Utility</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #222;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            padding: 10px;
+            background-color: #e8e8e8;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            word-wrap: break-word;
+        }
+        div {
+            margin-top: 20px;
+        }
+        #confirmation {
+            display: none;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <h1>URL Modifier</h1>
+    <form id="urlForm">
+        <label for="name">Enter a name:</label>
+        <input type="text" id="name" required><br>
+        <label for="url">Enter a URL:</label>
+        <input type="text" id="url" required><br>
+        <button type="button" onclick="modifyAndCopyUrl()">Modify and Copy URL</button>
+        <button type="button" onclick="resetForm()">Reset</button>
+        <span id="confirmation">✔ Copied</span>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        function modifyAndCopyUrl() {
+            const name = document.getElementById('name').value;
+            const urlInput = document.getElementById('url').value;
+            const url = new URL(urlInput);
+
+            // Remove the 'SearchTerm' parameter
+            url.searchParams.delete('SearchTerm');
+
+            // Set the 'SourceCode' parameter to '45'
+            url.searchParams.set('SourceCode', '45');
+
+            // Create the link text and HTML link
+            const linkText = `Buy a ${name} here`;
+            const htmlLink = `<a href="${url.href}">${linkText}</a>`;
+
+            // Display the link as plain text and copy to clipboard
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = htmlLink;
+            navigator.clipboard.writeText(htmlLink).then(() => {
+                document.getElementById('confirmation').style.display = 'inline';
+                setTimeout(() => {
+                    document.getElementById('confirmation').style.display = 'none';
+                }, 3000); // Hide confirmation after 3 seconds
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('urlForm').reset();
+            document.getElementById('result').innerText = '';
+            document.getElementById('confirmation').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
