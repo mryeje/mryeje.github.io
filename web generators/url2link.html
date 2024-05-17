@@ -58,6 +58,11 @@
             color: #4CAF50;
             font-weight: 500;
         }
+        #nameGuess {
+            color: #555;
+            margin-top: 10px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -72,6 +77,7 @@
         <span id="confirmation">✔ Copied</span>
     </form>
     <div id="result"></div>
+    <span id="nameGuess"></span>
 
     <script>
         function modifyAndCopyUrl() {
@@ -85,13 +91,18 @@
             // Set the 'SourceCode' parameter to '45'
             url.searchParams.set('SourceCode', '45');
 
+            // Generate a guess name from URL
+            const guessName = generateGuessName(url.pathname);
+
             // Create the link text and HTML link
             const linkText = `Buy a ${name} here`;
             const htmlLink = `<a href="${url.href}">${linkText}</a>`;
 
-            // Display the link as plain text and copy to clipboard
+            // Display the link and guessed name
             const resultElement = document.getElementById('result');
-            resultElement.innerText = htmlLink;
+            resultElement.innerHTML = htmlLink;
+            document.getElementById('nameGuess').textContent = "Here's my guess at the name: " + guessName;
+
             navigator.clipboard.writeText(htmlLink).then(() => {
                 document.getElementById('confirmation').style.display = 'inline';
                 setTimeout(() => {
@@ -102,10 +113,22 @@
             });
         }
 
+        function generateGuessName(pathname) {
+            // Extract words from pathname, remove first 3 words, filter numeric parts, and remove ".htm"
+            let words = pathname.split('/').filter(part => part && isNaN(part))
+                          .join(' ').replace(/-/g, ' ').split(' ');
+            if (words.length > 3) {
+                words = words.slice(3);
+            }
+            const cleanedWords = words.join(' ').replace('.htm', '');
+            return cleanedWords;
+        }
+
         function resetForm() {
             document.getElementById('urlForm').reset();
             document.getElementById('result').innerText = '';
             document.getElementById('confirmation').style.display = 'none';
+            document.getElementById('nameGuess').textContent = '';
         }
     </script>
 </body>
