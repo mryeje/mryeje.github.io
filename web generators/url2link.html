@@ -2,134 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Modifier and Utility</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Link Formatter</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f9;
-            color: #333;
-            padding: 20px;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        h1 {
-            color: #222;
-        }
-        form {
-            background-color: #fff;
+        .container {
+            background-color: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
         }
         input[type="text"] {
-            width: calc(100% - 22px);
+            width: 80%;
             padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
+            margin-top: 10px;
+            border: 2px solid #ddd;
             border-radius: 4px;
+            font-size: 16px;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #0056b3;
             color: white;
-            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            padding: 10px 20px;
+            margin-top: 10px;
             cursor: pointer;
-            font-weight: 500;
+            border-radius: 4px;
+            font-size: 16px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #004494;
         }
-        #result {
+        p {
+            margin-top: 20px;
+            color: #333;
+            font-size: 16px;
+            background-color: #e8f0fe; /* Slight blue background for pop */
             padding: 10px;
-            background-color: #e8e8e8;
-            border-radius: 4px;
-            font-family: 'Courier New', Courier, monospace;
+            border-radius: 5px;
+        }
+        span {
             word-wrap: break-word;
         }
-        div {
-            margin-top: 20px;
-        }
-        #confirmation {
+        .checkmark {
             display: none;
-            color: #4CAF50;
-            font-weight: 500;
-        }
-        #nameGuess {
-            color: #555;
-            margin-top: 10px;
-            font-style: italic;
+            font-size: 24px;
+            color: green;
+            margin-left: 10px;
         }
     </style>
-</head>
-<body>
-    <h1>URL Modifier</h1>
-    <form id="urlForm">
-        <label for="name">Enter a name:</label>
-        <input type="text" id="name" required><br>
-        <label for="url">Enter a URL:</label>
-        <input type="text" id="url" required><br>
-        <button type="button" onclick="modifyAndCopyUrl()">Modify and Copy URL</button>
-        <button type="button" onclick="resetForm()">Reset</button>
-        <span id="confirmation">✔ Copied</span>
-    </form>
-    <div id="result"></div>
-    <span id="nameGuess"></span>
-
     <script>
-        function modifyAndCopyUrl() {
-            const name = document.getElementById('name').value;
-            const urlInput = document.getElementById('url').value;
-            const url = new URL(urlInput);
+        function generateLink() {
+            var url = document.getElementById('urlInput').value;
+            var urlObject = new URL(url);
+            var pathname = urlObject.pathname;
+            var truncatedPath = pathname.split('.htm')[0];
 
-            // Remove the 'SearchTerm' parameter
-            url.searchParams.delete('SearchTerm');
+            var segments = truncatedPath.split('/').filter(segment => segment);
+            if (segments.length > 0) {
+                var descriptivePart = segments[0];
+                var parts = descriptivePart.split('-');
+                var meaningfulParts = parts.slice(3);
 
-            // Set the 'SourceCode' parameter to '45'
-            url.searchParams.set('SourceCode', '45');
+                var name = meaningfulParts.map(part =>
+                    part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+                ).join(' ');
+            } else {
+                var name = "No valid description";
+            }
 
-            // Generate a guess name from URL
-            const guessName = generateGuessName(url.pathname);
+            urlObject.searchParams.delete("SearchTerm");
+            urlObject.searchParams.set("SourceCode", "45");
 
-            // Create the link text and HTML link
-            const linkText = `Buy a ${name} here`;
-            const htmlLink = `<a href="${url.href}">${linkText}</a>`;
-
-            // Display the link and guessed name
-            const resultElement = document.getElementById('result');
-            resultElement.innerHTML = htmlLink;
-            document.getElementById('nameGuess').textContent = "Here's my guess at the name: " + guessName;
-
-            navigator.clipboard.writeText(htmlLink).then(() => {
-                document.getElementById('confirmation').style.display = 'inline';
-                setTimeout(() => {
-                    document.getElementById('confirmation').style.display = 'none';
-                }, 3000); // Hide confirmation after 3 seconds
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
+            var output = '&lt;a href="' + urlObject.toString() + '"&gt;' + name + '&lt;/a&gt;';
+            document.getElementById('formattedLink').innerHTML = output;
         }
 
-        function generateGuessName(pathname) {
-            // Extract words from pathname, remove first 3 words, filter numeric parts, and remove ".htm"
-            let words = pathname.split('/').filter(part => part && isNaN(part))
-                          .join(' ').replace(/-/g, ' ').split(' ');
-            if (words.length > 3) {
-                words = words.slice(3);
+        function copyToClipboard() {
+            var range = document.createRange();
+            range.selectNode(document.getElementById('formattedLink'));
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+
+            try {
+                var successful = document.execCommand('copy');
+                document.getElementById('copyCheckmark').style.display = 'inline';
+                setTimeout(function() {
+                    document.getElementById('copyCheckmark').style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                console.log('Oops, unable to copy');
             }
-            const cleanedWords = words.join(' ').replace('.htm', '');
-            return cleanedWords;
+
+            window.getSelection().removeAllRanges();
         }
 
         function resetForm() {
-            document.getElementById('urlForm').reset();
-            document.getElementById('result').innerText = '';
-            document.getElementById('confirmation').style.display = 'none';
-            document.getElementById('nameGuess').textContent = '';
+            document.getElementById('urlInput').value = '';
+            document.getElementById('formattedLink').innerHTML = '';
+            document.getElementById('copyCheckmark').style.display = 'none';
         }
     </script>
+</head>
+<body>
+    <div class="container">
+        <h1>URL to Link Formatter</h1>
+        <input type="text" id="urlInput" placeholder="Enter URL here">
+        <button onclick="generateLink()">Generate Link</button>
+        <button onclick="resetForm()">Reset</button>
+        <p>HTML Output: <span id="formattedLink"></span><button onclick="copyToClipboard()">Copy</button><span id="copyCheckmark" class="checkmark">✔</span></p>
+    </div>
 </body>
 </html>
