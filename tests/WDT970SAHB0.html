@@ -1,0 +1,527 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <title>Sketchfab Viewer API Example</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        #viewer-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            border: none;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #api-frame {
+            width: 100%;
+            height: 100%;
+        }
+        #placeholder-image {
+            width: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+       #searchInput {
+            position: absolute;
+            top: 25px;
+            right:25%;
+            width: 35%;
+            padding: 3px;
+            font-size: 16px;
+        }
+        #partMenuButton {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 7%;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        #partMenuButton:hover, #playIconButton:hover {
+           transform: scale(1.1);
+        }
+        #partMenuButton:active, #playIconButton:active {
+            transform: scale(0.9);
+        }
+        #playIconButton {
+            position: absolute;
+            top: 16px;
+            left: 8%;
+            width: 6.7%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #partMenuIcon {
+            width: 20px;
+            height: 20px;
+        }
+        #partMenuContainer {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            width: 150px;
+        }
+        #thirdIconButton {
+            position: absolute;
+            top: 14px;
+            left: 14.2%;
+            width: 7.4%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #thirdIconButton:active {
+            transform: scale(0.9);
+        }
+         #thirdIconButton:hover {
+           transform: scale(1.1);
+        }
+             #suggestionBox {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            width: 50%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            z-index: 1001;
+            display: none;
+        }
+        .menu-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 6px;
+            cursor: pointer;
+            width: auto;
+            margin-bottom: 2px;
+        }
+        .selected {
+            background-color: #ccc;
+        }
+        .suggestion-item {
+            padding: 5px 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+           .tooltip {
+            position: absolute;
+            top: 13%; /* Position as specified */
+            left: 1.5%; /* Align to the left */
+            color: white;
+            display: block; /* Visible by default */
+            background-color: #fbbc29; /* Background color as specified */
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000; /* High z-index to stay on top */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Remove or comment out this entire section if you no longer want the triangle */
+         .tooltip::before {
+            content: "";
+            position: absolute;
+            top: -10px; /* Position it above the tooltip */
+            left: 20px; /* Positioning it on the left side */
+            border-width: 0 10px 10px 10px; /* Creates a triangle */
+            border-style: solid;
+            border-color: transparent transparent #fbbc29 transparent; /* Bottom border is the same color as the tooltip */
+        }
+
+
+
+
+
+
+        .tooltip .closebtn {
+            position: absolute;
+            top: 0;
+            right: 5px;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+          
+        .icon {
+            width: 13%;
+            margin-right: 5px;
+        }
+            #popup-iframe {
+                width: 100%;
+                height: 100%;  // Make sure the height is sufficient to display the content
+                overflow: auto;  // Allows scrolling within the iframe
+                border: none;
+            }
+             @media only screen and (max-width: 480px) {
+            .icon {
+                width: 20%;
+            }
+            #thirdIconButton { width: 17%; left: 29.5%; }
+            #playIconButton { width: 15%; left: 16.5%;}
+            #partMenuButton { width: 15%; }
+            #searchInput { right:16%;}
+            #popup-container {
+                width: 88vw !important;
+                height: 60vh !important;
+                position: fixed !important;
+                top: 20% !important;
+                left: 6% !important;
+                -webkit-overflow-scrolling: touch;
+                overflow: auto;
+             }
+            #viewer-container { height: 500px; }
+            #popup-iframe { width: 100%; height: 100%; } /* Corrected */
+            .tooltip { top: 16%; left: 2.5%; } /* Corrected */
+        }
+
+    }
+    </style>
+</head>
+<body>
+    <div id="viewer-container">
+        <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
+        <iframe src="" id="api-frame"></iframe>
+        <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+        <div class="tooltip" style="display: block;"> <!-- Set to display: block -->
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <p>Click here to hide a section</p>
+        </div>
+        <img src="/icons/reset.png" id="playIconButton" class="icon" alt="New Icon" draggable="false" title="Reset View">
+        <img src="/icons/manual.png" id="thirdIconButton" class="icon" draggable="false" title="View user manual">
+        <div id="popup-container" style="display:none; position: fixed; top: 25%; left: 29%; width: 42%; height: 42%; background-color: white; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1002;">
+            <iframe src="" id="popup-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+            <button id="close-popup" style="position: absolute; top: 5px; right: 5px; background-color: #f00; color: #fff; border: none; cursor: pointer;">X</button>
+        </div>
+        <div id="partMenuContainer"></div>
+        <input type="text" id="searchInput" placeholder="Search Parts">
+        <div id="suggestionBox"></div>
+    </div>
+    
+    <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+    <script type="text/javascript">
+    var parts = {"Insulation": [999, 1000], "Body": [623, 624, 652, 653, 681, 682], "Frame": [911, 912, 949, 950], "Door": [696, 697, 743, 744, 835, 836, 864, 865], "Inner Door Panel": [987, 988], "3rd Rack": [509, 510, 526, 527, 561, 562], "Upper Rack": [1251, 1252, 1273, 1274, 1287, 1288, 1319, 1320, 1336, 1337, 1353, 1354, 1370, 1371, 1387, 1388, 1401, 1402, 1427, 1428, 1441, 1442, 1455, 1456, 1469, 1470, 1483, 1484], "Lower Rack": [1016, 1017, 1081, 1082, 1098, 1099, 1112, 1113, 1126, 1127, 1140, 1141, 1154, 1155, 1168, 1169, 1182, 1183], "Sump": [1196, 1197, 1222, 1223], "Water System": [1497, 1498, 1526, 1527, 1558, 1559, 1572, 1573, 1601, 1602, 1618, 1619, 1650, 1651, 1724, 1725, 1738, 1739], "Mechanical": [3, 4, 35, 36, 97, 98, 129, 130, 146, 147, 163, 164, 195, 196, 242, 243, 280, 281, 297, 298, 344, 345, 356, 357, 368, 369, 415, 416, 492, 493]};
+    var menuOpen = false;
+
+    function populateMenu() {
+        var menuContainer = document.getElementById("partMenuContainer");
+        menuContainer.innerHTML = "";
+
+        for (var part in parts) {
+            var item = document.createElement("div");
+            item.className = "menu-item";
+            item.textContent = part;
+
+            var icon = document.createElement("img");
+            icon.className = "icon";
+            icon.src = "/icons/open_eye.png";
+            item.appendChild(icon);
+
+            (function(selectedPart, iconElement, itemElement) {
+                itemElement.onclick = function() {
+                    if (itemElement.classList.contains("selected")) {
+                        itemElement.classList.remove("selected");
+                        iconElement.src = "/icons/open_eye.png";
+                        parts[selectedPart].forEach(showup);
+                    } else {
+                        api.hide();
+                        switch (selectedPart) {
+                            case 'Fridge door':
+                                showSpecificAnnotation(api, 0, 1);
+                                break;
+                            case 'Freezer Door':
+                                showSpecificAnnotation(api, 0, 2);
+                                break;
+                            case 'Refrigeration Unit':
+                                showSpecificAnnotation(api, 0, 3);
+                                break;
+                            case 'Fridge shelves':
+                                showSpecificAnnotation(api, 0, 4);
+                                break;
+                            case 'Freezer Shelves':
+                                showSpecificAnnotation(api, 0, 5);
+                                break;
+                            default:
+                                console.log(selectedPart);
+                        }
+
+                        parts[selectedPart].forEach(hideout);
+                        itemElement.classList.add("selected");
+                        iconElement.src = "/icons/closed-eye.png";
+                    }
+                };
+            })(part, icon, item);
+
+            menuContainer.appendChild(item);
+        }
+    }
+
+    function toggleMenu() {
+        var menu = document.getElementById("partMenuContainer");
+        menu.style.display = menuOpen ? "none" : "block";
+        menuOpen = !menuOpen;
+    }
+
+    function hideout(item) {
+        api.hide(item);
+    }
+
+    function showup(item) {
+        api.show(item);
+    }
+
+  function showSpecificAnnotation(api, annotationIndex, option) {
+    var allowedIndices = [];
+
+    switch (option) {
+        case 1:
+            allowedIndices = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 2:
+            allowedIndices = [0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 3:
+            allowedIndices = [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16];
+            break;
+        case 4:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16];
+            break;
+        case 5:
+            allowedIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15];
+            break;
+        default:
+            console.error('Invalid option:', option);
+            return;
+    }
+
+    api.getAnnotationList(function (err, annotations) {
+        if (err) {
+            console.error('Error getting annotations:', err);
+            return;
+        }
+
+        annotations.forEach((annotation, index) => {
+            if (allowedIndices.includes(index)) {
+                api.showAnnotation(index);
+            } else {
+                api.hideAnnotation(index);
+            }
+        });
+    });
+}
+
+    function getMaxTextureSize() {
+        // Default value
+        let maxTextureSize = 512; // Start with 512 as default
+
+        // Adjust based on device capabilities (adjust values as needed)
+        if (navigator.deviceMemory) {
+            const memory = navigator.deviceMemory;
+            console.log(`Detected device memory: ${memory} GB`);
+            if (memory <= 2) {
+                maxTextureSize = 512; // Low memory devices
+            } else if (memory <= 4) {
+                maxTextureSize = 1024; // Moderate memory devices
+            } else if (memory <= 7) {
+                maxTextureSize = 2048; // High memory devices
+            } else {
+                maxTextureSize = 4096; // Very high memory devices (8+ GB)
+            }
+        } else {
+            // Fallback option based on user agent or screen width
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+            maxTextureSize = isMobile ? 512 : 1024;
+            console.log(`Device memory not detected. Fallback logic used: ${isMobile ? 'Mobile device' : 'Desktop device'}`);
+        }
+
+        console.log(`Set max_texture_size: ${maxTextureSize}px`);
+        return maxTextureSize;
+    }
+
+
+
+    window.onload = function() {
+    var placeholder = document.getElementById("placeholder-image");
+    var iframe = document.getElementById("api-frame");
+    iframe.onload = function() {
+        placeholder.style.display = "none";
+    };
+
+    var uid = '457ca56bdbda46f693994ba7a209e420'; // Replace with your model UID
+    var maxTextureSize = getMaxTextureSize();
+    var client = new Sketchfab(iframe);
+    client.init(uid, {
+        success: function(apiInstance) {
+            api = apiInstance;
+            api.start(function() {
+                api.addEventListener('viewerready', function() {
+                    api.getAnnotationList(function(err, annotations) {
+                        if (!err) {
+                            annotationsData = annotations;
+                            filterAnnotations(api, annotations);
+                        }
+                    });
+                    
+                });
+            });
+        },
+        error: function(err) {
+            console.error('Sketchfab API error:', err);
+        },
+        autostart: 0,
+        preload: 1,
+        max_texture_size: maxTextureSize, // Adjust based on memory
+        transparent: 1,
+        ui_watermark: 0,
+        ui_infos: 0,
+        ui_controls: 1,
+        ui_annotations: 1,
+        ui_settings: 0,
+        ui_ar_qrcode: 0,
+        ui_ar_help: 0,
+        ui_help: 0,
+        ui_ar: 0,
+        ui_vr: 0,
+        ui_fullscreen: 0,
+        ui_inspector: 0
+    });
+        populateMenu();
+        document.getElementById("partMenuButton").addEventListener("click", function() {
+            toggleMenu();
+        });
+
+        document.getElementById("playIconButton").addEventListener("click", function() {
+            api.recenterCamera(function(err) {
+                if (!err) {
+                    Object.keys(parts).forEach(function(part) {
+                        parts[part].forEach(function(item) {
+                            api.show(item);
+                        });
+                    });
+                    resetMenu(); // Reset the dropdown menu
+                }
+            });
+        });
+        
+        function resetMenu() {
+            var menuContainer = document.getElementById("partMenuContainer");
+            var menuItems = menuContainer.getElementsByClassName("menu-item");
+
+            for (var i = 0; i < menuItems.length; i++) {
+                var item = menuItems[i];
+                var icon = item.getElementsByTagName("img")[0];
+                item.classList.remove("selected");
+                icon.src = "/icons/open_eye.png";
+            }
+        }
+
+        
+
+               var searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+            var searchValue = this.value.toLowerCase();
+            var filteredAnnotations = annotationsData.filter(annotation => annotation.name.toLowerCase().includes(searchValue));
+
+            var suggestionBox = document.getElementById('suggestionBox');
+            suggestionBox.innerHTML = '';
+
+            const maxSuggestions = 5;
+            filteredAnnotations.slice(0, maxSuggestions).forEach(annotation => {
+                var suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = annotation.name;
+                suggestionItem.onclick = () => navigateToAnnotation(annotation.name);
+                suggestionBox.appendChild(suggestionItem);
+            });
+
+            // Show or hide suggestion box based on the number of filtered results
+            suggestionBox.style.display = filteredAnnotations.length ? "block" : "none";
+        });
+
+        document.addEventListener('click', function(event) {
+            var searchInput = document.getElementById("searchInput");
+            var suggestionBox = document.getElementById("suggestionBox");
+            
+            if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+                suggestionBox.style.display = "none";
+            }
+        });
+        document.getElementById("thirdIconButton").addEventListener("click", function() {
+            var popup = document.getElementById("popup-container");
+            var iframe = document.getElementById("popup-iframe");
+            iframe.src = "https://docs.google.com/gview?url=https://partselectca-dsfph5cffxaaesb6.z01.azurefd.net/assets/manuals/EBF4AEBB8D1FC994820343DF54BFFE6BD3BA063D.pdf&embedded=true";
+            popup.style.display = "block";
+        });
+        
+        document.getElementById("popup-iframe").onload = function() {
+            // Check if the iframe body is empty
+            if (this.contentDocument && this.contentDocument.body.innerHTML.trim() === "") {
+                console.error("Failed to load the PDF. Retrying...");
+                this.src = this.src; // Retry loading the PDF
+            } else {
+                console.log("PDF loaded successfully.");
+            }
+        };
+
+        
+        
+        document.getElementById("close-popup").addEventListener("click", function() {
+            var popup = document.getElementById("popup-container");
+            var iframe = document.getElementById("popup-iframe");
+            popup.style.display = "none";
+            iframe.src = "";
+        });
+
+        document.addEventListener('click', function(event) {
+            var menu = document.getElementById("partMenuContainer");
+            if (menu.style.display == "block" && !menu.contains(event.target) && !document.getElementById("partMenuButton").contains(event.target)) {
+                toggleMenu();
+            }
+        });
+    };
+
+    function filterAnnotations(api, annotationsData) {
+        window.annotationsData = annotationsData;
+    }
+
+    function navigateToAnnotation(annotationName) {
+        var index = annotationsData.findIndex(annotation => annotation.name.toLowerCase() === annotationName.toLowerCase());
+        if (index !== -1) {
+            api.gotoAnnotation(index, {}, function(err) {
+                if (!err) {
+                    console.log('Navigated to annotation:', index + 1);
+                }
+            });
+        }
+    }
+    </script>
+</body>
+</html>
+    
+
