@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sketchfab Model Information</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #mesh-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #mesh-info p {
+            margin: 0;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sketchfab Model Information</h1>
+        <input type="text" id="uidInput" placeholder="Enter Model UID">
+        <button onclick="fetchModelInfo()">Fetch Model Info</button>
+
+        <!-- A div for displaying mesh info -->
+        <div id="mesh-info"></div>
+
+        <!-- Button to save mesh info -->
+        <button onclick="saveMeshInfo()">Save Mesh Info</button>
+    </div>
+
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+    <script>
+        var version = '1.12.1';
+        var api;
+
+        // Two dictionaries:
+        // 1) meshGroups => { 'GroupPrefix': [IDs] }
+        // 2) meshSymptoms => { 'SymptomName': [IDs] }
+        var meshGroups = {};
+        var meshSymptoms = {};
+
+        // Traverse the scene graph and collect ID info
+        function displayMeshInfo(sceneGraph) {
+            var meshInfoContainer = document.getElementById('mesh-info');
+            meshInfoContainer.innerHTML = ''; // Clear previous content
+
+            // Reset dictionaries
+            meshGroups = {};
+            meshSymptoms = {};
+
+            // Recursive function to walk the scene graph
+            function traverse(node) {
+                if (node.instanceID && node.name) {
+                    // 1) Find the first underscore => This is the "Group" prefix
+                    var underscoreIndex = node.name.indexOf('_');
+                    if (underscoreIndex !== -1) {
+                        var groupPrefix = node.name.substring(0, underscoreIndex).trim();
+
+                        // Ensure array for this group
+                        if (!meshGroups[groupPrefix]) {
+                            meshGroups[groupPrefix] = [];
+                        }
+                        meshGroups[groupPrefix].push(node.instanceID);
+
+                        // 2) Check if there's an exclamation mark '!' after the underscore
+                        //    for symptom(s). Example: "Motor_001!WillNotAgitate,LeakingWater"
+                        var afterUnderscore = node.name.substring(underscoreIndex + 1); // "001!WillNotAgitate,LeakingWater"
+                        var exclamationIndex = afterUnderscore.indexOf('!');
+                        if (exclamationIndex !== -1) {
+                            // e.g. "WillNotAgitate,LeakingWater"
+                            var symptomString = afterUnderscore.substring(exclamationIndex + 1).trim();
+                            // Split by commas to allow multiple symptoms
+                            var symptomNames = symptomString.split(',');
+
+                            symptomNames.forEach(function(symptomName) {
+                                symptomName = symptomName.trim();
+                                // Create array if doesn't exist
+                                if (!meshSymptoms[symptomName]) {
+                                    meshSymptoms[symptomName] = [];
+                                }
+                                meshSymptoms[symptomName].push(node.instanceID);
+                            });
+                        }
+                    }
+                }
+
+                // Recurse into children
+                if (node.children) {
+                    node.children.forEach(function(child) {
+                        traverse(child);
+                    });
+                }
+            }
+
+            // Begin traversal from root
+            traverse(sceneGraph);
+
+            // Display the result on-screen for quick reference
+            // 1) Show group info
+            for (var grp in meshGroups) {
+                if (meshGroups.hasOwnProperty(grp)) {
+                    meshInfoContainer.innerHTML += '<h2>' + grp + '</h2>';
+                    meshInfoContainer.innerHTML += '<p>' + meshGroups[grp].join(', ') + '</p>';
+                }
+            }
+
+            // 2) Show symptom info
+            for (var sym in meshSymptoms) {
+                if (meshSymptoms.hasOwnProperty(sym)) {
+                    meshInfoContainer.innerHTML += '<h2>*' + sym + '</h2>'; // star prefix to indicate symptom
+                    meshInfoContainer.innerHTML += '<p>' + meshSymptoms[sym].join(', ') + '</p>';
+                }
+            }
+        }
+
+        // Fetch model information from Sketchfab
+        function fetchModelInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            document.body.appendChild(iframe);
+
+            var client = new window.Sketchfab(version, iframe);
+
+            var error = function() {
+                console.error('Sketchfab API error');
+            };
+
+            var success = function(sketchfabApi) {
+                api = sketchfabApi;
+                api.start(function () {
+                    api.addEventListener('viewerready', function () {
+                        api.getSceneGraph(function (err, result) {
+                            if (err) {
+                                console.log('Error getting nodes', err);
+                                return;
+                            }
+                            // Display mesh IDs for each prefix + symptom
+                            displayMeshInfo(result);
+                        });
+                    });
+                });
+            };
+
+            // Initialize Sketchfab client
+            client.init(modelUid, {
+                success: success,
+                error: error,
+                autostart: 1,
+                preload: 1
+            });
+        }
+
+        // Save the extracted mesh info to a text file
+        function saveMeshInfo() {
+            var modelUid = document.getElementById('uidInput').value.trim();
+            var filename = modelUid + '.txt';
+            var textContent = '';
+
+            // 1) Main groups -> normal lines
+            for (var prefix in meshGroups) {
+                if (meshGroups.hasOwnProperty(prefix)) {
+                    textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\\n';
+                }
+            }
+            // 2) Symptoms -> star lines
+            for (var symptom in meshSymptoms) {
+                if (meshSymptoms.hasOwnProperty(symptom)) {
+                    textContent += '*' + symptom + ': ' + meshSymptoms[symptom].join(', ') + '\\n';
+                }
+            }
+
+            // Create a blob containing the text content
+            var blob = new Blob([textContent], { type: 'text/plain' });
+
+            // Create a link element to trigger the download
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = window.URL.createObjectURL(blob);
+
+            // Trigger the download
+            link.click();
+        }
+    </script>
+</body>
+</html>
