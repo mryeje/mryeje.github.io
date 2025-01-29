@@ -110,10 +110,14 @@
 
                             symptomNames.forEach(function(symptomName) {
                                 symptomName = symptomName.trim();
-                                if (!meshSymptoms[symptomName]) {
-                                    meshSymptoms[symptomName] = [];
+                                if (symptomName) {
+                                    // Remove any trailing _# from symptom name
+                                    symptomName = symptomName.replace(/_\d+$/, "");
+                                    if (!meshSymptoms[symptomName]) {
+                                        meshSymptoms[symptomName] = new Set();
+                                    }
+                                    meshSymptoms[symptomName].add(node.instanceID);
                                 }
-                                meshSymptoms[symptomName].push(node.instanceID);
                             });
                         }
                     } else {
@@ -138,6 +142,13 @@
             // Begin traversal
             traverse(sceneGraph);
 
+            // Convert symptom Sets to sorted arrays
+            for (var sym in meshSymptoms) {
+                if (meshSymptoms.hasOwnProperty(sym)) {
+                    meshSymptoms[sym] = Array.from(meshSymptoms[sym]).sort(function(a, b) { return a - b; });
+                }
+            }
+
             // Display the result on-screen
             // 1) Show group info
             for (var grp in meshGroups) {
@@ -159,6 +170,11 @@
         // Fetch model information
         function fetchModelInfo() {
             var modelUid = document.getElementById('uidInput').value.trim();
+            if (!modelUid) {
+                alert("Please enter a Model UID.");
+                return;
+            }
+
             var iframe = document.createElement('iframe');
             iframe.style.width = '100%';
             iframe.style.height = '600px';
@@ -197,6 +213,10 @@
         // Save the extracted mesh info to a text file
         function saveMeshInfo() {
             var modelUid = document.getElementById('uidInput').value.trim();
+            if (!modelUid) {
+                alert("Please enter a Model UID.");
+                return;
+            }
             var filename = modelUid + '.txt';
             var textContent = '';
 
