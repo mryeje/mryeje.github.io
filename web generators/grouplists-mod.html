@@ -154,6 +154,9 @@
                 return;
             }
 
+            // Clear previous mesh info
+            document.getElementById('mesh-info').innerHTML = "Fetching model info...";
+
             var iframe = document.createElement('iframe');
             iframe.style.display = 'none'; // Hide the iframe
             document.body.appendChild(iframe);
@@ -163,6 +166,7 @@
             var error = function() {
                 console.error('Sketchfab API error');
                 alert('Failed to initialize Sketchfab API.');
+                document.getElementById('mesh-info').innerHTML = "Failed to fetch model info.";
             };
 
             var success = function(apiInstance) {
@@ -172,9 +176,12 @@
                         api.getSceneGraph(function(err, result) {
                             if (!err) {
                                 displayMeshInfo(result);
+                                document.body.removeChild(iframe); // Clean up
                             } else {
                                 console.log('Error getting nodes', err);
                                 alert('Error fetching scene graph.');
+                                document.getElementById('mesh-info').innerHTML = "Error fetching scene graph.";
+                                document.body.removeChild(iframe); // Clean up
                             }
                         });
                     });
