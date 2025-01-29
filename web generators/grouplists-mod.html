@@ -75,7 +75,6 @@
         var meshGroups = {};
         var meshSymptoms = {};
 
-        // Traverse the scene graph and collect ID info
         function displayMeshInfo(sceneGraph) {
             var meshInfoContainer = document.getElementById('mesh-info');
             meshInfoContainer.innerHTML = ''; // Clear previous content
@@ -84,12 +83,13 @@
             meshGroups = {};
             meshSymptoms = {};
 
-            // Recursive function to walk the scene graph
+            // Recursive function to walk scene graph
             function traverse(node) {
                 if (node.instanceID && node.name) {
-                    // 1) Find the first underscore => This is the "Group" prefix
+                    // 1) Find first underscore => "Group" prefix
                     var underscoreIndex = node.name.indexOf('_');
                     if (underscoreIndex !== -1) {
+                        // E.g. "Motor_001!WillNotAgitate,LeakingWater"
                         var groupPrefix = node.name.substring(0, underscoreIndex).trim();
 
                         // Ensure array for this group
@@ -98,28 +98,35 @@
                         }
                         meshGroups[groupPrefix].push(node.instanceID);
 
-                        // 2) Check if there's an exclamation mark '!' after the underscore
-                        //    for symptom(s). Example: "Motor_001!WillNotAgitate,LeakingWater"
-                        var afterUnderscore = node.name.substring(underscoreIndex + 1); // "001!WillNotAgitate,LeakingWater"
+                        // 2) Check for '!' suffix for symptoms
+                        //    "001!WillNotAgitate,LeakingWater"
+                        var afterUnderscore = node.name.substring(underscoreIndex + 1);
                         var exclamationIndex = afterUnderscore.indexOf('!');
                         if (exclamationIndex !== -1) {
                             // e.g. "WillNotAgitate,LeakingWater"
                             var symptomString = afterUnderscore.substring(exclamationIndex + 1).trim();
-                            // Split by commas to allow multiple symptoms
+                            // Split by commas for multiple symptoms
                             var symptomNames = symptomString.split(',');
 
                             symptomNames.forEach(function(symptomName) {
                                 symptomName = symptomName.trim();
-                                // Create array if doesn't exist
                                 if (!meshSymptoms[symptomName]) {
                                     meshSymptoms[symptomName] = [];
                                 }
                                 meshSymptoms[symptomName].push(node.instanceID);
                             });
                         }
+                    } else {
+                        // If there's no underscore, 
+                        // let's just treat the entire name as a "group" prefix
+                        // (You can adapt logic as needed)
+                        var fallbackName = node.name.trim();
+                        if (!meshGroups[fallbackName]) {
+                            meshGroups[fallbackName] = [];
+                        }
+                        meshGroups[fallbackName].push(node.instanceID);
                     }
                 }
-
                 // Recurse into children
                 if (node.children) {
                     node.children.forEach(function(child) {
@@ -128,10 +135,10 @@
                 }
             }
 
-            // Begin traversal from root
+            // Begin traversal
             traverse(sceneGraph);
 
-            // Display the result on-screen for quick reference
+            // Display the result on-screen
             // 1) Show group info
             for (var grp in meshGroups) {
                 if (meshGroups.hasOwnProperty(grp)) {
@@ -143,13 +150,13 @@
             // 2) Show symptom info
             for (var sym in meshSymptoms) {
                 if (meshSymptoms.hasOwnProperty(sym)) {
-                    meshInfoContainer.innerHTML += '<h2>*' + sym + '</h2>'; // star prefix to indicate symptom
+                    meshInfoContainer.innerHTML += '<h2>*' + sym + '</h2>'; // star prefix
                     meshInfoContainer.innerHTML += '<p>' + meshSymptoms[sym].join(', ') + '</p>';
                 }
             }
         }
 
-        // Fetch model information from Sketchfab
+        // Fetch model information
         function fetchModelInfo() {
             var modelUid = document.getElementById('uidInput').value.trim();
             var iframe = document.createElement('iframe');
@@ -172,7 +179,6 @@
                                 console.log('Error getting nodes', err);
                                 return;
                             }
-                            // Display mesh IDs for each prefix + symptom
                             displayMeshInfo(result);
                         });
                     });
@@ -197,25 +203,26 @@
             // 1) Main groups -> normal lines
             for (var prefix in meshGroups) {
                 if (meshGroups.hasOwnProperty(prefix)) {
-                    textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\\n';
+                    // Use real newline \n, not '\\n'
+                    textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\n';
                 }
             }
             // 2) Symptoms -> star lines
             for (var symptom in meshSymptoms) {
                 if (meshSymptoms.hasOwnProperty(symptom)) {
-                    textContent += '*' + symptom + ': ' + meshSymptoms[symptom].join(', ') + '\\n';
+                    textContent += '*' + symptom + ': ' + meshSymptoms[symptom].join(', ') + '\n';
                 }
             }
 
-            // Create a blob containing the text content
+            // Create a blob of the text
             var blob = new Blob([textContent], { type: 'text/plain' });
 
-            // Create a link element to trigger the download
+            // Create a link to download
             var link = document.createElement('a');
             link.download = filename;
             link.href = window.URL.createObjectURL(blob);
 
-            // Trigger the download
+            // Trigger download
             link.click();
         }
     </script>
