@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sketchfab Viewer with Groups and Symptoms</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #controls {
+            display: flex;
+            padding: 10px;
+            background-color: #343a40;
+            color: #fff;
+        }
+        #controls > div {
+            margin-right: 20px;
+        }
+        #controls h2 {
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        .menu-item {
+            cursor: pointer;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .menu-item.selected {
+            background-color: #495057;
+            border-radius: 4px;
+        }
+        .menu-item img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        #viewer-container {
+            flex: 1;
+            position: relative;
+        }
+        #api-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="group-menu">
+            <h2>Groups</h2>
+            <!-- Group items will be populated here -->
+        </div>
+        <div id="symptom-menu">
+            <h2>Symptoms</h2>
+            <!-- Symptom items will be populated here -->
+        </div>
+    </div>
+    <div id="viewer-container">
+        <!-- Sketchfab iframe -->
+        <iframe src="" id="api-frame"></iframe>
+    </div>
+
+    <!-- Sketchfab API script -->
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+    <script>
+        var api = null;
+        var groups = {};      // { 'GroupName': [IDs] }
+        var symptoms = {};    // { 'SymptomName': [IDs] }
+        var currentSelectedGroup = null;
+        var currentSelectedSymptom = null;
+
+        function initializeViewer(modelUid) {
+            var iframe = document.getElementById('api-frame');
+            var client = new Sketchfab(version, iframe);
+
+            client.init(modelUid, {
+                success: function(apiInstance) {
+                    api = apiInstance;
+                    api.start(function() {
+                        api.addEventListener('viewerready', function() {
+                            api.getSceneGraph(function(err, result) {
+                                if (!err) {
+                                    parseSceneGraph(result);
+                                    populateMenus();
+                                } else {
+                                    console.error('Error fetching scene graph:', err);
+                                    alert('Failed to fetch scene graph.');
+                                }
+                            });
+                        });
+                    });
+                },
+                error: function() {
+                    console.error('Sketchfab API error');
+                    alert('Failed to initialize Sketchfab API.');
+                },
+                autostart: 1,
+                preload: 1
+            });
+        }
+
+        function parseSceneGraph(sceneGraph) {
+            groups = {};
+            symptoms = {};
+
+            function traverse(node) {
+                if (node.instanceID && node.name) {
+                    // Extract group prefix
+                    var underscoreIndex = node.name.indexOf('_');
+                    if (underscoreIndex !== -1) {
+                        var groupPrefix = node.name.substring(0, underscoreIndex).trim();
+
+                        if (!groups[groupPrefix]) {
+                            groups[groupPrefix] = [];
+                        }
+                        groups[groupPrefix].push(node.instanceID);
+
+                        // Check for symptoms
+                        var afterUnderscore = node.name.substring(underscoreIndex + 1);
+                        var exclamationIndex = afterUnderscore.indexOf('!');
+                        if (exclamationIndex !== -1) {
+                            var symptomString = afterUnderscore.substring(exclamationIndex + 1).trim();
+                            var symptomNames = symptomString.split(',');
+
+                            symptomNames.forEach(function(symptomName) {
+                                symptomName = symptomName.trim();
+                                if (symptomName) {
+                                    // Clean symptom name by removing trailing _# if any
+                                    var cleanedSymptomName = symptomName.replace(/_\d+$/, "");
+                                    console.log(`Original Symptom: "${symptomName}", Cleaned Symptom: "${cleanedSymptomName}"`);
+
+                                    if (!symptoms[cleanedSymptomName]) {
+                                        symptoms[cleanedSymptomName] = new Set();
+                                    }
+                                    symptoms[cleanedSymptomName].add(node.instanceID);
+                                }
+                            });
+                        }
+                    } else {
+                        // Handle objects without underscores as their own group
+                        var fallbackName = node.name.trim();
+                        if (!groups[fallbackName]) {
+                            groups[fallbackName] = [];
+                        }
+                        groups[fallbackName].push(node.instanceID);
+                    }
+                }
+
+                // Recurse into children
+                if (node.children) {
+                    node.children.forEach(function(child) {
+                        traverse(child);
+                    });
+                }
+            }
+
+            traverse(sceneGraph);
+
+            // Convert symptom Sets to sorted arrays
+            for (var sym in symptoms) {
+                if (symptoms.hasOwnProperty(sym)) {
+                    symptoms[sym] = Array.from(symptoms[sym]).sort(function(a, b) { return a - b; });
+                }
+            }
+
+            console.log("Parsed Groups:", groups);
+            console.log("Parsed Symptoms:", symptoms);
+        }
+
+        function populateMenus() {
+            populateGroupMenu();
+            populateSymptomMenu();
+        }
+
+        function populateGroupMenu() {
+            var groupMenu = document.getElementById('group-menu');
+
+            for (var group in groups) {
+                if (groups.hasOwnProperty(group)) {
+                    var item = document.createElement('div');
+                    item.className = 'menu-item';
+                    item.textContent = group;
+
+                    var icon = document.createElement('img');
+                    icon.src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png'; // Open eye icon
+                    item.prepend(icon);
+
+                    item.addEventListener('click', function() {
+                        var selectedGroup = this.textContent;
+                        toggleGroup(selectedGroup, this);
+                    });
+
+                    groupMenu.appendChild(item);
+                }
+            }
+        }
+
+        function populateSymptomMenu() {
+            var symptomMenu = document.getElementById('symptom-menu');
+
+            for (var symptom in symptoms) {
+                if (symptoms.hasOwnProperty(symptom)) {
+                    var item = document.createElement('div');
+                    item.className = 'menu-item';
+                    item.textContent = symptom;
+
+                    var icon = document.createElement('img');
+                    icon.src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png'; // Open eye icon
+                    item.prepend(icon);
+
+                    item.addEventListener('click', function() {
+                        var selectedSymptom = this.textContent;
+                        toggleSymptom(selectedSymptom, this);
+                    });
+
+                    symptomMenu.appendChild(item);
+                }
+            }
+        }
+
+        function toggleGroup(groupName, menuItem) {
+            if (currentSelectedGroup === groupName) {
+                // Unselect the group
+                groups[groupName].forEach(function(id) {
+                    api.show(id);
+                });
+                menuItem.classList.remove('selected');
+                menuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png';
+                currentSelectedGroup = null;
+            } else {
+                // Select the new group
+                // First, unselect previous group
+                if (currentSelectedGroup) {
+                    var previousMenuItem = findMenuItem('group-menu', currentSelectedGroup);
+                    previousMenuItem.classList.remove('selected');
+                    previousMenuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png';
+                    groups[currentSelectedGroup].forEach(function(id) {
+                        api.show(id);
+                    });
+                }
+
+                // Hide all groups except the selected one
+                for (var grp in groups) {
+                    if (groups.hasOwnProperty(grp)) {
+                        if (grp !== groupName) {
+                            groups[grp].forEach(function(id) {
+                                api.hide(id);
+                            });
+                        } else {
+                            groups[grp].forEach(function(id) {
+                                api.show(id);
+                            });
+                        }
+                    }
+                }
+
+                // Update UI
+                menuItem.classList.add('selected');
+                menuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/hidden.png'; // Closed eye icon
+                currentSelectedGroup = groupName;
+
+                // If a symptom is selected, ensure it's still visible
+                if (currentSelectedSymptom) {
+                    symptoms[currentSelectedSymptom].forEach(function(id) {
+                        api.show(id);
+                    });
+                }
+            }
+        }
+
+        function toggleSymptom(symptomName, menuItem) {
+            if (currentSelectedSymptom === symptomName) {
+                // Unselect the symptom
+                symptoms[symptomName].forEach(function(id) {
+                    api.show(id);
+                });
+                menuItem.classList.remove('selected');
+                menuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png';
+                currentSelectedSymptom = null;
+            } else {
+                // Select the new symptom
+                // First, unselect previous symptom
+                if (currentSelectedSymptom) {
+                    var previousMenuItem = findMenuItem('symptom-menu', currentSelectedSymptom);
+                    previousMenuItem.classList.remove('selected');
+                    previousMenuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/visible.png';
+                    symptoms[currentSelectedSymptom].forEach(function(id) {
+                        api.show(id);
+                    });
+                }
+
+                // Hide all parts
+                hideAllParts();
+
+                // Show only symptom's parts
+                symptoms[symptomName].forEach(function(id) {
+                    api.show(id);
+                });
+
+                // Update UI
+                menuItem.classList.add('selected');
+                menuItem.querySelector('img').src = 'https://img.icons8.com/ios-filled/50/ffffff/hidden.png'; // Closed eye icon
+                currentSelectedSymptom = symptomName;
+
+                // If a group is selected, ensure group parts are visible
+                if (currentSelectedGroup) {
+                    groups[currentSelectedGroup].forEach(function(id) {
+                        api.show(id);
+                    });
+                }
+            }
+        }
+
+        function hideAllParts() {
+            // Hide all groups
+            for (var grp in groups) {
+                if (groups.hasOwnProperty(grp)) {
+                    groups[grp].forEach(function(id) {
+                        api.hide(id);
+                    });
+                }
+            }
+            // Hide all symptoms
+            for (var sym in symptoms) {
+                if (symptoms.hasOwnProperty(sym)) {
+                    symptoms[sym].forEach(function(id) {
+                        api.hide(id);
+                    });
+                }
+            }
+        }
+
+        function findMenuItem(menuId, text) {
+            var menu = document.getElementById(menuId);
+            var items = menu.getElementsByClassName('menu-item');
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].textContent === text) {
+                    return items[i];
+                }
+            }
+            return null;
+        }
+
+        // Initialize with a default model UID if desired
+        // initializeViewer('your_model_uid_here');
+    </script>
+</body>
+</html>
