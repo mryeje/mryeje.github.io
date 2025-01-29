@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sketchfab Model Information</title>
+    <title>Sketchfab Model Information Exporter</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f0f0f0;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"] {
-            width: calc(100% - 10px);
+        input[type="text"], input[type="file"] {
+            width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
             font-size: 16px;
@@ -34,6 +37,7 @@
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
+            margin-right: 10px;
         }
         button:hover {
             background-color: #0056b3;
@@ -41,37 +45,44 @@
         #mesh-info {
             margin-top: 20px;
             padding: 10px;
-            background-color: #fff;
+            background-color: #e9ecef;
             border: 1px solid #ccc;
             border-radius: 5px;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+        #mesh-info h2 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #343a40;
         }
         #mesh-info p {
             margin: 0;
             padding: 5px 0;
+            color: #495057;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Sketchfab Model Information</h1>
-        <input type="text" id="uidInput" placeholder="Enter Model UID">
+        <h1>Sketchfab Model Information Exporter</h1>
+        <input type="text" id="uidInput" placeholder="Enter Sketchfab Model UID">
         <button onclick="fetchModelInfo()">Fetch Model Info</button>
-
+        <button onclick="saveMeshInfo()">Save Mesh Info</button>
+        
         <!-- A div for displaying mesh info -->
         <div id="mesh-info"></div>
-
-        <!-- Button to save mesh info -->
-        <button onclick="saveMeshInfo()">Save Mesh Info</button>
     </div>
 
-    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
+    <!-- Sketchfab API script -->
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
     <script>
         var version = '1.12.1';
         var api;
 
         // Two dictionaries:
         // 1) meshGroups => { 'GroupPrefix': [IDs] }
-        // 2) meshSymptoms => { 'SymptomName': [IDs] }
+        // 2) meshSymptoms => { 'SymptomName': Set([IDs]) }
         var meshGroups = {};
         var meshSymptoms = {};
 
@@ -99,31 +110,31 @@
                         meshGroups[groupPrefix].push(node.instanceID);
 
                         // 2) Check for '!' suffix for symptoms
-                        //    "001!WillNotAgitate,LeakingWater"
+                        //    "001!WillNotAgitate"
                         var afterUnderscore = node.name.substring(underscoreIndex + 1);
                         var exclamationIndex = afterUnderscore.indexOf('!');
                         if (exclamationIndex !== -1) {
-                            // e.g. "WillNotAgitate,LeakingWater"
+                            // e.g. "WillNotAgitate"
                             var symptomString = afterUnderscore.substring(exclamationIndex + 1).trim();
-                            // Split by commas for multiple symptoms
+                            // Split by commas for multiple symptoms (if any)
                             var symptomNames = symptomString.split(',');
 
                             symptomNames.forEach(function(symptomName) {
                                 symptomName = symptomName.trim();
                                 if (symptomName) {
                                     // Remove any trailing _# from symptom name
-                                    symptomName = symptomName.replace(/_\d+$/, "");
-                                    if (!meshSymptoms[symptomName]) {
-                                        meshSymptoms[symptomName] = new Set();
+                                    var cleanedSymptomName = symptomName.replace(/_\d+$/, "");
+                                    console.log(`Original Symptom: "${symptomName}", Cleaned Symptom: "${cleanedSymptomName}"`);
+
+                                    if (!meshSymptoms[cleanedSymptomName]) {
+                                        meshSymptoms[cleanedSymptomName] = new Set();
                                     }
-                                    meshSymptoms[symptomName].add(node.instanceID);
+                                    meshSymptoms[cleanedSymptomName].add(node.instanceID);
                                 }
                             });
                         }
                     } else {
-                        // If there's no underscore, 
-                        // let's just treat the entire name as a "group" prefix
-                        // (You can adapt logic as needed)
+                        // If there's no underscore, treat the entire name as a "group" prefix
                         var fallbackName = node.name.trim();
                         if (!meshGroups[fallbackName]) {
                             meshGroups[fallbackName] = [];
@@ -165,6 +176,9 @@
                     meshInfoContainer.innerHTML += '<p>' + meshSymptoms[sym].join(', ') + '</p>';
                 }
             }
+
+            console.log("Final meshGroups:", meshGroups);
+            console.log("Final meshSymptoms:", meshSymptoms);
         }
 
         // Fetch model information
@@ -176,23 +190,24 @@
             }
 
             var iframe = document.createElement('iframe');
-            iframe.style.width = '100%';
-            iframe.style.height = '600px';
+            iframe.style.display = 'none'; // Hide the iframe
             document.body.appendChild(iframe);
 
-            var client = new window.Sketchfab(version, iframe);
+            var client = new Sketchfab(version, iframe);
 
             var error = function() {
                 console.error('Sketchfab API error');
+                alert('Failed to initialize Sketchfab API.');
             };
 
-            var success = function(sketchfabApi) {
-                api = sketchfabApi;
+            var success = function(apiInstance) {
+                api = apiInstance;
                 api.start(function () {
                     api.addEventListener('viewerready', function () {
                         api.getSceneGraph(function (err, result) {
                             if (err) {
                                 console.log('Error getting nodes', err);
+                                alert('Error fetching scene graph.');
                                 return;
                             }
                             displayMeshInfo(result);
@@ -223,7 +238,7 @@
             // 1) Main groups -> normal lines
             for (var prefix in meshGroups) {
                 if (meshGroups.hasOwnProperty(prefix)) {
-                    // Use real newline \n, not '\\n'
+                    // Use real newline \n
                     textContent += prefix + ': ' + meshGroups[prefix].join(', ') + '\n';
                 }
             }
@@ -233,6 +248,9 @@
                     textContent += '*' + symptom + ': ' + meshSymptoms[symptom].join(', ') + '\n';
                 }
             }
+
+            console.log("Saving mesh info to:", filename);
+            console.log("Content to save:\n", textContent);
 
             // Create a blob of the text
             var blob = new Blob([textContent], { type: 'text/plain' });
@@ -244,6 +262,9 @@
 
             // Trigger download
             link.click();
+
+            // Clean up
+            document.body.removeChild(link);
         }
     </script>
 </body>
