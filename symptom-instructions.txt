@@ -1,0 +1,8 @@
+To correctly export a model to sketchfab with symptoms, do the following:
+1) Put all related parts into relevent collections.
+2) Click on the parts that will be assicioated with symptoms, go to object properties and add custom property.
+3) Change the type to string and the property name to Symptoms and the value should be the symptom name.
+4) Use the auto renaming script for symptoms
+5) export to sketchfab
+6) open model ID in grouplists-mod1.html
+Save mesh info and run the instaweb-symptoms.py
