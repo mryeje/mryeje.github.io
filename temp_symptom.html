@@ -165,12 +165,12 @@
 </head>
 <body>
     <div id="viewer-container">
-        <img src="C:/Users/jsmith/Blender/User interface/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
+        <img src="/icons/MicrosoftTeams-image (1).png" id="placeholder-image" alt="Placeholder Image">
         <iframe src="" id="api-frame"></iframe>
-        <img src="C:/Users/jsmith/Blender/User interface/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
+        <img src="/icons/dropdown_icon.png" id="partMenuButton" alt="Menu" draggable="false" title="Hide a section">
         <img src="/icons/reset.png" id="playIconButton" class="icon" alt="Reset" draggable="false" title="Reset View">
-        <img src="C:/Users/jsmith/Blender/User interface/icons/manual.png" id="thirdIconButton" class="icon" draggable="false" title="View user manual">
-        <img src="C:/Users/jsmith/Blender/User interface/icons/dropdown_icon.png" id="symptomsMenuButton" alt="Symptoms Menu" draggable="false" title="Go to Symptoms Page">
+        <img src="/icons/manual.png" id="thirdIconButton" class="icon" draggable="false" title="View user manual">
+        <img src="/icons/dropdown_icon.png" id="symptomsMenuButton" alt="Symptoms Menu" draggable="false" title="Go to Symptoms Page">
         <div id="popup-container">
             <iframe src="" id="popup-iframe"></iframe>
             <button id="close-popup" style="position:absolute; top:5px; right:5px; background:#f00; color:#fff; border:none; cursor:pointer;">X</button>
@@ -217,17 +217,17 @@
             item.textContent = part;
             var icon = document.createElement("img");
             icon.className = "icon";
-            icon.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+            icon.src = "/icons/open_eye.png";
             item.appendChild(icon);
             (function(partName, iconElem, itemElem) {
                 itemElem.onclick = function() {
                     if (itemElem.classList.contains("selected")) {
                         itemElem.classList.remove("selected");
-                        iconElem.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+                        iconElem.src = "/icons/open_eye.png";
                         parts[partName].forEach(id => api.show(id));
                     } else {
                         itemElem.classList.add("selected");
-                        iconElem.src = "C:/Users/jsmith/Blender/User interface/icons/closed-eye.png";
+                        iconElem.src = "/icons/closed-eye.png";
                         parts[partName].forEach(id => api.hide(id));
                     }
                 };
@@ -245,19 +245,19 @@
             item.textContent = sym;
             var icon = document.createElement("img");
             icon.className = "icon";
-            icon.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+            icon.src = "/icons/open_eye.png";
             item.appendChild(icon);
             (function(symName, iconElem, itemElem) {
                 itemElem.onclick = function() {
                     if (itemElem.classList.contains("selected")) {
                         itemElem.classList.remove("selected");
-                        iconElem.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+                        iconElem.src = "/icons/open_eye.png";
                         showAllParts();
                     } else {
                         hideAllPartsIndividually();
                         resetSymptomsMenuSelection();
                         itemElem.classList.add("selected");
-                        iconElem.src = "C:/Users/jsmith/Blender/User interface/icons/closed-eye.png";
+                        iconElem.src = "/icons/closed-eye.png";
                         symptoms[symName].forEach(id => api.show(id));
                     }
                 };
@@ -417,7 +417,7 @@
                             var item = items[i];
                             var icon = item.getElementsByTagName("img")[0];
                             item.classList.remove("selected");
-                            icon.src = "C:/Users/jsmith/Blender/User interface/icons/open_eye.png";
+                            icon.src = "/icons/open_eye.png";
                         }
                     } else {
                         console.log("Error recentering camera:", err);
