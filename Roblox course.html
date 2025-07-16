@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From Player to Creator: A Roblox Adventure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f0f8ff; /* AliceBlue */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-size: 22px;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        header, footer {
+            text-align: center;
+            color: #4a4e69;
+        }
+
+        h1, h2, h3, h4 {
+            color: #4a4e69; /* Dark blue/purple */
+        }
+
+        h1 {
+            font-size: 3.5em;
+            text-shadow: 2px 2px #e0e0e0;
+        }
+
+        h2 {
+            font-size: 2.8em;
+            border-bottom: 3px dashed #9a8c98; /* Muted purple */
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 2.2em;
+            color: #c9ada7; /* Muted pink/brown */
+        }
+
+        h4 {
+            font-size: 1.8em;
+            color: #22223b; /* Darker blue */
+        }
+
+        a {
+            color: #0077cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #0055aa;
+            text-decoration: underline;
+        }
+
+       .mission-briefing,.joke,.riddle {
+            background-color: #fffbe6; /* Light yellow */
+            border-left: 5px solid #ffc107; /* Amber */
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+       .joke,.riddle {
+            font-style: italic;
+        }
+
+        ol {
+            list-style-type: none;
+            counter-reset: lesson-counter;
+            padding-left: 0;
+        }
+
+        ol li {
+            counter-increment: lesson-counter;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            position: relative;
+        }
+
+        ol li::before {
+            content: counter(lesson-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #ff6b6b; /* Bright red/pink */
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        pre {
+            background-color: #282c34; /* Dark theme for code */
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        /* Inline code styling */
+        p code, li code {
+            background-color: #eef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 18px;
+            text-align: left;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+        }
+
+        table th {
+            background-color: #4a4e69;
+            color: white;
+        }
+
+        table tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        strong {
+            color: #d90429; /* Strong red for emphasis */
+        }
+
+        #appendix ul {
+            list-style-type: '👉';
+            padding-left: 30px;
+        }
+        
+        #appendix li {
+            padding-left: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>From Player to Creator: A Roblox Adventure</h1>
+    </header>
+    <main>
+        <section id="intro">
+            <h2>Introduction: A Top-Secret Mission for a Master Builder!</h2>
+            <p>Greetings, Agent L.</p>
+            <p>We've been watching you. Your skills in building tricky, awesome levels in Mario Maker are legendary. But now, we have a new mission for you, should you choose to accept it.</p>
+            <p>Your mission: build the ultimate 3D obstacle course—an "Obby"—in the secret world of Roblox Studio. You'll get access to a high-tech secret lab, learn to write secret codes, and build traps so tricky they'll make your friends cry (with laughter, probably).</p>
+            <p>This message will not self-destruct, because we need you to read it. Let's get building!</p>
+            <div class="riddle">
+                <p><strong>Your First Riddle:</strong> What has many keys but can't open a single lock?</p>
+                <p>... A piano! And soon, your computer keyboard will be the key to unlocking new game-making powers!</p>
+            </div>
+        </section>
+
+        <section id="module1">
+            <h2>Module 1: Your Secret Lab - Getting to Know Roblox Studio</h2>
+            <h4>Objective: Get comfortable with the Roblox Studio interface and 3D movement. No coding yet!</h4>
+            <div class="mission-briefing">
+                <h3>Mission Briefing</h3>
+                <p>First things first, Agent L. Every master builder needs a secret lab. We're going to get you set up in Roblox Studio and teach you how to move around and use your basic tools. This is like learning where all the blocks are in Mario Maker before you start building.</p>
+            </div>
+            <h3>Lessons:</h3>
+            <ol>
+                <li><strong>Downloading Your Lab:</strong> Your first task is to get the software. With a grown-up's help, go to the Roblox website and find the "Create" button. Follow the instructions to download and install Roblox Studio. This is your new headquarters!</li>
+                <li><strong>The Three Big Screens:</strong> When you open your lab, you'll see a lot of buttons. Don't worry! We only need to know three things for now:
+                    <ul>
+                        <li><strong>The 3D Viewport:</strong> The giant window in the middle. This is your building area!</li>
+                        <li><strong>The Explorer:</strong> This is your <strong>Toy Box</strong>. It's a list on the right side that shows every single thing in your game.</li>
+                        <li><strong>The Properties Window:</strong> This is the <strong>Control Panel</strong>. When you click on a toy from your Toy Box, this window lets you change everything about it.</li>
+                    </ul>
+                </li>
+                <li><strong>Flying and Walking:</strong> To move around your lab, use the <code>W</code>, <code>A</code>, <code>S</code>, and <code>D</code> keys, just like in many games. To look around, hold down the right mouse button and move your mouse. You can fly! This is how you'll get a good view of your creations.</li>
+                <li><strong>Your First Building Block:</strong> Let's add something to your empty world. At the top of the screen, find the <strong>Home</strong> tab and click the button that says <strong>Part</strong>. A gray brick will appear. Congratulations, you've made your first object!</li>
+                <li><strong>Project #1: The Rainbow Road:</strong> Time for your first project. Add a bunch of Parts to your world. Click on each one and look at the <strong>Properties</strong> window (your Control Panel). Find the property called <code>BrickColor</code> and click it to change the color. Find the one called <code>Material</code> to change its texture from plastic to wood, metal, or even grass! Try to make a long road with many different colors and materials.</li>
+                <li><strong>The Most Important Button in the Universe:</strong> Click on one of your new parts and press the <strong>Play</strong> button at the top. Uh oh! Did your part fall out of the sky? That's because it doesn't have gravity turned off. Now, stop the game. Select your part again and find the <strong>Anchor</strong> button in the <strong>Home</strong> tab. It looks like an anchor from a ship. Click it. Now press <strong>Play</strong> again. It stays put! <strong>ALWAYS ANCHOR YOUR PLATFORMS!</strong> This is the #1 rule for all master builders.</li>
+            </ol>
+            <h4>YouTube Reference:</h4>
+            <p>To see a pro do it, watch the first few minutes of this video. It shows you how to move around and place your first parts.
+                <br>
+                <a href="https://www.youtube.com/playlist?list=PLU4izPVyjdQbi0q8gD1D0cfU1Sfvn_Dal" target="_blank">How to Roblox Studio Basics (Beginner Friendly Tutorial) by Chrisandthemike</a>
+            </p>
+        </section>
+
+        <section id="module2">
+            <h2>Module 2: The Art of the Obby - Building Your First Jumps</h2>
+            <h4>Objective: Use the building tools to create a simple, multi-stage platforming challenge.</h4>
+            <div class="mission-briefing">
+                <h3>Mission Briefing</h3>
+                <p>Okay, Agent L, you know your way around the lab. Now it's time to build the foundation of your obby. We're going to create a series of jumps. Remember, a good obby is like a good joke: it's all about the timing!</p>
+            </div>
+            <div class="joke">
+                <p><strong>Today's Joke:</strong> Why did the scarecrow win an award?</p>
+                <p>... Because he was outstanding in his field!</p>
+            </div>
+            <h3>Lessons:</h3>
+            <ol>
+                <li><strong>The Holy Trinity of Tools:</strong> At the top of the screen, next to the Anchor button, you will find your three most important tools: <strong>Move</strong>, <strong>Scale</strong>, and <strong>Rotate</strong>.
+                    <ul>
+                        <li><strong>Move:</strong> Lets you move parts up, down, left, and right.</li>
+                        <li><strong>Scale:</strong> Lets you make parts bigger or smaller, longer or shorter.</li>
+                        <li><strong>Rotate:</strong> Lets you spin parts around.</li>
+                    </ul>
+                    Practice using these three tools on a Part until you feel like a pro.
+                </li>
+                <li><strong>Deleting the Floor:</strong> A good obby is dangerous! Let's get rid of that boring floor. In your <strong>Explorer</strong> window (the Toy Box), find the item named <code>Baseplate</code>. Click on it, and then press the <strong>Delete</strong> key on your keyboard. Poof! Now if a player falls, they fall into the endless sky!</li>
+                <li><strong>The Spawn Point:</strong> The block you start on is called a <code>SpawnLocation</code>. You can use the <strong>Move</strong> tool to place it at the beginning of your obby. Make sure the little person icon on it is facing the direction you want the player to go.</li>
+                <li><strong>Project #2: The Leaping Lizard Gauntlet:</strong> Time for your second project. Your mission is to build a sequence of 5 to 7 platforms that a player has to jump across. Use the <strong>Scale</strong> and <strong>Move</strong> tools to make some jumps short, some long, some high, and some low. After you place a few platforms, use the <strong>Play Here</strong> button (it's under the main Play button) to test your course. Are the jumps possible? Are they too easy? Are they too hard? A master builder always tests their work!</li>
+            </ol>
+            <h4>YouTube Reference:</h4>
+            <p>For a great guide on building a simple obby, search YouTube for this video title:
+                <br>
+                <strong>How to Build Your First Obby by kidskod Roblox Rookies</strong>
+            </p>
+        </section>
+
+        <section id="module3">
+            <h2>Module 3: The Secret Code - Making Things Happen with Scripts</h2>
+            <h4>Objective: Write your very first Lua script to make a part interactive.</h4>
+            <div class="mission-briefing">
+                <h3>Mission Briefing</h3>
+                <p>Agent L, you've mastered building. But what if you could give your blocks... superpowers? That's where scripting comes in. It's a secret code that tells your parts what to do. Our first spell will be the "Disappearing Platform" trick!</p>
+            </div>
+            <div class="riddle">
+                <p><strong>Today's Riddle:</strong> What has to be broken before you can use it?</p>
+                <p>... An egg! And we're about to "crack" the code!</p>
+            </div>
+            <h3>Lessons:</h3>
+            <ol>
+                <li><strong>What's a Script?</strong> A script is just a list of instructions for the computer, like a recipe for a cake. The computer is very literal, so it will follow your recipe <em>exactly</em> as you write it. The language for these recipes is called <strong>Lua</strong>.</li>
+                <li><strong>Your First Script:</strong> In the <strong>Explorer</strong>, find one of the platforms you made. Click the little <code>+</code> sign next to its name and select <strong>Script</strong>. A new window will open. It will probably say <code>print("Hello, world!")</code>. This is a tradition for coders, but we don't need it. Delete that line so you have a blank page.</li>
+                <li><strong>The Recipe for a Fading Trap:</strong> We are going to write a script that makes a platform disappear for a few seconds when a player touches it. Type this recipe <em>exactly</em> as you see it. Punctuation and capitalization are very important!
+<pre><code>local part = script.Parent
+
+local function onTouch(otherPart)
+    if otherPart.Parent:FindFirstChild("Humanoid") then
+        part.Transparency = 1
+        part.CanCollide = false
+        wait(3)
+        part.Transparency = 0
+        part.CanCollide = true
+    end
+end
+
+part.Touched:Connect(onTouch)</code></pre>
+                </li>
+                <li><strong>Project #3: The Ghost Bridge:</strong> Now for the fun part. Build a long bridge made of 5 or 6 separate parts. Put this same script inside <em>every single part</em> of the bridge. Now when you test it, you'll have to run across before the bridge disappears behind you!</li>
+            </ol>
+            <h4>YouTube Reference:</h4>
+            <p>To see this script being built step-by-step, this video is perfect.
+                <br>
+                <a href="https://www.youtube.com/playlist?list=PLGntQxTVnjLigQMeIJYoV52rvORGDD8LL" target="_blank">How to Make a Fading Trap in Roblox Studio by Create & Learn</a>
+            </p>
+            
+            <h3>Table 2: Agent L's Secret Spellbook (Your First Lua Commands)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>The Spell (What to Type)</th>
+                  <th>What it Does (The Magic Effect)</th>
+                  <th>Secret Code Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>local part = script.Parent</code></td>
+                  <td>Creates a variable (a nickname) called <code>part</code> that holds the object the script is inside.</td>
+                  <td><code>script.Parent</code> literally means "the parent of this script." It's a super useful spell!</td>
+                </tr>
+                <tr>
+                  <td><code>part.Transparency = 1</code></td>
+                  <td>Makes the <code>part</code> completely invisible.</td>
+                  <td><code>1</code> is invisible. <code>0</code> is solid. <code>0.5</code> is see-through like a ghost!</td>
+                </tr>
+                <tr>
+                  <td><code>part.CanCollide = false</code></td>
+                  <td>Lets players walk right through the <code>part</code>.</td>
+                  <td><code>false</code> means OFF (no colliding). <code>true</code> means ON (you can stand on it).</td>
+                </tr>
+                <tr>
+                  <td><code>wait(3)</code></td>
+                  <td>Pauses the script for a number of seconds.</td>
+                  <td>You can change the number in the parentheses to wait for a longer or shorter time.</td>
+                </tr>
+                <tr>
+                  <td><code>part.Touched:Connect(onTouch)</code></td>
+                  <td>This is a powerful trigger! It runs a function whenever the <code>part</code> is touched by something.</td>
+                  <td>This is how you make traps and buttons work!</td>
+                </tr>
+              </tbody>
+            </table>
+        </section>
+
+        <section id="module4">
+            <h2>Module 4: Level Up! - Creating Killer Obstacles</h2>
+            <h4>Objective: Learn to create classic obby obstacles like kill bricks and conveyors.</h4>
+            <div class="mission-briefing">
+                <h3>Mission Briefing</h3>
+                <p>Every great obby needs great traps. It's time to add some real danger to your course, Agent L. We'll create "lava bricks" that reset the player and speedy conveyors that try to push them off!</p>
+            </div>
+            <div class="joke">
+                <p><strong>Today's Joke:</strong> What do you call a cow that can't moo?</p>
+                <p>... A milk dud!</p>
+            </div>
+            <h3>Lessons:</h3>
+            <ol>
+                <li><strong>The Insta-Reset Brick (Kill Brick):</strong> This is one of the most popular traps. Make a new Part, color it red like lava, and Anchor it. Now, add a new script to it with this recipe:
+<pre><code>local killBrick = script.Parent
+
+local function onTouch(otherPart)
+    local partParent = otherPart.Parent
+    local humanoid = partParent:FindFirstChild("Humanoid")
+
+    if humanoid then
+        humanoid.Health = 0
+    end
+end
+
+killBrick.Touched:Connect(onTouch)</code></pre>
+                </li>
+                <li><strong>The Pushy Platform (Conveyor):</strong> This one is even easier and doesn't need a script to start! Add a new Part and make it long like a treadmill. In the <strong>Properties</strong> window, find the property called <code>Velocity</code>. This is the speed and direction the part is moving. Try typing <code>10</code> into the first number (the X value). Now when you play, the part will push you! You can change the numbers to make it push players faster, slower, or in different directions. You can even make them go up!</li>
+                <li><strong>Project #4: The Gauntlet of Doom:</strong> Your mission is to combine everything you have learned. Create a new section of your obby that has:
+                    <ul>
+                        <li>A few normal jumps.</li>
+                        <li>A disappearing "Ghost Bridge."</li>
+                        <li>A floor of red "Kill Bricks" you have to jump over.</li>
+                        <li>A final conveyor belt that tries to push you off the finish line.</li>
+                    </ul>
+                    This will be your most challenging and awesome section yet!
+                </li>
+            </ol>
+            <h4>YouTube Reference:</h4>
+            <p>This video shows a great way to set up lava bricks in your game.
+                <br>
+                <a href="https://www.youtube.com/watch?v=9v3GvfX_qr8" target="_blank">How to Make a Simple Obby in Roblox Studio by AlvinBlox</a>
+            </p>
+        </section>
+
+        <section id="module5">
+            <h2>Module 5: Going Public! - Sharing Your Game with the World</h2>
+            <h4>Objective: Learn how to save, configure, and publish the game.</h4>
+            <div class="mission-briefing">
+                <h3>Mission Briefing</h3>
+                <p>Your obby is complete, Agent L. The final step is to unleash it upon the world! It's time to publish your game so your friends (and future fans) can play it.</p>
+            </div>
+            <div class="riddle">
+                <p><strong>Today's Riddle:</strong> It belongs to you, but other people use it more than you do. What is it?</p>
+                <p>... Your name! And now, everyone's going to know the name of your awesome game!</p>
+            </div>
+            <h3>Lessons:</h3>
+            <ol>
+                <li><strong>Saving Your Masterpiece:</strong> You should save your work often! In the top-left corner, click <strong>File</strong>.
+                    <ul>
+                        <li><code>Save to File</code> saves a copy on your computer.</li>
+                        <li><code>Save to Roblox</code> saves it to your online Roblox account. This is what we want to do before we publish.</li>
+                    </ul>
+                </li>
+                <li><strong>Game Settings 101:</strong> After you save to Roblox, go to the <strong>Home</strong> tab and click on <strong>Game Settings</strong>. Here you can give your game a cool name and write a description telling people what it's about.</li>
+                <li><strong>Flipping the Switch: Making it Public:</strong> In the same <strong>Game Settings</strong> menu, go to the <strong>Permissions</strong> tab. You will see an option for <strong>Public</strong>. Click it! Now your game is live on the Roblox platform. You can go to your game's page on the Roblox website and copy the link to share with your friends so they can try to beat your course.</li>
+                <li><strong>Mission Accomplished!</strong> Congratulations, Agent L! You have completed your training and published your very first game. You went from a Master Builder to a Master Coder. Your skills are now legendary. But this is just the beginning. Keep experimenting, keep building, and keep trying new things. The Roblox world is yours to create!</li>
+            </ol>
+        </section>
+
+        <section id="appendix">
+            <h2>Appendix: The Coder's Joke Book & Riddle Treasury</h2>
+            <h3>Jokes:</h3>
+            <ul>
+                <li>What do you call a pig that knows karate? A pork chop!</li>
+                <li>Why did the cookie go to the hospital? Because he felt crummy.</li>
+                <li>What do you call a fake noodle? An impasta!</li>
+                <li>Why did Tigger stick his head in the toilet? Because he was looking for Pooh!</li>
+                <li>What's brown and sticky? A stick!</li>
+                <li>What do you call a boomerang that won't come back? A stick.</li>
+                <li>Why did the math book look so sad? Because it had too many problems!</li>
+            </ul>
+            <h3>Riddles:</h3>
+            <ul>
+                <li>What is full of holes but still holds water? A sponge.</li>
+                <li>I'm tall when I'm young, and I'm short when I'm old. What am I? A candle.</li>
+                <li>What has an eye, but cannot see? A needle.</li>
+                <li>What has a thumb and four fingers but is not alive? A glove.</li>
+                <li>I follow you all the time and copy your every move, but you can't touch me or catch me. What am I? Your shadow.</li>
+                <li>What can you catch, but not throw? A cold.</li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>Mission Complete! Keep building!</p>
+    </footer>
+</body>
+</html>
