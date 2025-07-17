@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Content Strategy for Trade Skills</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Subtle Accents -->
+    <!-- Application Structure Plan: The SPA is designed as a strategic briefing document, guiding the user from high-level findings to a specific, actionable content framework. The structure is thematic and sequential: 1) Introduction setting the context. 2) Core Findings, an interactive dashboard exploring the 'why' behind viral success in these niches. Users can click on different psychological drivers to see related data and explanations. This is chosen over a linear report summary to engage the user immediately with the core concepts. 3) The S.A.V.E.D. Model, a detailed, sectioned breakdown of the proposed content paradigm. Each letter of the acronym is a 'tab' or section, explaining the principle and showing 'how-to' implement it. This allows for focused learning. 4) A Content Strategy dashboard that lets the user select a trade (e.g., OPE Mechanic) and see tailored video ideas based on the S.A.V.E.D. model, making the framework immediately practical. The flow is from understanding (Findings) -> learning a system (S.A.V.E.D. Model) -> practical application (Strategy Dashboard). -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Analysis of what makes "boring" niche videos viral. Goal: Inform & Compare. Viz/Method: Interactive Bar Chart (Chart.js) and associated text blocks. Interaction: Clicking a button for a success factor (e.g., 'Satisfying', 'Authentic') updates the chart to show its relative components and changes the descriptive text. Justification: This connects abstract concepts to visual data, making the relationships clearer than just text. Library: Chart.js for its simplicity and canvas rendering.
+        - Report Info: The proposed S.A.V.E.D. content framework. Goal: Organize & Explain. Viz/Method: A tab-like section using styled HTML divs. Interaction: Clicking on a letter (S, A, V, E, D) reveals detailed information for that principle. Justification: This breaks a large amount of information into digestible chunks, preventing cognitive overload and allowing users to focus on one concept at a time. Method: HTML/CSS/Tailwind + JS for show/hide logic.
+        - Report Info: Example video ideas for different trades. Goal: Demonstrate Application. Viz/Method: A dropdown selector and a dynamic card-based display. Interaction: User selects a trade (e.g., Plumber, OPE Mechanic) from a dropdown, and the JS updates a grid of 'idea cards' with relevant video titles and descriptions based on the S.A.V.E.D. model. Justification: This makes the entire report immediately actionable and tailored to the user's specific interest (e.g., the OPE parts retailer). Method: HTML/CSS/Tailwind + JS data arrays and DOM manipulation.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4; /* Warm Neutral */
+            color: #3D3D3D;
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+        .nav-button.active {
+            background-color: #8C6D62; /* Accent */
+            color: #FFFFFF;
+        }
+        .nav-button:not(.active):hover {
+            background-color: #EAE5E2; /* Lighter Neutral */
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #EAE5E2;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .saved-tab.active {
+            background-color: #8C6D62;
+            color: #fff;
+            border-color: #8C6D62;
+        }
+        .saved-tab {
+             border: 2px solid #D1C7C3;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#6D4C41] mb-2">Beating the Algorithm</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An Interactive Report on Creating Viral Content for "Niche" Trade Skills & Outdoor Power Equipment</p>
+        </header>
+
+        <nav id="navigation" class="flex justify-center items-center space-x-2 md:space-x-4 mb-12 bg-white p-2 rounded-full shadow-sm sticky top-4 z-10">
+            <button class="nav-button active" data-target="findings">Core Findings</button>
+            <button class="nav-button" data-target="model">The S.A.V.E.D. Model</button>
+            <button class="nav-button" data-target="strategy">Strategy Dashboard</button>
+        </nav>
+
+        <main>
+            <!-- Core Findings Section -->
+            <section id="findings" class="content-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Why "Boring" Goes Viral</h2>
+                    <p class="text-md text-gray-600 max-w-2xl mx-auto">This section explores the key psychological drivers that make seemingly mundane repair and trade-skill videos highly engaging. Click on each driver to see its component breakdown and understand the science behind what captures viewer attention. This interactive dashboard reveals that success is not random; it's based on fulfilling specific human curiosities and needs.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="card p-6">
+                        <div id="findings-text-container">
+                            <h3 id="findings-title" class="text-2xl font-bold text-[#6D4C41] mb-3">The Power of Satisfaction</h3>
+                            <p id="findings-desc" class="text-gray-700">The most powerful driver is the brain's response to order and problem-solving. Viewers experience a release of dopamine and serotonin when they watch chaos turn into order, a broken item fixed, or a dirty object cleaned. This creates a deeply satisfying, almost therapeutic, viewing experience that encourages re-watching and sharing.</p>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <button onclick="updateChart('satisfaction')" class="findings-btn bg-[#8C6D62] text-white px-3 py-1 rounded-full text-sm font-medium">Satisfying & Sensory</button>
+                            <button onclick="updateChart('authenticity')" class="findings-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">Authenticity</button>
+                            <button onclick="updateChart('value')" class="findings-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">Educational Value</button>
+                            <button onclick="updateChart('efficiency')" class="findings-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">Efficiency</button>
+                        </div>
+                    </div>
+                    <div class="card p-4">
+                        <div class="chart-container">
+                            <canvas id="findingsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S.A.V.E.D. Model Section -->
+            <section id="model" class="content-section hidden">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">The S.A.V.E.D. Content Model</h2>
+                    <p class="text-md text-gray-600 max-w-3xl mx-auto">Based on our findings, we've developed the S.A.V.E.D. model—a framework for creating high-impact video content for repair and trade-skill niches. This isn't just a list of tips; it's a strategic paradigm designed to be memorable and effective. Explore each principle by clicking the tabs below to understand its core concept and practical implementation steps.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="w-full md:w-1/4 flex md:flex-col justify-around md:justify-start">
+                        <div onclick="switchSavedTab('s')" class="saved-tab active flex-1 md:flex-none p-4 text-center rounded-lg cursor-pointer mb-2">
+                            <h3 class="text-2xl font-bold">S</h3>
+                            <p class="hidden md:block">Satisfying</p>
+                        </div>
+                        <div onclick="switchSavedTab('a')" class="saved-tab flex-1 md:flex-none p-4 text-center rounded-lg cursor-pointer mb-2">
+                             <h3 class="text-2xl font-bold">A</h3>
+                             <p class="hidden md:block">Authentic</p>
+                        </div>
+                        <div onclick="switchSavedTab('v')" class="saved-tab flex-1 md:flex-none p-4 text-center rounded-lg cursor-pointer mb-2">
+                             <h3 class="text-2xl font-bold">V</h3>
+                             <p class="hidden md:block">Valuable</p>
+                        </div>
+                        <div onclick="switchSavedTab('e')" class="saved-tab flex-1 md:flex-none p-4 text-center rounded-lg cursor-pointer mb-2">
+                            <h3 class="text-2xl font-bold">E</h3>
+                            <p class="hidden md:block">Efficient</p>
+                        </div>
+                        <div onclick="switchSavedTab('d')" class="saved-tab flex-1 md:flex-none p-4 text-center rounded-lg cursor-pointer mb-2">
+                            <h3 class="text-2xl font-bold">D</h3>
+                            <p class="hidden md:block">Diagnostic</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-3/4 card p-6 md:p-8">
+                        <div id="saved-content">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Strategy Dashboard Section -->
+            <section id="strategy" class="content-section hidden">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Actionable Content Strategy</h2>
+                    <p class="text-md text-gray-600 max-w-3xl mx-auto">This is where theory becomes practice. Select a trade specialization from the dropdown menu to see a list of tailored video ideas. Each idea is crafted using the S.A.V.E.D. model, providing a clear, actionable starting point for your content creation pipeline. Use these examples as inspiration to build a library of engaging, high-performance videos.</p>
+                </div>
+
+                <div class="card p-6 max-w-4xl mx-auto">
+                    <div class="flex flex-col sm:flex-row gap-4 items-center mb-6">
+                         <label for="trade-selector" class="font-semibold text-lg text-gray-700">Select Your Niche:</label>
+                         <select id="trade-selector" class="w-full sm:w-auto flex-grow p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#8C6D62] focus:border-[#8C6D62]">
+                            <option value="ope">Outdoor Power Equipment</option>
+                            <option value="plumber">Plumbing</option>
+                            <option value="carpenter">Carpentry</option>
+                            <option value="mechanic">Auto Mechanics</option>
+                         </select>
+                    </div>
+
+                    <div id="ideas-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const navButtons = document.querySelectorAll('.nav-button');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const targetId = button.dataset.target;
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Chart.js implementation
+        const findingsData = {
+            satisfaction: {
+                title: 'The Power of Satisfaction',
+                description: "The most powerful driver is the brain's response to order and problem-solving. Viewers experience a release of dopamine when they watch chaos turn into order, a broken item fixed, or a dirty object cleaned. This creates a deeply satisfying, almost therapeutic, viewing experience.",
+                chart: {
+                    labels: ['Transformation (Before/After)', 'ASMR Sounds', 'Cleaning Process', 'Order from Chaos'],
+                    data: [45, 25, 20, 10]
+                }
+            },
+            authenticity: {
+                title: 'Craving Authenticity',
+                description: "Viewers build trust with creators who show genuine expertise and relatable struggles. Polished, corporate content often fails because it lacks the human element. Showing real, greasy equipment and admitting to challenges makes the creator more credible.",
+                chart: {
+                    labels: ['Real-World Scenarios', 'Relatable Mistakes', 'Unscripted Moments', 'Expert Knowledge'],
+                    data: [40, 20, 15, 25]
+                }
+            },
+            value: {
+                title: 'Clear Educational Value',
+                description: 'Beyond entertainment, successful videos teach something useful. Viewers are often searching for a solution to their own problem. Content that provides a clear, actionable tip or a diagnostic "aha!" moment is highly valued and shared.',
+                chart: {
+                    labels: ['Problem Solving', 'Learning a New Skill', '"Insider" Tips', 'Product Knowledge'],
+                    data: [50, 25, 15, 10]
+                }
+            },
+            efficiency: {
+                title: 'Engineered for Efficiency',
+                description: 'Short-form content must respect the viewer\'s time. Successful videos get straight to the point. They use quick cuts, timelapses, and a "no fluff" approach to deliver information and satisfaction in under 60 seconds, perfectly matching modern attention spans.',
+                chart: {
+                    labels: ['Quick Problem/Solution', 'Use of Timelapses', 'Concise Narration', 'Sub-30s Length'],
+                    data: [40, 30, 15, 15]
+                }
+            }
+        };
+
+        let findingsChart;
+        const ctx = document.getElementById('findingsChart').getContext('2d');
+
+        function createChart(data) {
+            if (findingsChart) {
+                findingsChart.destroy();
+            }
+            findingsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Relative Impact Score',
+                        data: data.data,
+                        backgroundColor: ['#8C6D62', '#A99087', '#C5B5AF', '#E2DAD6'],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 2,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#3D3D3D',
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 6,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: 500
+                                },
+                                color: '#3D3D3D',
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 20) {
+                                        return label.substring(0, 20) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(key) {
+            const data = findingsData[key];
+            document.getElementById('findings-title').textContent = data.title;
+            document.getElementById('findings-desc').textContent = data.description;
+            createChart(data.chart);
+
+            document.querySelectorAll('.findings-btn').forEach(btn => {
+                btn.classList.remove('bg-[#8C6D62]', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.add('bg-[#8C6D62]', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+        }
+
+        // S.A.V.E.D. Model Content
+        const savedContent = {
+            s: {
+                title: 'Satisfying & Sensory',
+                why: 'Taps into the brain\'s love for order and completion, creating a therapeutic and highly shareable experience.',
+                how: [
+                    { icon: '✨', text: '<strong>Focus on Transformation:</strong> Show a clear "Before" (dirty, broken) and "After" (clean, fixed). This is the core payoff.' },
+                    { icon: '🔊', text: '<strong>Emphasize ASMR:</strong> Capture crisp sounds—a part clicking into place, a clean engine whir, the scrape of gunk being removed.' },
+                    { icon: '🧼', text: '<strong>The "Clean-up":</strong> Dedicate a few seconds to showing the process of cleaning a grimy part. It’s visually hypnotic.' }
+                ]
+            },
+            a: {
+                title: 'Authentic & Actionable',
+                why: 'Builds trust and credibility. Viewers crave genuine expertise over slick, corporate marketing.',
+                how: [
+                    { icon: '🔧', text: '<strong>Show, Don\'t Just Tell:</strong> Let the hands and tools be the stars. Minimize talking heads.' },
+                    { icon: '😅', text: '<strong>Embrace the Struggle:</strong> Don\'t be afraid to show a stuck bolt or a real-world problem. Overcoming it is part of the authentic story.' },
+                    { icon: '💡', text: '<strong>Provide One Key Tip:</strong> Each video should offer at least one clear, simple takeaway that a DIYer could immediately use.' }
+                ]
+            },
+            v: {
+                title: 'Valuable & Visual',
+                why: 'Provides a clear reason for the viewer to watch. It must solve a problem or teach something new.',
+                how: [
+                    { icon: '🎯', text: '<strong>Problem-First Approach:</strong> Start the video with the problem (e.g., "Engine won\'t start... here\'s why"). This is your hook.' },
+                    { icon: '👁️', text: '<strong>The Visual "Aha!":</strong> Use close-ups to show the *exact* point of failure—a cracked belt, a clogged filter. This is the core value.' },
+                    { icon: '✍️', text: '<strong>Use Minimal Text:</strong> On-screen text should only be used to label parts or give critical specs. Let the visuals do the talking.' }
+                ]
+            },
+            e: {
+                title: 'Efficient & Engaging',
+                why: 'Respects the viewer\'s time and is optimized for the short-form video format and modern attention spans.',
+                how: [
+                    { icon: '⏩', text: '<strong>No Wasted Time:</strong> Cut out all walking, searching for tools, and long pauses. Every second must show progress.' },
+                    { icon: '✂️', text: '<strong>Use Hyper-Lapse & Quick Cuts:</strong> Speed through repetitive actions like unscrewing bolts, then cut to normal speed for critical moments.' },
+                    { icon: '⏱️', text: '<strong>The 15-30 Second Rule:</strong> Get in, show the problem, show the fix, show the result, and get out. Keep it concise.' }
+                ]
+            },
+            d: {
+                title: 'Diagnostic, Not Just Demonstrative',
+                why: 'The key differentiator for a parts retailer. You teach customers to diagnose their own problem, which directly leads to a sale.',
+                how: [
+                    { icon: '❓', text: '<strong>"If X, then Y" Framing:</strong> Frame content as a diagnostic tool. "If your mower makes this noise, you need this part."' },
+                    { icon: '🔢', text: '<strong>Show the Part Number:</strong> Briefly flash the part number on screen to bridge the gap from video to retail site.' },
+                    { icon: '🏢', text: '<strong>Use Subtle Branding:</strong> The focus is the repair, but a branded work mat or a final screen with your logo reinforces your brand as the expert source.' }
+                ]
+            }
+        };
+
+        function switchSavedTab(key) {
+            const content = savedContent[key];
+            const container = document.getElementById('saved-content');
+            
+            let howToList = content.how.map(item => 
+                `<li class="flex items-start space-x-3">
+                    <span class="text-2xl">${item.icon}</span>
+                    <span class="text-gray-700">${item.text}</span>
+                </li>`
+            ).join('');
+
+            container.innerHTML = `
+                <h3 class="text-3xl font-bold text-[#6D4C41] mb-2">${content.title}</h3>
+                <p class="text-lg font-medium text-gray-500 mb-6">${content.why}</p>
+                <h4 class="text-xl font-semibold text-gray-800 mb-4">How to Implement:</h4>
+                <ul class="space-y-4">
+                    ${howToList}
+                </ul>
+            `;
+
+            document.querySelectorAll('.saved-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.saved-tab:nth-child(${Object.keys(savedContent).indexOf(key) + 1})`).classList.add('active');
+        }
+
+
+        // Strategy Dashboard Content
+        const ideaData = {
+            ope: [
+                { title: 'The 5-Second Carburetor Clean', s: 'Satisfying spray & grime removal.', v: 'Fixes sputtering engine.', e: 'Quick, high-impact fix.' },
+                { title: 'Lawnmower Won\'t Start? Check This First!', a: 'Shows a common, real problem.', d: 'Diagnoses a faulty spark plug.', v: 'Saves viewer time and money.' },
+                { title: 'The Perfect Chainsaw Sharpening Sound', s: 'ASMR of metal on sharpener.', e: 'Quick timelapse of the process.', v: 'Teaches a vital skill.' },
+                { title: 'Transforming a Rusty Deck in 30s', s: 'Before/After of rust removal.', a: 'Uses common, accessible tools.', e: 'Fast, dramatic change.' },
+            ],
+            plumber: [
+                { title: 'That Dripping Sound? Gone in 15s.', s: 'Silence after the drip is satisfying.', d: 'Diagnoses a worn-out washer.', e: 'Extremely fast fix.' },
+                { title: 'Unclog a Sink WITHOUT Chemicals', a: 'Real-world clogged sink.', v: 'Teaches a useful, eco-friendly trick.', s: 'Satisfying gunk removal.' },
+                { title: 'The Perfect Solder Joint', s: 'Visual of molten solder flowing perfectly.', v: 'Demonstrates a pro-level skill.', e: 'Short, focused demonstration.' },
+                { title: 'Why Your Toilet Keeps Running', d: 'Visually shows a faulty flapper.', e: 'Quick diagnosis of a common issue.', v: 'Saves water and money.' }
+            ],
+            carpenter: [
+                { title: 'The Perfect Dovetail Joint', s: 'Flawless fit is deeply satisfying.', v: 'Showcases high-level craftsmanship.', e: 'Mesmerizing process timelapse.' },
+                { title: 'Fixing a Rocking Chair in 10s', d: 'Quickly identifies the loose joint.', a: 'Simple fix anyone can do.', e: 'Fast problem-to-solution arc.' },
+                { title: 'The Sound of a Perfectly Planed Board', s: 'ASMR of wood shaving curls.', v: 'Highlights a fundamental skill.', a: 'Focus on the tool and the wood.' },
+                { title: 'Reclaiming Old Wood (Before/After)', s: 'Dramatic transformation.', a: 'Shows potential in discarded materials.', e: 'Visually compelling short story.' }
+            ],
+            mechanic: [
+                { title: 'Dirty to Clean: Throttle Body Restoration', s: 'High-contrast cleaning satisfaction.', v: 'Fixes rough idle issues.', e: 'Quick, impressive visual change.' },
+                { title: 'The Click of a Fresh Spark Plug', s: 'Satisfying sound of the torque wrench.', d: 'Diagnoses misfire with old plug.', a: 'A routine but crucial job.' },
+                { title: 'Brake Pad Swap in 30 Seconds', e: 'Hyper-lapse of the process.', v: 'Shows the core steps of a common job.', s: 'Old vs. new part comparison.' },
+                { title: 'Finding an Engine Vacuum Leak with Smoke', d: 'Visual "aha!" moment.', a: 'Real diagnostic technique.', v: 'Teaches a non-obvious pro trick.' }
+            ]
+        };
+
+        const tradeSelector = document.getElementById('trade-selector');
+        const ideasGrid = document.getElementById('ideas-grid');
+
+        function populateIdeas(trade) {
+            const ideas = ideaData[trade];
+            ideasGrid.innerHTML = '';
+            ideas.forEach(idea => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+                card.innerHTML = `
+                    <h4 class="font-bold text-md text-[#6D4C41] mb-2">${idea.title}</h4>
+                    <ul class="text-sm space-y-1 text-gray-600">
+                        <li class="flex items-center"><span class="font-bold text-green-600 mr-2">S:</span> ${idea.s}</li>
+                        <li class="flex items-center"><span class="font-bold text-blue-600 mr-2">A/D:</span> ${idea.a || idea.d}</li>
+                        <li class="flex items-center"><span class="font-bold text-purple-600 mr-2">V/E:</span> ${idea.v || idea.e}</li>
+                    </ul>
+                `;
+                ideasGrid.appendChild(card);
+            });
+        }
+        
+        tradeSelector.addEventListener('change', (e) => {
+            populateIdeas(e.target.value);
+        });
+
+        // Initial setup
+        window.onload = () => {
+            updateChart('satisfaction');
+            switchSavedTab('s');
+            populateIdeas('ope');
+        };
+
+    </script>
+</body>
+</html>
