@@ -75,6 +75,7 @@
             color: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+      /* Original rage-quit-panel now hidden by default, content grabbed by JS */
       .rage-quit-panel {
             background-color: #ffe0b2; /* Light orange for warnings */
             border-left: 5px solid #ff9800; /* Orange border */
@@ -83,6 +84,7 @@
             border-radius: 8px;
             font-style: italic;
             color: #5d4037;
+            display: none; /* IMPORTANT: Hide these by default now */
         }
       .rage-quit-panel strong {
             color: #e65100; /* Darker orange */
@@ -142,6 +144,136 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        /* Floating Rage Quit Button */
+        .rage-quit-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #e63946; /* Red */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Make it round */
+            width: 60px;
+            height: 60px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 1000; /* Ensure it's on top */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 5px;
+        }
+        .rage-quit-button:hover {
+            background-color: #c42d3a;
+            transform: scale(1.05);
+        }
+        .rage-quit-button span {
+            font-size: 1.8em; /* Emoji size */
+            margin-bottom: 2px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000; /* Higher than rage quit button */
+            visibility: hidden; /* Hidden by default */
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Modal Content (Speech Bubble) */
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-width: 90%; /* Responsive width */
+            width: 500px; /* Max width for larger screens */
+            transform: translateY(20px); /* Initial slight offset for animation */
+            transition: transform 0.3s ease;
+            border: 2px solid #ff9800; /* Orange border for speech bubble feel */
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0); /* Slide up on show */
+        }
+
+        /* Speech bubble pointer */
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            bottom: -20px; /* Position below the content */
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
+            border-right: 2px solid #ff9800;
+            border-bottom: 2px solid #ff9800;
+            z-index: -1; /* Behind the content */
+        }
+
+        /* Close button */
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            background-color: #eee;
+            color: #333;
+        }
+
+        /* Content within modal */
+        #modalRageQuitContent {
+            margin-bottom: 15px;
+            font-style: normal; /* Override panel italic */
+            color: #333;
+        }
+        #modalRageQuitContent strong {
+            color: #e65100;
+        }
+
+        .modal-troubleshooting-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .modal-troubleshooting-link a {
+            color: #457b9d;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
@@ -160,6 +292,30 @@
                 margin: 0 5px;
                 padding: 3px 8px;
                 font-size: 0.9em;
+            }
+            .rage-quit-button {
+                width: 50px;
+                height: 50px;
+                font-size: 0.7em;
+                right: 10px;
+                bottom: 10px;
+            }
+            .rage-quit-button span {
+                font-size: 1.5em;
+            }
+            .modal-content {
+                padding: 20px;
+                border-radius: 10px;
+            }
+            .modal-content::before {
+                bottom: -15px;
+                width: 20px;
+                height: 20px;
+            }
+            .modal-close-button {
+                font-size: 1.2em;
+                top: 5px;
+                right: 5px;
             }
         }
     </style>
@@ -183,7 +339,7 @@
             <span>Stage 8</span>
         </div>
 
-        <div class="collapsible-section">
+        <div class="collapsible-section" id="troubleshooting-guide">
             <details>
                 <summary>Troubleshooting Guide: When Your Yarn Just Won't Cooperate (It's Not You, It's the Yarn... Probably)</summary>
                 <div class="collapsible-content">
@@ -229,7 +385,7 @@
         <section>
             <h2>Your Crochet Journey: The Masterclass Stages</h2>
 
-            <h3>Stage 1: The Hook, The Yarn, & The Slip Knot (aka, Don't Panic!)</h3>
+            <h3 id="stage-1">Stage 1: The Hook, The Yarn, & The Slip Knot (aka, Don't Panic!)</h3>
             <h4>What You'll Learn:</h4>
             <p>Get ready to meet your new besties: the hook and the yarn! We'll show you how to pick the perfect pair and master the magical slip knot to kick off your crochet adventures.</p>
             <h4>Step-by-Step:</h4>
@@ -243,14 +399,14 @@
                 <iframe src="https://www.youtube.com/embed/GcOzdAzmtNM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 1 - How to Slip Knot and Chain</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-1">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Hand cramping already? Did your slip knot just vanish? Is the hook feeling like a tiny alien invasion?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> Your hands are basically learning a new dance move, like trying to moonwalk for the first time – it's gonna be awkward before it's awesome! Don't aim for "perfect" right now, just "I can do this more than once without launching yarn across the room." Try different ways to hold the hook (like a knife or a pencil [7]) until it feels like *your* jam. Take a deep breath [1], shake out those hands, and remember this is YOUR journey, not a competition with a YouTube guru. It's totally normal for your hands to feel weird at first; it doesn't mean you're "bad" at it, just that you're building new skills! [3]</p>
                 <p><strong>Encouragement:</strong> Every crochet pro started right here. You're on your way to becoming a yarn wizard!</p>
             </div>
 
-            <h3>Stage 2: Chain Reaction! (Mastering the Foundation)</h3>
+            <h3 id="stage-2">Stage 2: Chain Reaction! (Mastering the Foundation)</h3>
             <h4>What You'll Learn:</h4>
             <p>Time to build your project's backbone: the chain! We'll make sure it's smooth, even, and totally twist-free.</p>
             <h4>Step-by-Step:</h4>
@@ -264,14 +420,14 @@
                 <iframe src="https://www.youtube.com/embed/GcOzdAzmtNM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 1 - How to Slip Knot and Chain</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-2">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Is your chain looking more like a tangled noodle than a straight line? Is it twisting like a pretzel?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> Think of your chain as the foundation of a skyscraper – if it's wobbly, the whole thing might lean. But hey, even skyscrapers have rough drafts! Grab some super bright, light-colored yarn [4] and just make a ridiculously long, messy chain. No pressure, no perfection, just pure chain-making fun! You can even turn it into a cool garland for your room or a leash for your imaginary dragon. [9] This is all about practice without the "OMG, it has to be perfect!" vibe. Your brain is getting used to the rhythm, and that's the real win. No deadlines, just chill vibes while you yarn it up. [3, 4]</p>
                 <p><strong>Encouragement:</strong> Every chain, even the wonky ones, is making you a crochet pro!</p>
             </div>
 
-            <h3>Stage 3: Single Crochet Superstar (Your First Real Stitch!)</h3>
+            <h3 id="stage-3">Stage 3: Single Crochet Superstar (Your First Real Stitch!)</h3>
             <h4>What You'll Learn:</h4>
             <p>Ready for your first *real* stitch? The single crochet (SC) is your fabric-making BFF. Master this, and you're officially a stitch wizard!</p>
             <h4>Step-by-Step:</h4>
@@ -285,14 +441,14 @@
                 <iframe src="https://www.youtube.com/embed/G6jWzL3-l_0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 2 - How to Single Crochet (Double Crochet in UK)</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-3">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Is your fabric looking like a wavy potato chip? Or is it shrinking like your favorite sweater in the wash?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> Your first fabric might be a little... unique. That's totally normal, like when your first batch of cookies turns out a bit flat. [1] Focus on *trying* to make each stitch right, not on the finished edge being ruler-straight. If your project is getting smaller, you're probably missing stitches at the end of rows (oops!). If it's growing, you're adding extra (sneaky!). Grab some stitch markers – they're like tiny GPS for your stitches [8]. Every wonky edge is just proof you're learning, not a sign you're bad at this. It means you're building grit! [2]</p>
                 <p><strong>Encouragement:</strong> This stitch is the OG of crochet. Master it, and a whole world of awesome projects opens up!</p>
             </div>
 
-            <h3>Stage 4: Half Double Crochet Harmony (Adding Height & Speed)</h3>
+            <h3 id="stage-4">Stage 4: Half Double Crochet Harmony (Adding Height & Speed)</h3>
             <h4>What You'll Learn:</h4>
             <p>Level up your stitch game with the Half Double Crochet (HDC)! It's taller than SC, so your projects grow faster, but still super cozy.</p>
             <h4>Step-by-Step:</h4>
@@ -306,14 +462,14 @@
                 <iframe src="https://www.youtube.com/embed/6iR2_X7lO-o" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 4 - How to Half Double Crochet (Half Treble in UK)</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-4">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Are your stitches looking like they're on a rollercoaster (uneven heights)? Or is pulling through all three loops a wrestling match?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> This stitch is a bit of a juggling act, but it's totally worth it for speed! If your stitches are uneven, make sure you're pulling that yarn up to the same height every time. If those three loops are fighting you, try loosening your grip just a tiny bit so your hook can glide through. Remember, you're not aiming for instant perfection, just consistent effort. [1, 2] Every little tweak you make is a win, showing you're learning to be a crochet detective and solve problems!</p>
                 <p><strong>Encouragement:</strong> Once you nail this, you'll be whipping up projects in no time. Get ready for some serious speed-crocheting superpowers!</p>
             </div>
 
-            <h3>Stage 5: Double Crochet Dynamo (Building Taller Fabric)</h3>
+            <h3 id="stage-5">Stage 5: Double Crochet Dynamo (Building Taller Fabric)</h3>
             <h4>What You'll Learn:</h4>
             <p>Meet the Double Crochet (DC) – the tall, speedy friend of stitches! It creates a looser, airy fabric and works up super fast.</p>
             <h4>Step-by-Step:</h4>
@@ -327,14 +483,14 @@
                 <iframe src="https://www.youtube.com/embed/41f8m5_721Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 5 - How to Double Crochet (Treble Crochet in UK)</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-5">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Are your stitches looking too gappy, like they're practicing social distancing? Or is it still hard to keep them all the same height?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> The DC is all about growing fast! If your fabric looks too open, check your tension – make sure those loops on your hook are snug, but not choking. Keeping heights even means pulling the yarn up to the same level each time. You don't need to be perfect right away, just understand how it works and keep trying. [2] This is where you really build that "I can figure this out" muscle!</p>
                 <p><strong>Encouragement:</strong> This stitch is a total game-changer for blankets and scarves. Keep practicing, and you'll be a fabric-making machine!</p>
             </div>
 
-            <h3>Stage 6: Slip Stitch Secrets (Joining & Finishing Touches)</h3>
+            <h3 id="stage-6">Stage 6: Slip Stitch Secrets (Joining & Finishing Touches)</h3>
             <h4>What You'll Learn:</h4>
             <p>The Slip Stitch (sl st) is the ninja of crochet! It's tiny but mighty, perfect for joining rounds or moving your yarn without adding height.</p>
             <h4>Step-by-Step:</h4>
@@ -347,14 +503,14 @@
                 <iframe src="https://www.youtube.com/embed/hJ81qfB6k7c" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 3 - How to Slip Stitch</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-6">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Is your slip stitch so tight it's practically invisible? Or is it just not lying flat?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> This little stitch is super important for neat finishes, but it can be tricky! If it's too tight, loosen up your tension a tiny bit. It should be snug, not a death grip! If it's not flat, make sure you're not pulling the yarn too much after you complete the stitch. Remember, even the small details matter, but don't stress about perfection. [1, 2] Just focus on getting the hang of it, and your precision powers will grow!</p>
                 <p><strong>Encouragement:</strong> This stitch is your secret weapon for making your projects look super professional!</p>
             </div>
 
-            <h3>Stage 7: Shaping Your World: Increasing & Decreasing</h3>
+            <h3 id="stage-7">Stage 7: Shaping Your World: Increasing & Decreasing</h3>
             <h4>What You'll Learn:</h4>
             <p>Ready to sculpt with yarn? Learn how to increase (add stitches) and decrease (remove stitches) to create awesome shapes, from cute amigurumi to cozy sweaters!</p>
             <h4>Step-by-Step (General Concepts):</h4>
@@ -367,14 +523,14 @@
                 <iframe src="https://www.youtube.com/embed/5kR4w3-Bv2M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 7 - How to Single Crochet Together (Decrease)</a> [12]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-7">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Is your shaping looking a bit... wonky? Or are you getting weird holes or bumps where they shouldn't be?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> Shaping is where crochet gets its artistic vibe, but it can feel like trying to sculpt with spaghetti at first! If it's not smooth, remember: practice makes progress. Don't be afraid to unravel and try again – each redo builds your muscle memory and understanding. If you see holes, check your tension, especially when you're working stitches together. This is a prime spot to use the "Power of Yet" – your shaping might not be perfect *yet*, but it will get there! [2] Focus on the journey, not just the destination. [1]</p>
                 <p><strong>Encouragement:</strong> Mastering increases and decreases means you can make anything! You're officially a crochet sculptor!</p>
             </div>
 
-            <h3>Stage 8: Decoding Patterns & Polishing Your Work (Becoming a Crochet Detective)</h3>
+            <h3 id="stage-8">Stage 8: Decoding Patterns & Polishing Your Work (Becoming a Crochet Detective)</h3>
             <h4>What You'll Learn:</h4>
             <p>Time to become a crochet detective! Learn to read patterns like a pro, understand "gauge" (super important for sizing!), and make your finished projects look totally flawless.</p>
             <h4>Step-by-Step:</h4>
@@ -392,7 +548,7 @@
                 <iframe src="https://www.youtube.com/embed/4rf1lR9xw5k" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><a href="https://www.youtube.com/playlist?list=PLqlBWJOmTEX2GbiDXweNHdhB-zTegpvcb" target="_blank">Blossom Crochet: How to finish and tie off your projects!</a> [13, 14]</p>
             </div>
-            <div class="rage-quit-panel">
+            <div class="rage-quit-panel" id="rage-quit-8">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Does the pattern look like alien gibberish? Is your project turning out the wrong size? Are yarn tails making your masterpiece look like a hot mess?</p>
                 <p><strong>Humorous/Psychological Advice:</strong> Reading patterns is like learning a secret language – it takes time, but once you get it, a whole new world of projects opens up! Don't rush; read the whole thing before you even start. [7, 8] If your gauge is off, that's just your project giving you feedback, not a personal attack! It just means you might need a different hook size. Weaving in ends is the final act of love for your creation. Take your time; a neat finish is everything! This is all about breaking down big tasks into smaller, totally doable steps, so you don't get overwhelmed. [1]</p>
@@ -416,5 +572,119 @@
     <footer>
         <p>&copy; 2024 Yarn Boss Masterclass. All rights reserved. Happy crocheting!</p>
     </footer>
+
+    <button class="rage-quit-button" id="rageQuitButton">
+        <span>😩</span><br>Rage Quit?
+    </button>
+
+    <!-- The Modal Pop-up Structure -->
+    <div id="rageQuitModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeModalButton">&times;</button>
+            <div id="modalRageQuitContent">
+                <!-- Specific rage quit advice will be injected here by JavaScript -->
+            </div>
+            <p class="modal-troubleshooting-link">
+                Need more help? Check out the full <a href="#troubleshooting-guide">Troubleshooting Guide</a>!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentActiveStageId = 'stage-1'; // Default to stage 1
+
+        const stageHeadings = document.querySelectorAll('h3[id^="stage-"]');
+        const rageQuitButton = document.getElementById('rageQuitButton');
+        const troubleshootingGuideDetails = document.querySelector('#troubleshooting-guide details');
+        const progressTrackerSpans = document.querySelectorAll('.progress-tracker span');
+
+        // Modal elements
+        const rageQuitModal = document.getElementById('rageQuitModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const modalRageQuitContent = document.getElementById('modalRageQuitContent');
+
+        // Intersection Observer to track active stage
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    currentActiveStageId = entry.target.id;
+                    // Update progress tracker visual
+                    progressTrackerSpans.forEach(span => {
+                        // Extract stage number from ID (e.g., "stage-1" -> "1")
+                        const stageNum = currentActiveStageId.split('-')[1];
+                        if (span.textContent.includes(`Stage ${stageNum}`)) {
+                            span.classList.add('current');
+                        } else {
+                            span.classList.remove('current');
+                        }
+                    });
+                }
+            });
+        }, {
+            root: null, // viewport
+            rootMargin: '0px 0px -50% 0px', // Trigger when top half of element is in view
+            threshold: 0 // As soon as it enters
+        });
+
+        stageHeadings.forEach(heading => {
+            observer.observe(heading);
+        });
+
+        // Click handler for the Rage Quit button
+        rageQuitButton.addEventListener('click', () => {
+            // Clear previous content
+            modalRageQuitContent.innerHTML = '';
+
+            // Find the specific rage quit panel for the active stage
+            const specificRageQuitPanelId = `rage-quit-${currentActiveStageId.split('-')[1]}`;
+            const specificRageQuitPanel = document.getElementById(specificRageQuitPanelId);
+
+            if (specificRageQuitPanel) {
+                // Clone the content of the specific rage quit panel
+                const clonedContent = specificRageQuitPanel.cloneNode(true);
+                // Remove the 'display: none' style if it was inline, or ensure it's removed
+                clonedContent.style.display = 'block';
+                // Append only the inner HTML (excluding the outer panel div itself)
+                modalRageQuitContent.innerHTML = clonedContent.innerHTML;
+            } else {
+                modalRageQuitContent.innerHTML = "<p>Oops! No specific rage quit advice for this stage right now, but you've got this!</p>";
+            }
+
+            // Show the modal
+            rageQuitModal.classList.add('show');
+        });
+
+        // Click handler for the modal close button
+        closeModalButton.addEventListener('click', () => {
+            rageQuitModal.classList.remove('show');
+            // Optional: Clear content after closing if preferred, but not strictly necessary for this implementation
+            // modalRageQuitContent.innerHTML = '';
+        });
+
+        // Close modal if clicking outside the content
+        rageQuitModal.addEventListener('click', (event) => {
+            if (event.target === rageQuitModal) {
+                rageQuitModal.classList.remove('show');
+            }
+        });
+
+        // Initial update of progress tracker on load
+        window.addEventListener('load', () => {
+             // Find the first stage heading to set initial active stage
+            const firstStageHeading = document.querySelector('h3[id^="stage-"]');
+            if (firstStageHeading) {
+                currentActiveStageId = firstStageHeading.id;
+                progressTrackerSpans.forEach(span => {
+                    const stageNum = currentActiveStageId.split('-')[1];
+                    if (span.textContent.includes(`Stage ${stageNum}`)) {
+                        span.classList.add('current');
+                    } else {
+                        span.classList.remove('current');
+                    }
+                });
+            }
+        });
+
+    </script>
 </body>
 </html>
