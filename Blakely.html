@@ -275,6 +275,44 @@
             font-weight: bold;
         }
 
+        /* JJ Maybank Thumbnail and Quote Styling */
+        .jj-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            float: left; /* To place it next to the text */
+            border: 2px solid #457b9d; /* Small border for definition */
+        }
+        .quote-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .quote-text {
+            flex-grow: 1;
+        }
+        .quote-source {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+            font-style: normal;
+        }
+        .quote-text p {
+            margin: 0; /* Remove default paragraph margin */
+        }
+        .quote-text p:first-child {
+            font-style: italic; /* Keep quote text italic */
+        }
+        hr.quote-separator {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 15px 0;
+        }
+
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
@@ -514,7 +552,7 @@
             <h3 id="stage-7">Stage 7: Shaping Your World: Increasing & Decreasing</h3>
             <h4>What You'll Learn:</h4>
             <p>Ready to sculpt with yarn? Learn how to increase (add stitches) and decrease (remove stitches) to create awesome shapes, from cute amigurumi to cozy sweaters!</p>
-            <h4>Step-by-Step (General Concepts):</h4>
+            <h4>Step-by-Step:</h4>
             <ol>
                 <li><strong>Increasing:</strong> Work two or more stitches into one spot to make your project grow.</li>
                 <li><strong>Decreasing:</strong> Combine two or more stitches into one to make your project shrink or curve. [12]</li>
@@ -604,6 +642,17 @@
         const closeModalButton = document.getElementById('closeModalButton');
         const modalRageQuitContent = document.getElementById('modalRageQuitContent');
 
+        // JJ Maybank Quotes (filtered)
+        const jjMaybankQuotes = [
+            { text: "Stupid things have good outcomes all the time.", source: "Goodreads" },
+            { text: "I can't let you take the blame for something I did. You have too much to lose.", source: "Goodreads" },
+            { text: "Even a blind pig can find an acorn at times! I actually don't know what that saying means, but I saw it on Reddit.", source: "Goodreads" },
+            { text: "Be so careful John B, just give me that John D already", source: "Reddit" },
+            { text: "Fish on!", source: "Reddit" },
+            { text: "Pentagon I think? We have security clearance, I have a card.", source: "Reddit" },
+            { text: "You powerpuff girls have fun.", source: "Reddit" }
+        ];
+
         // Intersection Observer to track active stage
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -636,20 +685,42 @@
             // Clear previous content
             modalRageQuitContent.innerHTML = '';
 
+            // Select a random JJ Maybank quote
+            const randomIndex = Math.floor(Math.random() * jjMaybankQuotes.length);
+            const randomQuote = jjMaybankQuotes[randomIndex];
+
+            // Construct the HTML for the quote and thumbnail
+            // IMPORTANT: Replace 'https://placehold.co/50x50/ff6f61/ffffff?text=JJ' with an actual image URL of JJ Maybank's face.
+            // Example: 'https://example.com/jj_maybank_face.jpg'
+            const jjThumbnailUrl = 'https://placehold.co/50x50/ff6f61/ffffff?text=JJ'; // Placeholder, replace this!
+            const quoteHtml = `
+                <div class="quote-container">
+                    <img src="${jjThumbnailUrl}" alt="JJ Maybank Thumbnail" class="jj-thumbnail">
+                    <div class="quote-text">
+                        <p>"${randomQuote.text}"</p>
+                        <p class="quote-source">- JJ Maybank (${randomQuote.source})</p>
+                    </div>
+                </div>
+                <hr class="quote-separator">
+            `;
+
             // Find the specific rage quit panel for the active stage
             const specificRageQuitPanelId = `rage-quit-${currentActiveStageId.split('-')[1]}`;
             const specificRageQuitPanel = document.getElementById(specificRageQuitPanelId);
 
+            let rageQuitAdviceHtml = '';
             if (specificRageQuitPanel) {
-                // Clone the content of the specific rage quit panel
-                const clonedContent = specificRageQuitPanel.cloneNode(true);
-                // Remove the 'display: none' style if it was inline, or ensure it's removed
-                clonedContent.style.display = 'block';
-                // Append only the inner HTML (excluding the outer panel div itself)
-                modalRageQuitContent.innerHTML = clonedContent.innerHTML;
+                // Get the inner HTML of the specific rage quit panel
+                // We clone and get innerHTML to avoid moving the actual element from its original place
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = specificRageQuitPanel.innerHTML;
+                rageQuitAdviceHtml = tempDiv.innerHTML;
             } else {
-                modalRageQuitContent.innerHTML = "<p>Oops! No specific rage quit advice for this stage right now, but you've got this!</p>";
+                rageQuitAdviceHtml = "<p>Oops! No specific rage quit advice for this stage right now, but you've got this!</p>";
             }
+
+            // Inject the quote and the rage quit advice into the modal content
+            modalRageQuitContent.innerHTML = quoteHtml + rageQuitAdviceHtml;
 
             // Show the modal
             rageQuitModal.classList.add('show');
@@ -658,8 +729,6 @@
         // Click handler for the modal close button
         closeModalButton.addEventListener('click', () => {
             rageQuitModal.classList.remove('show');
-            // Optional: Clear content after closing if preferred, but not strictly necessary for this implementation
-            // modalRageQuitContent.innerHTML = '';
         });
 
         // Close modal if clicking outside the content
