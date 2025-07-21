@@ -99,6 +99,24 @@
             height: 315px; /* Standard YouTube embed height */
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: none; /* Hide iframes, replaced by buttons */
+        }
+      .youtube-button {
+            display: inline-block;
+            background-color: #e63946; /* Red like YouTube */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 10px; /* Space from previous content */
+        }
+      .youtube-button:hover {
+            background-color: #c42d3a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
       .joke-box {
             background-color: #c8e6c9; /* Light green */
@@ -238,14 +256,14 @@
         /* Close button */
         .modal-close-button {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 11px; /* Moved down by 10% */
+            left: 11px; /* Moved left by 10% */
             background: none;
             border: none;
-            font-size: 1.5em;
+            font-size: 2em; /* Made larger */
             color: #888;
             cursor: pointer;
-            padding: 5px;
+            padding: 8px; /* Increased padding for larger clickable area */
             border-radius: 50%;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
@@ -352,9 +370,9 @@
                 height: 20px;
             }
             .modal-close-button {
-                font-size: 1.2em;
-                top: 5px;
-                right: 5px;
+                font-size: 1.5em; /* Adjusted for mobile */
+                top: 6px; /* Adjusted for mobile */
+                left: 6px; /* Adjusted for mobile */
             }
         }
     </style>
@@ -435,8 +453,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/GcOzdAzmtNM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 1 - How to Slip Knot and Chain</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/GcOzdAzmtNM" target="_blank" class="youtube-button">Watch Lesson 1 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-1">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -456,8 +474,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/GcOzdAzmtNM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 1 - How to Slip Knot and Chain</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/GcOzdAzmtNM" target="_blank" class="youtube-button">Watch Lesson 2 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-2">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -477,8 +495,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/G6jWzL3-l_0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 2 - How to Single Crochet (Double Crochet in UK)</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/G6jWzL3-l_0" target="_blank" class="youtube-button">Watch Lesson 3 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-3">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -498,8 +516,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/6iR2_X7lO-o" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 4 - How to Half Double Crochet (Half Treble in UK)</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/6iR2_X7lO-o" target="_blank" class="youtube-button">Watch Lesson 4 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-4">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -519,8 +537,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/41f8m5_721Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 5 - How to Double Crochet (Treble Crochet in UK)</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/41f8m5_721Q" target="_blank" class="youtube-button">Watch Lesson 5 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-5">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -539,8 +557,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/hJ81qfB6k7c" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 3 - How to Slip Stitch</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/hJ81qfB6k7c" target="_blank" class="youtube-button">Watch Lesson 6 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-6">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -559,8 +577,8 @@
             </ol>
             <h4>YouTube Tutorial:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/5kR4w3-Bv2M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: Lesson 7 - How to Single Crochet Together (Decrease)</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/5kR4w3-Bv2M" target="_blank" class="youtube-button">Watch Lesson 7 on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-7">
                 <strong>Before the Rage Quit, Try This:</strong>
@@ -580,17 +598,17 @@
             </ol>
             <h4>YouTube Tutorials:</h4>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/M97U5V8o_0s" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.happyberry.co.uk/c/learn-how-to-crochet-for-absolute-beginners/" target="_blank">HappyBerry Crochet: How To Read Written Crochet Patterns</a> [12]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/embed/M97U5V8o_0s" target="_blank" class="youtube-button">Watch Pattern Reading on YouTube</a>
             </div>
             <div class="youtube-video">
-                <iframe src="https://www.youtube.com/embed/4rf1lR9xw5k" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <p><a href="https://www.youtube.com/playlist?list=PLqlBWJOmTEX2GbiDXweNHdhB-zTegpvcb" target="_blank">Blossom Crochet: How to finish and tie off your projects!</a> [13, 14]</p>
+                <!-- Original iframe removed due to embedding issues -->
+                <a href="https://www.youtube.com/playlist?list=PLqlBWJOmTEX2GbiDXweNHdhB-zTegpvcb" target="_blank" class="youtube-button">Watch Finishing Touches on YouTube</a>
             </div>
             <div class="rage-quit-panel" id="rage-quit-8">
                 <strong>Before the Rage Quit, Try This:</strong>
                 <p><strong>Diagnosis:</strong> Does the pattern look like alien gibberish? Is your project turning out the wrong size? Are yarn tails making your masterpiece look like a hot mess?</p>
-                <p><strong>Humorous/Psychological Advice:</strong> Reading patterns is like learning a secret language – it takes time, but once you get it, a whole new world of projects opens up! Don't rush; read the whole thing before you even start. [7, 8] If your gauge is off, that's just your project giving you feedback, not a personal attack! It just means you might need a different hook size. Weaving in ends is the final act of love for your creation. Take your time; a neat finish is everything! This is all about breaking down big tasks into smaller, totally doable steps, so you don't get overwhelmed. [1]</p>
+                <p><strong>Humorous/Psychological Advice:</strong> Reading patterns is like learning a secret language – it takes time, but once you crack it, a whole new world of projects opens up! Don't rush; read the whole thing before you even start. [7, 8] If your gauge is off, that's just your project giving you feedback, not a personal attack! It just means you might need a different hook size. Weaving in ends is the final act of love for your creation. Take your time; a neat finish is everything! This is all about breaking down big tasks into smaller, totally doable steps, so you don't get overwhelmed. [1]</p>
                 <p><strong>Encouragement:</strong> You're not just crocheting now; you're truly understanding the craft. You're becoming a crochet detective, ready to tackle any pattern out there!</p>
             </div>
         </section>
