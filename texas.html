@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas Hold'em Mastery: A Course Syllabus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Background: #F4F1DE, Text: #374151, Accents: #31708E, #D69E2E, Card/Panel: #FFFFFF) -->
+    <!-- Application Structure Plan: This single-page application is structured as a linear course syllabus, divided into major modules and then weekly sections. A sticky top navigation bar allows users to jump directly to any module. Each module and week presents its content (Topic, Learning Objectives, Readings/Resources, Exercises) in a clear, digestible card format, facilitating a structured, step-by-step learning path. This linear design is chosen to provide a clear progression through the course material, ideal for users who prefer a structured, guided learning experience, especially those managing focus challenges. The layout is fully responsive for mobile viewing, ensuring accessibility on the go. -->
+    <!-- Visualization & Content Choices: 
+        - Course Syllabus: (Report Info: Course structure) -> Goal: Organize/Guide -> Viz: Linear HTML sections -> Interaction: Scroll, Navigation links -> Justification: Provides a clear, university-style progression through the material, meeting the user's request for a structured, linear guide. -> Library/Method: HTML/CSS + Tailwind.
+        - Readings/Resources: (Report Info: All collected links) -> Goal: Inform/Provide Access -> Viz: Direct links within content -> Interaction: Click links -> Justification: Integrates resources directly into the relevant weekly context for immediate access. -> Library/Method: HTML.
+        - Exercises: (Report Info: Actionable tasks) -> Goal: Action/Apply -> Viz: Text descriptions -> Interaction: User performs offline -> Justification: Clearly outlines practical application steps for each week. -> Library/Method: HTML.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F4F1DE;
+            color: #374151;
+            scroll-behavior: smooth;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #31708E;
+            border-bottom-color: #31708E;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+        }
+        .module-section {
+            padding-top: 5rem; /* Offset for sticky header */
+            margin-top: -5rem; /* Counteract padding to keep scroll position accurate */
+        }
+        @media (max-width: 767px) {
+            .module-section {
+                padding-top: 4rem;
+                margin-top: -4rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-[#31708E]">🃏 Poker Course</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#module1" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Module 1</a>
+                        <a href="#module2" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Module 2</a>
+                        <a href="#module3" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Module 3</a>
+                        <a href="#module4" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Module 4</a>
+                        <a href="#module5" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Module 5</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[#31708E]">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#module1" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Module 1</a>
+                <a href="#module2" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Module 2</a>
+                <a href="#module3" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Module 3</a>
+                <a href="#module4" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Module 4</a>
+                <a href="#module5" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Module 5</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">Texas Hold'em Mastery: A Course Syllabus</h1>
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">**Course Code:** POKER-401 | **Semester:** Fall 2025 | **Instructor:** AI Poker Professor</p>
+            <p class="mt-4 max-w-3xl mx-auto text-gray-700 leading-relaxed">
+                This course provides intermediate-to-advanced online Texas Hold'em tournament players with a structured, mastery-driven framework for continuous improvement. It integrates cutting-edge strategic concepts with robust mental game techniques, specifically tailored for individuals with ADHD, a preference for heuristic thinking, and a motivation rooted in deep understanding rather than purely financial gain. Students will develop personalized study systems, cultivate an adaptive "calculated maniac" playing style, and foster profound emotional resilience to navigate the inherent randomness and psychological demands of the game.
+            </p>
+            <div class="mt-8 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-[#31708E] mb-4">Learning Objectives</h2>
+                <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                    <li>Design and implement a personalized, ADHD-friendly poker study system utilizing spaced repetition and knowledge management tools.</li>
+                    <li>Articulate and apply core preflop and postflop heuristics for online tournament play without a HUD.</li>
+                    <li>Differentiate between Game Theory Optimal (GTO) and exploitative strategies, and fluidly adapt their approach based on opponent tendencies.</li>
+                    <li>Cultivate a "calculated maniac" table image, leveraging strategic aggression for maximum tournament equity.</li>
+                    <li>Identify, analyze, and mitigate personal emotional leaks, including tilt and entitlement.</li>
+                    <li>Apply Stoic philosophy and mindfulness principles to accept variance, manage ego, and maintain decision quality irrespective of outcome.</li>
+                    <li>Utilize advanced poker software and resources for deep analysis and practice.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Module 1 -->
+        <section id="module1" class="module-section mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Module 1: Laying the Foundation – The Mastery Mindset & Personal Systems</h2>
+            
+            <div class="card rounded-lg shadow-xl p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 1: Understanding Your Learning Profile & Setting Goals</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Introduction to the mastery-based approach; self-assessment of learning style (ADHD, heuristic preference); defining personal poker goals beyond money.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Understand the course philosophy; identify individual cognitive strengths and challenges; set clear, mastery-driven objectives.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Introduction: The Evolving Landscape of Online Poker Mastery" from the "Optimizing Online Texas Hold'em Performance" report.</li>
+                        <li>*Optional:* Excerpts from "Peak: Secrets from the New Science of Expertise" by Anders Ericsson (focus on deliberate practice).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Complete a "Player Archetype Profile" self-assessment (reflect on the traits presented in the web app).</li>
+                        <li>Journaling: Write down your core motivations for poker and long-term mastery goals.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 2: Building Your ADHD-Friendly Study System</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Environmental control; Pomodoro Technique & time blocking; micro-tasks and task chunking; physical activity and self-care for focus.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Implement foundational study habits; create a personalized weekly study schedule.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Personal Study Systems & Journeys: Tailored Approaches for Cognitive Diversity" from the "Optimizing Online Texas Hold'em Performance" report.</li>
+                        <li>Article: <a href="https://www.splitsuit.com/ultimate-weekly-poker-study-guide" target="_blank" class="text-[#31708E] hover:underline">"Studying Poker: Your Weekly Study Guide In 2025" (SplitSuit)</a>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Design your "Weekly Study Planner" (using the interactive planner concept from the web app as inspiration).</li>
+                        <li>Practice the Pomodoro Technique for at least 3 study sessions.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 2 -->
+        <section id="module2" class="module-section mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Module 2: Strategic Foundations – Preflop & Postflop Heuristics</h2>
+            
+            <div class="card rounded-lg shadow-xl p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 3: Preflop Heuristics for Tournament Play</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Developing simple, actionable rules of thumb for opening, calling, and 3-betting ranges in various positions. Adjusting for stack depth.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Apply fundamental preflop heuristics; understand the importance of position.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Simple Preflop Heuristics (Rules of Thumb)" from "The Calculated Maniac Playbook" section of the web app.</li>
+                        <li>Video: <a href="https://www.youtube.com/watch?v=3JfDDf3hOK8" target="_blank" class="text-[#31708E] hover:underline">"8 ADVANCED Poker Tips For PREFLOP" (Splitsuit on YouTube)</a>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Create 5 simple preflop heuristics for your game, focusing on different positions (UTG, BTN, SB).</li>
+                        <li>Review 10 of your own played hands, analyzing your preflop decisions against your new heuristics.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 4: Postflop Rules of Thumb & Basic Exploits (No HUD)</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Developing simple postflop rules for continuation betting, check-raising, and value betting. Identifying common opponent leaks without a HUD.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Apply basic postflop heuristics; begin recognizing exploitable tendencies.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Strategic Postflop Rules" and "Exploiting without a HUD" from "The Calculated Maniac Playbook" section of the web app.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Create 3 postflop rules of thumb based on common opponent types (e.g., calling station, tight-passive player).</li>
+                        <li>During your next play session, take mental notes on 3 opponents' obvious tendencies.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 3 -->
+        <section id="module3" class="module-section mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Module 3: Advanced Strategy – The Calculated Maniac & GTO Integration</h2>
+            
+            <div class="card rounded-lg shadow-xl p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 5: The "Calculated Maniac" Image & Strategic Aggression</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Cultivating a deceptive, aggressive table image; understanding the psychology behind it; balancing aggression with control.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Understand how to build and leverage a "calculated maniac" image in tournaments.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Cultivating the Aggressive Image" from "The Calculated Maniac Playbook" section of the web app.</li>
+                        <li>Article: <a href="https://www.pokerlistings.com/poker-strategies/cash-game-nl-holdem/exploiting-your-table-image" target="_blank" class="text-[#31708E] hover:underline">"How to Exploit Your Table Image in Poker" (PokerListings)</a>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Plan 2 specific spots in your next session where you will deliberately cultivate your "maniac" image (e.g., showing down a bluff, raising a wide range from a specific position).</li>
+                        <li>Self-reflection: How do you think opponents perceive your play?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 6: GTO Fundamentals & The GTO vs. Exploitative Spectrum</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Introduction to Game Theory Optimal (GTO) concepts; understanding GTO as an unexploitable baseline; the dynamic relationship between GTO and exploitative play.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Grasp the core principles of GTO; understand when to lean towards GTO vs. exploitative play.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"The GTO vs. Exploitative Spectrum" section of the web app.</li>
+                        <li>Article: <a href="https://www.reddit.com/r/poker/comments/jldemj/exploitative_vs_gto_why_you_need_to_learn_both_to/" target="_blank" class="text-[#31708E] hover:underline">"Exploitative vs GTO - Why you need to learn both to be a decent player." (r/poker Reddit thread)</a>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Use the GTO vs. Exploitative slider concept from the web app and write down your understanding of each extreme and the balanced approach.</li>
+                        <li>Practice a simple GTO concept (e.g., minimum defense frequency) using a solver tool (e.g., <a href="https://deepsolver.com/" target="_blank" class="text-[#31708E] hover:underline">Deepsolver</a>) for 15-20 minutes.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 4 -->
+        <section id="module4" class="module-section mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Module 4: Mental Game Mastery – Ego, Variance, and Resilience</h2>
+            
+            <div class="card rounded-lg shadow-xl p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 7: Conquering Tilt & Emotional Leaks</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Identifying tilt triggers; practical strategies for managing emotional responses (breaks, bankroll management, self-care).</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Recognize and actively combat tilt; implement immediate "tilt-breaking" strategies.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"The Tilt-Breaker Flowchart" section of the web app.</li>
+                        <li>Article: <a href="https://www.consciouspoker.com/blog/how-to-overcome-bad-beats-in-poker/" target="_blank" class="text-[#31708E] hover:underline">"7 Tips to Overcome Bad Beats in Poker" (Conscious Poker)</a>.</li>
+                        <li>Book: <a href="https://www.amazon.com/Mental-Game-Poker-Strategies-Confidence/dp/0974150204" target="_blank" class="text-[#31708E] hover:underline">"The Mental Game of Poker" by Jared Tendler</a> (Chapters on Tilt).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Journaling: Document your last 3 tilt experiences, identifying triggers and what you could have done differently.</li>
+                        <li>Practice the "Tilt-Breaker Flowchart" mentally during your next session if tilt arises.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 8: Embracing Randomness & Taming the Ego</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> The philosophy of variance; distinguishing decision quality from outcome; applying Stoic principles; understanding and overcoming "entitlement tilt."</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Develop a philosophical acceptance of randomness; detach ego from results; focus on process over outcome.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Philosophical Anchors" (Stoicism & Ego) section of the web app.</li>
+                        <li>Article: <a href="https://www.blackrain79.com/2021/01/poker-stoic.html" target="_blank" class="text-[#31708E] hover:underline">"Why Using Stoic Philosophy Will Skyrocket Your Poker Winnings" (BlackRain79)</a>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Reflect on a recent bad beat: Did you judge the outcome or the decision? Reframe it through a Stoic lens.</li>
+                        <li>Practice mindfulness for 5-10 minutes daily, focusing on observing thoughts without judgment.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 5 -->
+        <section id="module5" class="module-section mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Module 5: Advanced Tools & Continuous Improvement</h2>
+            
+            <div class="card rounded-lg shadow-xl p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 9: Leveraging Advanced Study Tools</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Deep dive into Notion for advanced knowledge management; Anki for complex concept memorization; utilizing solvers for in-depth analysis.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Master the use of Notion and Anki for personalized study; effectively use solvers for specific hand analysis.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>"Tools of the Trade" (Notion, Anki, Spreadsheets) section of the web app.</li>
+                        <li>"Digital Tools for Structured Practice" from the "Optimizing Online Texas Hold'em Performance" report.</li>
+                        <li><a href="https://www.notion.so/templates/poker-players-dashboard" target="_blank" class="text-[#31708E] hover:underline">Notion Poker Player's Dashboard template</a>.</li>
+                        <li><a href="https://apps.ankiweb.net/" target="_blank" class="text-[#31708E] hover:underline">Anki Spaced Repetition Software</a>.</li>
+                        <li><a href="https://toanki.net/" target="_blank" class="text-[#31708E] hover:underline">toanki.net</a> (for converting Notion notes to Anki).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Set up a Notion database for your poker study notes and integrate it with Anki (if not already done).</li>
+                        <li>Analyze 3 complex hands using a solver (e.g., <a href="https://deepsolver.com/" target="_blank" class="text-[#31708E] hover:underline">Deepsolver</a>, <a href="https://simplepoker.com/en/Solutions/?partner=thebestpokersites" target="_blank" class="text-[#31708E] hover:underline">Simple Postflop</a>), focusing on understanding the underlying GTO principles.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#4A5568] mb-4">Week 10: Simulating Pressure & Sustaining the Journey</h3>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Topic:</span> Simulating live poker pressure online; long-term commitment to mastery; adapting to evolving game dynamics; preventing burnout.</p>
+                <p class="text-gray-700 mb-4"><span class="font-semibold">Learning Objectives:</span> Develop strategies for simulating pressure; create a long-term plan for sustained improvement.</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Readings/Resources:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Article: <a href="https://jaredtendler.com/why-playing-smaller-field-mtts-is-good-for-your-mental-game/" target="_blank" class="text-[#31708E] hover:underline">"Why Playing Smaller Field MTTs is Good For Your Mental Game" (Jared Tendler)</a>.</li>
+                        <li>Self-reflection on sustaining motivation and avoiding burnout.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-[#D69E2E]">Exercises:</h4>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Identify one way you can simulate pressure in your online play (e.g., playing higher stakes for a short, focused period, or setting specific performance goals for a session).</li>
+                        <li>Develop a 3-month personal poker study roadmap, outlining key areas of focus.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment Section -->
+        <section id="assessment" class="module-section mb-12">
+            <div class="p-6 md:p-8 bg-white rounded-lg shadow-xl">
+                <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Assessment</h2>
+                <ul class="list-disc list-inside text-left text-gray-700 space-y-3 max-w-2xl mx-auto">
+                    <li><span class="font-semibold">Weekly Journaling/Reflection (40%):</span> Consistent documentation of study, play, and mental game insights.</li>
+                    <li><span class="font-semibold">Hand History Analysis (30%):</span> Submission of 3 detailed hand analyses demonstrating application of strategic concepts and mental game principles.</li>
+                    <li><span class="font-semibold">Personalized Study System Design (20%):</span> Presentation of a comprehensive, tailored study system (e.g., Notion setup, Anki deck structure).</li>
+                    <li><span class="font-semibold">Final Reflection Essay (10%):</span> A philosophical reflection on personal growth, ego management, and acceptance of randomness in your poker journey.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Required Software/Tools Section -->
+        <section id="tools" class="module-section mb-12">
+            <div class="p-6 md:p-8 bg-white rounded-lg shadow-xl">
+                <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Required Software/Tools</h2>
+                <ul class="list-disc list-inside text-left text-gray-700 space-y-3 max-w-2xl mx-auto">
+                    <li>Internet access for online poker platforms and resources.</li>
+                    <li><a href="https://www.notion.so/" target="_blank" class="text-[#31708E] hover:underline">Notion</a> (free personal plan sufficient).</li>
+                    <li><a href="https://apps.ankiweb.net/" target="_blank" class="text-[#31708E] hover:underline">Anki</a> (free desktop/web app).</li>
+                    <li>A poker solver/trainer (e.g., <a href="https://gtowizard.com/" target="_blank" class="text-[#31708E] hover:underline">GTO Wizard</a>, <a href="https://simplepoker.com/en/Solutions/?partner=thebestpokersites" target="_blank" class="text-[#31708E] hover:underline">Simple Postflop</a> – free trials or basic versions may suffice for exercises).</li>
+                    <li>A hand history tracker/viewer (optional, but highly recommended for review, e.g., <a href="https://www.pokertracker.com/" target="_blank" class="text-[#31708E] hover:underline">Poker Tracker 4</a>, <a href="https://www.holdemmanager.com/" target="_blank" class="text-[#31708E] hover:underline">Hold'em Manager 3</a>).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Academic Integrity Section -->
+        <section id="integrity" class="module-section mb-12">
+            <div class="p-6 md:p-8 bg-white rounded-lg shadow-xl">
+                <h2 class="text-3xl font-bold text-center text-[#31708E] mb-8">Academic Integrity</h2>
+                <p class="text-gray-700 text-center max-w-2xl mx-auto">
+                    All work submitted must be original. Collaboration on concepts is encouraged, but individual assignments must reflect independent thought and analysis.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // Toggle mobile menu visibility
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Smooth scroll and active link highlighting
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        // Close mobile menu if open
+                        mobileMenu.classList.add('hidden');
+
+                        // Scroll to the target element
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+
+                        // Update active class for navigation links
+                        navLinks.forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Highlight active navigation link on scroll
+            const sections = document.querySelectorAll('.module-section');
+            const observerOptions = {
+                root: null,
+                rootMargin: '-50% 0px -50% 0px', // Adjust this to control when section becomes active
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Set initial active link based on URL hash or default to first module
+            const initialHash = window.location.hash.substring(1);
+            if (initialHash) {
+                const initialLink = document.querySelector(`.nav-link[href="#${initialHash}"]`);
+                if (initialLink) {
+                    initialLink.classList.add('active');
+                    document.getElementById(initialHash).scrollIntoView();
+                }
+            } else {
+                document.querySelector('.nav-link[href="#module1"]').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
