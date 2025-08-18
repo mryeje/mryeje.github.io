@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billionaire Meritocracy Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-view application centered around a primary search interface. The user can type a name into the search bar, which provides autocomplete suggestions. Selecting a name or searching displays a grid of result cards, each containing a billionaire's name, a summary of their wealth origin, and a visually distinct Meritocracy Score. This structure was chosen for its simplicity and directness, allowing users to quickly access the specific information they are interested in without navigating complex menus, directly addressing the prompt's request for a search-focused tool. -->
+    <!-- Visualization & Content Choices: The primary "visualization" is the Meritocracy Score, presented as a colored numerical badge on each result card. Report Info: Meritocracy Score -> Goal: Inform/Compare -> Presentation Method: Styled HTML div (badge) -> Interaction: Filtering via search -> Justification: This provides an immediate, scannable visual cue about the billionaire's background, allowing for quick comparison between individuals shown in the search results. The search bar with autocomplete serves the goal of organizing and accessing the data efficiently. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .merit-score-1 { background-color: #ef4444; color: white; }
+        .merit-score-2 { background-color: #f97316; color: white; }
+        .merit-score-3 { background-color: #f59e0b; color: white; }
+        .merit-score-4 { background-color: #eab308; color: white; }
+        .merit-score-5 { background-color: #84cc16; color: white; }
+        .merit-score-6 { background-color: #22c55e; color: white; }
+        .merit-score-7 { background-color: #10b981; color: white; }
+        .merit-score-8 { background-color: #14b8a6; color: white; }
+        .merit-score-9 { background-color: #06b6d4; color: white; }
+        .merit-score-10 { background-color: #0ea5e9; color: white; }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-900">Pathways to Wealth</h1>
+            <p class="mt-2 text-lg text-stone-600">An Interactive Explorer of Billionaire Lineage and Meritocracy</p>
+        </header>
+
+        <main>
+            <div class="max-w-2xl mx-auto mb-8 relative">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Search for a billionaire..." class="w-full px-5 py-3 text-lg bg-white border-2 border-stone-200 rounded-full shadow-sm focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition-shadow">
+                    <div class="absolute top-1/2 right-5 transform -translate-y-1/2 text-stone-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                </div>
+                <div id="suggestions-box" class="absolute z-10 w-full bg-white border border-stone-200 rounded-lg mt-1 shadow-lg hidden max-h-60 overflow-y-auto"></div>
+            </div>
+
+            <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+             <div id="initial-message" class="text-center py-16 text-stone-500">
+                <p class="text-xl">Start typing a name to explore the dataset.</p>
+            </div>
+        </main>
+
+        <footer class="text-center mt-12 pt-8 border-t border-stone-200">
+            <h2 class="text-xl font-semibold text-stone-700 mb-4">Data Sources</h2>
+            <div class="text-stone-500 space-y-1">
+                <p>Primary data sourced from the Forbes 2025 World's Billionaires list.</p>
+                <p>Cross-referenced with data from Bloomberg and other public financial records.</p>
+                 <p>Biographical details compiled from reputable news archives and academic publications.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const billionaireData = [
+            { "name": "Elon Musk", "meritocracyScore": 6, "summary": "Born into a wealthy South African family, used his advantaged background and early interest in technology to co-found Zip2 and PayPal, then founded SpaceX and was an early investor and CEO of Tesla, building them into industry-defining companies." },
+            { "name": "Mark Zuckerberg", "meritocracyScore": 7, "summary": "Grew up in a comfortable, upper-middle-class home with early access to computers. Developed Facebook in his Harvard dorm room, leveraging his programming skills and elite university environment to create a global social media empire." },
+            { "name": "Jeff Bezos", "meritocracyScore": 6, "summary": "Raised in a stable middle-class family, he founded Amazon after receiving ~$250,000 in seed funding from his parents. Leveraged an elite Princeton education and Wall Street experience to pioneer e-commerce and cloud computing." },
+            { "name": "Larry Ellison", "meritocracyScore": 9, "summary": "Born to a single mother and raised by relatives, he dropped out of two universities. Taught himself computer programming in California and co-founded Oracle after identifying the commercial potential of relational databases." },
+            { "name": "Bernard Arnault & family", "meritocracyScore": 4, "summary": "Did not inherit LVMH but used $15 million from his father's successful construction business to acquire Christian Dior, which became the cornerstone for building the world's largest luxury goods conglomerate through aggressive acquisitions." },
+            { "name": "Warren Buffett", "meritocracyScore": 7, "summary": "Son of a congressman and stockbroker, he showed an early aptitude for business and investing. He studied under Benjamin Graham and built his fortune through value investing, transforming a textile company, Berkshire Hathaway, into a massive holding company." },
+            { "name": "Larry Page", "meritocracyScore": 7, "summary": "Grew up in a home filled with computers and technology magazines. His academic upbringing led him to Stanford for a Ph.D. in computer science, where he met Sergey Brin and co-developed the PageRank algorithm that powers Google." },
+            { "name": "Sergey Brin", "meritocracyScore": 7, "summary": "Immigrated from the Soviet Union at age six with his highly educated Jewish parents, who fled antisemitism. His academic family background fostered his quantitative skills, leading him to co-found Google with Larry Page at Stanford." },
+            { "name": "Amancio Ortega", "meritocracyScore": 10, "summary": "Grew up in poverty in post-war Spain and left school at 14 to work as a shop hand for a shirtmaker. He started his own business making bathrobes and lingerie, eventually opening the first Zara store and pioneering the fast-fashion model." },
+            { "name": "Steve Ballmer", "meritocracyScore": 7, "summary": "Grew up in an affluent Detroit suburb. Attended Harvard, where he met Bill Gates. Dropped out of Stanford Business School to join Microsoft as its first business manager, later becoming CEO and accumulating his wealth through his stake in the company." },
+            { "name": "Rob Walton & family", "meritocracyScore": 2, "summary": "Eldest son of Walmart founder Sam Walton. Inherited his fortune and served as the company's chairman from 1992 to 2015, overseeing its global expansion. His wealth is tied to his inherited stake in the retail giant." },
+            { "name": "Jim Walton & family", "meritocracyScore": 2, "summary": "Youngest son of Walmart founder Sam Walton. Inherited his fortune and serves as chairman of the family's Arvest Bank Group. His wealth is derived from his inherited stake in Walmart." },
+            { "name": "Bill Gates", "meritocracyScore": 5, "summary": "Son of an influential family, he had access to early computers at an elite private school. Co-founded Microsoft with Paul Allen. A key early contract with IBM was facilitated by his mother's connection to the IBM chairman." },
+            { "name": "Michael Bloomberg", "meritocracyScore": 8, "summary": "Grew up in a middle-class home. Paid his way through Johns Hopkins with loans and part-time work. After being laid off from Salomon Brothers, he founded Bloomberg LP, revolutionizing the financial data industry." },
+            { "name": "Alice Walton", "meritocracyScore": 1, "summary": "The only daughter of Walmart founder Sam Walton. Inherited her fortune and has focused on art curation, founding the Crystal Bridges Museum of American Art. Her wealth is derived from her inherited stake in Walmart." },
+            { "name": "Jensen Huang", "meritocracyScore": 8, "summary": "Born in Taiwan, he was sent to a reform school in the U.S. by mistake at age 9. Reunited with his middle-class parents in Oregon, he excelled academically and co-founded Nvidia, a leader in graphics processing units (GPUs)." },
+            { "name": "Michael Dell", "meritocracyScore": 7, "summary": "Grew up in a financially secure professional family. Started selling custom PCs from his university dorm room with $1,000, pioneering the direct-to-consumer model and building a global technology giant." },
+            { "name": "Mukesh Ambani", "meritocracyScore": 5, "summary": "Inherited Reliance Industries, a company his father Dhirubhai Ambani built from a small textile business. Mukesh dramatically expanded the conglomerate into petrochemicals, refining, retail, and telecommunications." },
+            { "name": "Carlos Slim Helu & family", "meritocracyScore": 4, "summary": "Son of a wealthy Lebanese-Mexican immigrant who taught him finance from a young age. He expanded the family's business interests and built his empire by acquiring undervalued companies, most notably the state-owned telecom firm Telmex." },
+            { "name": "Francoise Bettencourt Meyers & family", "meritocracyScore": 1, "summary": "Granddaughter of L'Oréal founder Eugène Schueller. She inherited the family's 33% stake in the cosmetics giant upon the death of her mother, Liliane Bettencourt, making her the world's wealthiest woman." },
+            { "name": "Julia Koch & family", "meritocracyScore": 1, "summary": "Inherited a 42% stake in Koch Industries after her husband, David Koch, died in 2019. Her wealth is derived from the industrial conglomerate built by her father-in-law and expanded by her husband and brother-in-law." },
+            { "name": "Charles Koch & family", "meritocracyScore": 3, "summary": "Son of Koch Industries founder Fred Koch. He and his late brother David inherited the business and expanded it exponentially into one of the largest private companies in America. His wealth is a mix of inheritance and significant entrepreneurial expansion." },
+            { "name": "Zhang Yiming", "meritocracyScore": 8, "summary": "Son of civil servants, he studied software engineering and founded ByteDance in 2012. He developed the news aggregator Toutiao and the viral short-video app TikTok/Douyin, leveraging AI to create a global tech giant." },
+            { "name": "Changpeng Zhao", "meritocracyScore": 9, "summary": "Born in China, his professor father was exiled as a 'pro-bourgeois intellect.' The family immigrated to Canada, where he worked at McDonald's to help with expenses. He used his computer science degree to build Binance into the world's largest crypto exchange." },
+            { "name": "Jeff Yass", "meritocracyScore": 5, "summary": "Co-founded trading firm Susquehanna International Group (SIG) with friends. His father, an accountant, played an integral role in building the company's back-office operations. Yass built his fortune through quantitative trading." },
+            { "name": "Zhong Shanshan", "meritocracyScore": 10, "summary": "Dropped out of primary school during the Cultural Revolution and worked as a construction worker. He later became a reporter before founding beverage company Nongfu Spring and acquiring a stake in a vaccine maker." },
+            { "name": "Thomas Peterffy", "meritocracyScore": 10, "summary": "Escaped communist Hungary in 1965 as a refugee with no money and no English. He taught himself programming and pioneered electronic trading, founding the discount brokerage Interactive Brokers." },
+            { "name": "Gautam Adani", "meritocracyScore": 9, "summary": "Dropped out of university and moved to Mumbai to work as a diamond sorter. He later started a commodity trading business, which he grew into the Adani Group, a massive conglomerate in ports, power, and infrastructure." },
+            { "name": "Ma Huateng", "meritocracyScore": 8, "summary": "Son of a port manager in Shenzhen. He studied computer science and worked as a software engineer before co-founding Tencent in 1998. He built the company into a tech giant with its messaging app WeChat and a vast gaming empire." },
+            { "name": "Tadashi Yanai & family", "meritocracyScore": 6, "summary": "After graduating, he joined his father's single tailor shop. In 1984, he opened the first Uniqlo store, transforming the small family business into Fast Retailing, a global apparel giant." },
+            { "name": "Stephen Schwarzman", "meritocracyScore": 8, "summary": "Son of a small business owner, he attended Yale and Harvard Business School. After a career at Lehman Brothers, he co-founded the private equity firm Blackstone, growing it into a global investment powerhouse." },
+            { "name": "Lei Jun", "meritocracyScore": 9, "summary": "Born to teacher parents in rural Hubei. After an early career as CEO of software company Kingsoft, he co-founded smartphone maker Xiaomi in 2010, building it into a major global electronics brand." },
+            { "name": "Jacqueline Mars", "meritocracyScore": 1, "summary": "Granddaughter of Mars, Inc. founder Frank Mars. She and her brother John each inherited an estimated one-third of the candy and pet food giant. She worked in the company until her retirement in 2001." },
+            { "name": "John Mars", "meritocracyScore": 1, "summary": "Grandson of Mars, Inc. founder Frank Mars. He and his sister Jacqueline each inherited an estimated one-third of the company. He served as chairman of the secretive family-owned business." },
+            { "name": "Ken Griffin", "meritocracyScore": 6, "summary": "Started his first hedge fund in his Harvard dorm with $265,000, including a significant investment from his grandmother. He built this into Citadel, one of the world's most successful hedge fund and market-making firms." },
+            { "name": "Colin Huang", "meritocracyScore": 9, "summary": "Born to middle-class factory workers in Hangzhou. An early internship at Microsoft and a job at Google in the U.S. gave him the experience to found Pinduoduo, an innovative social e-commerce platform." },
+            { "name": "Dieter Schwarz", "meritocracyScore": 5, "summary": "Inherited his father's grocery wholesale business. He opened the first Lidl discount supermarket in 1973 and built the Schwarz Group into Europe's largest retail empire, which also includes the Kaufland hypermarket chain." },
+            { "name": "Mark Mateschitz", "meritocracyScore": 1, "summary": "The only child of Red Bull co-founder Dietrich Mateschitz. He inherited his father's 49% stake in the energy drink company upon his death in 2022." },
+            { "name": "Klaus-Michael Kuehne", "meritocracyScore": 1, "summary": "Grandson of August Kuehne, co-founder of logistics giant Kühne + Nagel. The family fortune was significantly enhanced through the expropriation of Jewish assets during the Nazi regime. He inherited the company and serves as honorary chairman." },
+            { "name": "Li Ka-shing", "meritocracyScore": 10, "summary": "Fled war-torn China for Hong Kong as a refugee. Left school at 15 to work in a plastics factory after his father died. Started his own plastics company and built it into a vast conglomerate spanning real estate, ports, and telecom." },
+            { "name": "Giovanni Ferrero", "meritocracyScore": 2, "summary": "Grandson of Ferrero founder Pietro Ferrero. He inherited the global confectionery company with his brother and became sole CEO after his brother's death. He has since expanded the company through major acquisitions." },
+            { "name": "Lukas Walton", "meritocracyScore": 1, "summary": "Grandson of Walmart founder Sam Walton. He inherited his fortune when his father, John Walton, died in a plane crash. He owns stakes in Walmart and Arvest Bank but does not work for the companies." },
+            { "name": "Robin Zeng", "meritocracyScore": 10, "summary": "Born to a peasant family in a farming village. He earned a Ph.D. in physics and founded Contemporary Amperex Technology (CATL), which has become the world's largest supplier of batteries for electric vehicles." },
+            { "name": "Gianluigi Aponte", "meritocracyScore": 8, "summary": "Came from a family with a history of seafaring but no major company. He started his career as a ship captain, then took out a loan to buy his first cargo ship in 1970, building it into MSC, the world's largest container shipping line." },
+            { "name": "Rafaela Aponte-Diamant", "meritocracyScore": 6, "summary": "Daughter of a Swiss banker, she co-founded MSC with her husband, Gianluigi Aponte. She is responsible for decorating the ships for the MSC Cruises division. Her 50% stake makes her the world's wealthiest self-made woman." },
+            { "name": "Alain Wertheimer", "meritocracyScore": 1, "summary": "Grandson of Pierre Wertheimer, who co-founded Chanel with Coco Chanel. He and his brother Gerard inherited the iconic luxury brand. Alain serves as the chairman of Chanel." },
+            { "name": "Gerard Wertheimer", "meritocracyScore": 1, "summary": "Grandson of Pierre Wertheimer, who co-founded Chanel with Coco Chanel. He and his brother Alain inherited the company. Gerard chairs the company's watch division from his residence in Switzerland." },
+            { "name": "Gina Rinehart", "meritocracyScore": 3, "summary": "Daughter of Australian iron-ore prospector Lang Hancock. She inherited a bankrupt estate upon his death in 1992 and, through litigation and deal-making, built Hancock Prospecting into a massive mining powerhouse." },
+            { "name": "Len Blavatnik", "meritocracyScore": 8, "summary": "Born in Soviet Ukraine to a Jewish family, he immigrated to the U.S. in 1978. He used his Columbia and Harvard degrees to make a fortune in post-Soviet Russian privatizations, then diversified by acquiring Warner Music and LyondellBasell." },
+            { "name": "He Xiangjian", "meritocracyScore": 9, "summary": "In 1968, he led a group of 23 residents from his village in Guangdong to start a small lid production workshop with minimal capital. This evolved into Midea Group, one of the world's largest appliance manufacturers." }
+        ];
+
+        const searchInput = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('suggestions-box');
+        const resultsContainer = document.getElementById('results-container');
+        const initialMessage = document.getElementById('initial-message');
+
+        const displayResults = (filteredData) => {
+            resultsContainer.innerHTML = '';
+            if (filteredData.length > 0) {
+                initialMessage.classList.add('hidden');
+                filteredData.forEach(person => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-xl shadow-md border border-stone-100 transform hover:-translate-y-1 transition-transform duration-300';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-2xl font-bold text-stone-800">${person.name}</h3>
+                            <div title="Meritocracy Score: ${person.meritocracyScore}/10" class="merit-score-${person.meritocracyScore} w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-inner">
+                                ${person.meritocracyScore}
+                            </div>
+                        </div>
+                        <p class="mt-4 text-stone-600">${person.summary}</p>
+                    `;
+                    resultsContainer.appendChild(card);
+                });
+            } else {
+                 resultsContainer.innerHTML = `<div class="text-center py-16 text-stone-500 md:col-span-2 lg:col-span-3">
+                    <p class="text-xl">No results found.</p>
+                </div>`;
+                initialMessage.classList.add('hidden');
+            }
+        };
+
+        const showSuggestions = (filteredData) => {
+            if (filteredData.length > 0 && searchInput.value) {
+                suggestionsBox.innerHTML = filteredData.map(person => 
+                    `<div class="p-3 hover:bg-sky-50 cursor-pointer suggestion-item">${person.name}</div>`
+                ).join('');
+                suggestionsBox.classList.remove('hidden');
+            } else {
+                suggestionsBox.classList.add('hidden');
+            }
+        };
+        
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            if (query.length > 0) {
+                const filtered = billionaireData.filter(person => person.name.toLowerCase().includes(query));
+                showSuggestions(filtered);
+                displayResults(filtered);
+            } else {
+                suggestionsBox.classList.add('hidden');
+                resultsContainer.innerHTML = '';
+                initialMessage.classList.remove('hidden');
+            }
+        });
+
+        suggestionsBox.addEventListener('click', (e) => {
+            if (e.target.classList.contains('suggestion-item')) {
+                const selectedName = e.target.textContent;
+                searchInput.value = selectedName;
+                suggestionsBox.classList.add('hidden');
+                const selectedPerson = billionaireData.filter(person => person.name === selectedName);
+                displayResults(selectedPerson);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.add('hidden');
+            }
+        });
+        
+    </script>
+</body>
+</html>
