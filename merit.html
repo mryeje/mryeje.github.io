@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billionaire Meritocracy Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: A single-view application centered around a primary search interface. The user can type a name into the search bar, which provides autocomplete suggestions. Selecting a name or searching displays a grid of result cards, each containing a billionaire's name, a summary of their wealth origin, and a visually distinct Meritocracy Score. This structure was chosen for its simplicity and directness, allowing users to quickly access the specific information they are interested in without navigating complex menus, directly addressing the prompt's request for a search-focused tool. -->
-    <!-- Visualization & Content Choices: The primary "visualization" is the Meritocracy Score, presented as a colored numerical badge on each result card. Report Info: Meritocracy Score -> Goal: Inform/Compare -> Presentation Method: Styled HTML div (badge) -> Interaction: Filtering via search -> Justification: This provides an immediate, scannable visual cue about the billionaire's background, allowing for quick comparison between individuals shown in the search results. The search bar with autocomplete serves the goal of organizing and accessing the data efficiently. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -23,10 +19,12 @@
         .merit-score-8 { background-color: #14b8a6; color: white; }
         .merit-score-9 { background-color: #06b6d4; color: white; }
         .merit-score-10 { background-color: #0ea5e9; color: white; }
+        .twisty { cursor: pointer; transition: transform 0.3s; display:inline-block; }
+        .twisty.open { transform: rotate(90deg); }
     </style>
      <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-stone-50 text-stone-800">
 
@@ -41,7 +39,9 @@
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="Search for a billionaire..." class="w-full px-5 py-3 text-lg bg-white border-2 border-stone-200 rounded-full shadow-sm focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition-shadow">
                     <div class="absolute top-1/2 right-5 transform -translate-y-1/2 text-stone-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                 </div>
                 <div id="suggestions-box" class="absolute z-10 w-full bg-white border border-stone-200 rounded-lg mt-1 shadow-lg hidden max-h-60 overflow-y-auto"></div>
@@ -49,7 +49,7 @@
 
             <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
-             <div id="initial-message" class="text-center py-16 text-stone-500">
+            <div id="initial-message" class="text-center py-16 text-stone-500">
                 <p class="text-xl">Start typing a name to explore the dataset.</p>
             </div>
         </main>
@@ -59,7 +59,7 @@
             <div class="text-stone-500 space-y-1">
                 <p>Primary data sourced from the Forbes 2025 World's Billionaires list.</p>
                 <p>Cross-referenced with data from Bloomberg and other public financial records.</p>
-                 <p>Biographical details compiled from reputable news archives and academic publications.</p>
+                <p>Biographical details compiled from reputable news archives and academic publications.</p>
             </div>
         </footer>
     </div>
@@ -118,6 +118,10 @@
             { "name": "He Xiangjian", "meritocracyScore": 9, "summary": "In 1968, he led a group of 23 residents from his village in Guangdong to start a small lid production workshop with minimal capital. This evolved into Midea Group, one of the world's largest appliance manufacturers." }
         ];
 
+
+        // Tightened meritocracy logic (example: reduce generous high scores)
+        const tightenScore = (score) => Math.max(1, Math.min(10, Math.round(score * 0.9)));
+
         const searchInput = document.getElementById('search-input');
         const suggestionsBox = document.getElementById('suggestions-box');
         const resultsContainer = document.getElementById('results-container');
@@ -128,17 +132,30 @@
             if (filteredData.length > 0) {
                 initialMessage.classList.add('hidden');
                 filteredData.forEach(person => {
+                    const score = tightenScore(person.meritocracyScore);
                     const card = document.createElement('div');
                     card.className = 'bg-white p-6 rounded-xl shadow-md border border-stone-100 transform hover:-translate-y-1 transition-transform duration-300';
                     card.innerHTML = `
                         <div class="flex justify-between items-start">
                             <h3 class="text-2xl font-bold text-stone-800">${person.name}</h3>
-                            <div title="Meritocracy Score: ${person.meritocracyScore}/10" class="merit-score-${person.meritocracyScore} w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-inner">
-                                ${person.meritocracyScore}
+                            <div class="flex items-center space-x-2">
+                                <div title="Meritocracy Score: ${score}/10" class="merit-score-${score} w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-inner">
+                                    ${score}
+                                </div>
+                                <span class="text-stone-600 text-sm">(${score <= 3 ? 'Inherited' : score <= 6 ? 'Mixed' : 'Self-Made'})</span>
                             </div>
                         </div>
-                        <p class="mt-4 text-stone-600">${person.summary}</p>
+                        <p class="mt-4 text-stone-600 line-clamp-3">${person.summary}</p>
+                        <span class="twisty mt-2 inline-block text-sky-600">▶ More</span>
+                        <p class="mt-2 text-stone-600 hidden">${person.summary}</p>
                     `;
+                    const twisty = card.querySelector('.twisty');
+                    const fullSummary = card.querySelectorAll('p')[1];
+                    twisty.addEventListener('click', () => {
+                        fullSummary.classList.toggle('hidden');
+                        twisty.classList.toggle('open');
+                        twisty.textContent = fullSummary.classList.contains('hidden') ? '▶ More' : '▼ Less';
+                    });
                     resultsContainer.appendChild(card);
                 });
             } else {
@@ -188,7 +205,6 @@
                 suggestionsBox.classList.add('hidden');
             }
         });
-        
     </script>
 </body>
 </html>
