@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reverse Pseudoisochromatic Plate Generator</title>
+    <script src="https://colorjs.io/dist/color.global.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f0; }
+       .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 20px; }
+        canvas { border: 1px solid black; background-color: white; max-width: 100%; }
+       .controls { display: flex; flex-direction: column; gap: 10px; padding: 10px; background-color: #ddd; border-radius: 5px; width: 512px; max-width: 90%; }
+        label { display: block; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Reverse Pseudoisochromatic Plate Generator</h1>
+    <div class="controls">
+        <label for="imageLoader">Upload Image:</label>
+        <input type="file" id="imageLoader" name="imageLoader"/>
+        <label for="cvdType">CVD Type:</label>
+        <select id="cvdType">
+            <option value="protanopia">Protanopia</option>
+            <option value="deuteranopia">Deuteranopia</option>
+        </select>
+        <label for="luminanceSeparation">Luminance Separation (L* difference):</label>
+        <input type="range" id="luminanceSeparation" min="0" max="10" value="2" step="0.1">
+        <label for="threshold">Figure/Background Threshold:</label>
+        <input type="range" id="threshold" min="0" max="255" value="128" step="1">
+        <button id="processButton">Process Image</button>
+        <label><input type="checkbox" id="simulateCvd"> Simulate CVD on Output</label>
+    </div>
+    <div class="container">
+        <div>
+            <h2>Original Image</h2>
+            <canvas id="canvasInput" width="512" height="512"></canvas>
+        </div>
+        <div>
+            <h2>Processed Image</h2>
+            <canvas id="canvasOutput" width="512" height="512"></canvas>
+        </div>
+    </div>
+
+<script>
+    // --- Color Science & Simulation Logic ---
+
+    // Brettel/Vienot simulation matrices for sRGB linear values
+    // Source: https://daltonlens.org/colorblindness-simulator
+    const SIMULATION_MATRICES = {
+        protanopia: [0.152286, 1.052583, -0.204868],
+            [0.114503, 0.786281,  0.099216],
+            [-0.003882, -0.048116, 1.051998],
+        deuteranopia: [0.367322, 0.860646, -0.227968],
+            [0.280085, 0.672501,  0.047413],
+            [-0.011820, 0.042940,  0.968881]
+    };
+
+    function srgb_to_linear(c) {
+        c = c / 255.0;
+        return (c <= 0.04045)? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+
+    function linear_to_srgb(c) {
+        c = (c <= 0.0031308)? c * 12.92 : 1.055 * Math.pow(c, 1.0 / 2.4) - 0.055;
+        return Math.max(0, Math.min(255, c * 255));
+    }
+
+    function apply_matrix(matrix, vector) {
+        const result = ;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                result[i] += matrix[i][j] * vector[j];
+            }
+        }
+        return result;
+    }
+
+    function simulateCvd(r, g, b, type) {
+        const matrix = SIMULATION_MATRICES[type];
+        if (!matrix) return [r, g, b];
+        
+        const lin_r = srgb_to_linear(r);
+        const lin_g = srgb_to_linear(g);
+        const lin_b = srgb_to_linear(b);
+
+        const [sim_r, sim_g, sim_b] = apply_matrix(matrix, [lin_r, lin_g, lin_b]);
+
+        return [
+            linear_to_srgb(sim_r),
+            linear_to_srgb(sim_g),
+            linear_to_srgb(sim_b)
+        ];
+    }
+    
+    // --- Main Application Logic ---
+
+    const imageLoader = document.getElementById('imageLoader');
+    const processButton = document.getElementById('processButton');
+    const cvdTypeSelect = document.getElementById('cvdType');
+    const lumSeparationSlider = document.getElementById('luminanceSeparation');
+    const thresholdSlider = document.getElementById('threshold');
+    const simulateCvdCheckbox = document.getElementById('simulateCvd');
+
+    const canvasInput = document.getElementById('canvasInput');
+    const ctxInput = canvasInput.getContext('2d');
+    const canvasOutput = document.getElementById('canvasOutput');
+    const ctxOutput = canvasOutput.getContext('2d');
+
+    let originalImageData = null;
+
+    imageLoader.addEventListener('change', e => {
+        const reader = new FileReader();
+        reader.onload = event => {
+            const img = new Image();
+            img.onload = () => {
+                const aspectRatio = img.width / img.height;
+                canvasInput.width = 512;
+                canvasInput.height = 512 / aspectRatio;
+                canvasOutput.width = 512;
+                canvasOutput.height = 512 / aspectRatio;
+                ctxInput.drawImage(img, 0, 0, canvasInput.width, canvasInput.height);
+                originalImageData = ctxInput.getImageData(0, 0, canvasInput.width, canvasInput.height);
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files);
+    });
+
+    processButton.addEventListener('click', processImage);
+    simulateCvdCheckbox.addEventListener('change', processImage);
+
+    function processImage() {
+        if (!originalImageData) {
+            alert("Please upload an image first.");
+            return;
+        }
+
+        const width = originalImageData.width;
+        const height = originalImageData.height;
+        const inputData = originalImageData.data;
+        const outputImageData = ctxOutput.createImageData(width, height);
+        const outputData = outputImageData.data;
+
+        const cvdType = cvdTypeSelect.value;
+        const lumSeparation = parseFloat(lumSeparationSlider.value);
+        const threshold = parseInt(thresholdSlider.value);
+
+        // Define adversarial color pairs in CIELAB space
+        // These pairs are on the same confusion line but have different hues for trichromats.
+        // L* is modulated by lumSeparation.
+        const ADVERSARIAL_PALETTES = {
+            protanopia: {
+                figure: { l: 50 + lumSeparation / 2, a: -20, b: 15 }, // Greenish
+                background: { l: 50 - lumSeparation / 2, a: 30, b: 10 }  // Reddish
+            },
+            deuteranopia: {
+                figure: { l: 50 + lumSeparation / 2, a: -30, b: 20 }, // Greenish
+                background: { l: 50 - lumSeparation / 2, a: 40, b: 15 }  // Reddish
+            }
+        };
+
+        const palette = ADVERSARIAL_PALETTES;
+        
+        const figColor = new Color("lab", [palette.figure.l, palette.figure.a, palette.figure.b]);
+        const bgColor = new Color("lab", [palette.background.l, palette.background.a, palette.background.b]);
+
+        const figRGB = figColor.to("srgb").coords.map(c => c * 255);
+        const bgRGB = bgColor.to("srgb").coords.map(c => c * 255);
+
+        for (let i = 0; i < inputData.length; i += 4) {
+            const r = inputData[i];
+            const g = inputData[i + 1];
+            const b = inputData[i + 2];
+
+            // Convert to grayscale to create mask
+            const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+            let targetRGB;
+            if (luminance < threshold) {
+                targetRGB = figRGB; // Figure
+            } else {
+                targetRGB = bgRGB; // Background
+            }
+            
+            let finalRGB = targetRGB;
+            if (simulateCvdCheckbox.checked) {
+                finalRGB = simulateCvd(targetRGB, targetRGB[1], targetRGB[2], cvdType);
+            }
+
+            outputData[i]     = finalRGB;
+            outputData[i + 1] = finalRGB[1];
+            outputData[i + 2] = finalRGB[2];
+            outputData[i + 3] = 255; // Alpha
+        }
+
+        ctxOutput.putImageData(outputImageData, 0, 0);
+    }
+
+</script>
+</body>
+</html>
