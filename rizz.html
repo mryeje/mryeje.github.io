@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teen Slang & Risky Trends Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Simple focus styles for accessibility */
+    :focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
+    .badge { font-size: .75rem; padding: .25rem .5rem; border-radius: 9999px; font-weight: 600; }
+    .badge-critical{ background:#dc2626; color:white; }
+    .badge-high{ background:#ea580c; color:white; }
+    .badge-medium{ background:#f59e0b; color:black; }
+    .badge-preventive{ background:#3b82f6; color:white; }
+    .badge-low{ background:#22c55e; color:white; }
+    .tab-active{ background:#111827; color:#fff; }
+    .tab{ white-space:nowrap; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+      <h1 class="text-xl sm:text-2xl font-bold flex-1">Teen Slang & Risky Trends Guide</h1>
+      <button id="resourcesBtn" class="hidden sm:inline-flex px-3 py-2 rounded-2xl border shadow-sm hover:bg-gray-50" aria-controls="resourcesDrawer" aria-expanded="false">Parent Resources</button>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 pb-3">
+      <label class="block" for="searchInput">
+        <span class="sr-only">Search slang, risks, or strategies</span>
+        <input id="searchInput" type="search" placeholder="Search slang, risks, or strategies…" class="w-full rounded-xl border px-4 py-3 shadow-sm" />
+      </label>
+      <div id="tabs" class="mt-3 flex gap-2 overflow-x-auto pb-2">
+        <!-- Tabs injected here -->
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-4">
+    <section id="cards" class="grid gap-4">
+      <!-- Cards injected here -->
+    </section>
+
+    <div class="text-center mt-8">
+      <button id="resourcesBtnMobile" class="inline-flex sm:hidden px-4 py-2 rounded-2xl border shadow-sm hover:bg-gray-50" aria-controls="resourcesDrawer" aria-expanded="false">Explore Parent Resources</button>
+    </div>
+  </main>
+
+  <!-- Resources Drawer -->
+  <aside id="resourcesDrawer" class="fixed inset-x-0 bottom-0 translate-y-full transition-transform duration-300 bg-white border-t shadow-2xl">
+    <div class="max-w-4xl mx-auto p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold">Quick Resources</h2>
+        <button id="closeDrawer" class="px-3 py-1 rounded-lg border hover:bg-gray-50">Close</button>
+      </div>
+      <p class="text-sm text-gray-600 mb-3">Save these in your contacts and bookmarks.</p>
+      <ul class="space-y-2 text-sm">
+        <li><a class="underline hover:no-underline" href="https://988lifeline.org" target="_blank" rel="noopener noreferrer">988 Suicide & Crisis Lifeline</a> — Call or text <strong>988</strong>.</li>
+        <li><a class="underline hover:no-underline" href="https://www.crisistextline.org" target="_blank" rel="noopener noreferrer">Crisis Text Line</a> — Text <strong>HOME</strong> to <strong>741741</strong> (US/Canada).</li>
+        <li><a class="underline hover:no-underline" href="https://www.commonsensemedia.org" target="_blank" rel="noopener noreferrer">Common Sense Media</a> — App/game reviews & family guides.</li>
+        <li><a class="underline hover:no-underline" href="https://www.connectsafely.org" target="_blank" rel="noopener noreferrer">ConnectSafely</a> — Parent/teen online safety tips.</li>
+        <li><a class="underline hover:no-underline" href="https://www.esafety.gov.au" target="_blank" rel="noopener noreferrer">eSafety Commissioner (AU)</a> — Scams, cyberbullying, reporting.</li>
+        <li><a class="underline hover:no-underline" href="https://support.tiktok.com/en/family-pairing" target="_blank" rel="noopener noreferrer">TikTok Family Pairing</a> — Link parent/teen accounts for controls.</li>
+      </ul>
+    </div>
+  </aside>
+
+  <script>
+    // ----- Data (from your doc-derived set) -----
+    const DATA = [
+      {
+        category: "Everyday Slang & Acronyms",
+        terms: [
+          { term: "Bet", definition: "Agreement or confirmation, like 'okay' or 'for sure'.", risk: "Low", example: "Want to meet at the park after school? Bet." },
+          { term: "Bruh", definition: "Casual 'bro' or 'dude', used for surprise or disbelief.", risk: "Low", example: "Bruh, are you serious?" },
+          { term: "Cap / No Cap", definition: "'Cap' = lie; 'No cap' = truth/authentic.", risk: "Low", example: "That's cap! / No cap, I got tickets!" },
+          { term: "Salty", definition: "Bitter or annoyed over something minor.", risk: "Low", example: "He's salty because he lost the game." },
+          { term: "Shook", definition: "Deeply surprised or unsettled.", risk: "Low", example: "I was so shook by the movie ending." },
+          { term: "Sus", definition: "Suspicious; shady or untrustworthy.", risk: "Low", example: "That guy is acting sus." },
+          { term: "AF", definition: "'As f—k,' used as an intensifier.", risk: "Medium", example: "I'm tired AF." },
+          { term: "IYKYK", definition: "If you know, you know — insider reference.", risk: "Low", example: "Best camp ever. IYKYK." },
+          { term: "ONG", definition: "On God — emphasis of truth.", risk: "Low", example: "ONG, that was the best concert!" },
+          { term: "TBH", definition: "To be honest — candid opinion.", risk: "Low", example: "TBH, I didn’t like the movie." },
+          { term: "LMP", definition: "Dual meaning — 'Like my pic' or explicit sexual phrase.", risk: "High", example: "(Harmless) LMP on Insta! / (Risky) used sexually." }
+        ]
+      },
+      {
+        category: "Platform & Meme Culture",
+        terms: [
+          { term: "Skibidi", definition: "Nonsense word from 'Skibidi Toilet' meme series.", risk: "Low", example: "That homework was skibidi." },
+          { term: "Ohio", definition: "Describes something weird or cringe.", risk: "Low", example: "That's so Ohio." },
+          { term: "Fanum Tax", definition: "Taking food from a friend as a joke.", risk: "Low", example: "Says 'Fanum tax' and takes some chips." },
+          { term: "Rizz", definition: "Charisma or flirting skill.", risk: "Medium", example: "He's trying to rizz her up." },
+          { term: "GYAT", definition: "Sexual exclamation tied to body objectification.", risk: "High", example: "GYAT!" },
+          { term: "NPC", definition: "Non-player character; insult for someone lacking originality.", risk: "Low", example: "He repeats TikToks, total NPC." },
+          { term: "W / L", definition: "Win or Loss — shorthand judgment.", risk: "Low", example: "That update is a W." }
+        ]
+      },
+      {
+        category: "Identity & Aesthetics",
+        terms: [
+          { term: "Sigma / Alpha / Beta", definition: "Male archetypes online — dominant, weak, or lone wolf.", risk: "Medium", example: "He's a sigma, independent and respected." },
+          { term: "Simp", definition: "Doing too much for someone without reciprocation.", risk: "Medium", example: "He bought her roses; such a simp." },
+          { term: "E-girl / E-boy", definition: "Online subculture with emo/goth/anime style.", risk: "Low", example: "Her look is very e-girl." },
+          { term: "Looksmaxxing", definition: "Maximizing physical appearance, linked to toxic forums.", risk: "Medium", example: "I've been looksmaxxing for school." },
+          { term: "Mewing", definition: "Tongue posture trend for jawline improvement.", risk: "Low", example: "Can't talk, I'm mewing." },
+          { term: "Brat Summer", definition: "Pop culture aesthetic inspired by Charli XCX album.", risk: "Low", example: "We're in our Brat Summer era." },
+          { term: "Stan", definition: "Obsessive fan of a celebrity.", risk: "Low", example: "She's a Swiftie stan." },
+          { term: "Delulu", definition: "Delusional — wishful thinking, fandom origin.", risk: "Low", example: "She thinks he noticed her; she's delulu." },
+          { term: "Ship", definition: "To root for two people to be in a relationship.", risk: "Low", example: "I ship those characters." }
+        ]
+      },
+      {
+        category: "Risky Codes & Emojis",
+        terms: [
+          { term: "KYS", definition: "Kill Yourself — critical bullying/suicide risk.", risk: "Critical", example: "He told me to KYS in chat." },
+          { term: "KMS", definition: "Kill Myself — may be flippant or serious.", risk: "Critical", example: "Forgot homework, KMS." },
+          { term: "Unalive", definition: "Code for suicide or death.", risk: "Critical", example: "I feel unalive today." },
+          { term: "Plug", definition: "Drug dealer/source.", risk: "High", example: "I got a plug for weed." },
+          { term: "420", definition: "Marijuana use code.", risk: "High", example: "Celebrating 420." },
+          { term: "Molly / X", definition: "MDMA / Ecstasy.", risk: "High", example: "We tried molly at the party." },
+          { term: "🌽", definition: "Corn emoji = porn.", risk: "High", example: "Watching 🌽 online." },
+          { term: "⬛ 🟧", definition: "References Pornhub logo colors.", risk: "High", example: "He sent ⬛ 🟧." },
+          { term: "Accountant", definition: "Code for sex worker / OnlyFans creator.", risk: "High", example: "She's an accountant online." },
+          { term: "DTF", definition: "Down to f—k, casual sex.", risk: "High", example: "She said she's DTF." },
+          { term: "CD9 / POS", definition: "Code 9 / Parents over shoulder.", risk: "Medium", example: "POS, stop texting that." }
+        ]
+      },
+      {
+        category: "Dangerous Challenges",
+        terms: [
+          { term: "Blackout Challenge", definition: "Self-strangulation for thrill — fatal risks.", risk: "Critical", example: "Kids trying the choking game." },
+          { term: "Benadryl Challenge", definition: "Overdosing for hallucinations.", risk: "High", example: "Teens took 12+ pills for TikTok." },
+          { term: "Devious Lick", definition: "Stealing/vandalizing school property.", risk: "Medium", example: "He filmed stealing a soap dispenser." },
+          { term: "Nyquil Chicken", definition: "Cooking chicken in Nyquil — toxic hoax.", risk: "High", example: "Cooking 'sleepy chicken'." }
+        ]
+      },
+      {
+        category: "Parent Strategies & Resources",
+        terms: [
+          { term: "Family Media Plan", definition: "Joint rules for screen time, privacy, kindness online.", risk: "Preventive", example: "No phones at dinner or after 10pm.", links:[{label:"Family Media Plan Template (AAP)", url:"https://www.healthychildren.org/English/media/Pages/default.aspx#plan"}] },
+          { term: "Open Conversations", definition: "Use slang as a bridge instead of reacting negatively.", risk: "Preventive", example: "That's new—what does it mean?" },
+          { term: "Critical Thinking", definition: "Encourage questioning viral content.", risk: "Preventive", example: "Does this seem staged?" },
+          { term: "TikTok Family Pairing", definition: "Built-in parental control linking accounts.", risk: "Preventive", example: "Restrict DMs via Family Pairing.", links:[{label:"TikTok Family Pairing Help", url:"https://support.tiktok.com/en/family-pairing"}] },
+          { term: "Crisis Resources", definition: "988 Suicide & Crisis Lifeline, Crisis Text Line HOME to 741741.", risk: "Emergency", example: "Save hotlines in contacts.", links:[{label:"988 Lifeline", url:"https://988lifeline.org"},{label:"Crisis Text Line", url:"https://www.crisistextline.org"}] },
+          { term: "Trusted Guides", definition: "Common Sense Media, ConnectSafely, eSafety Commissioner.", risk: "Preventive", example: "Check app/game reviews before installing.", links:[{label:"Common Sense Media", url:"https://www.commonsensemedia.org"},{label:"ConnectSafely", url:"https://www.connectsafely.org"},{label:"eSafety Commissioner", url:"https://www.esafety.gov.au"}] }
+        ]
+      }
+    ];
+
+    // ----- Rendering -----
+    const searchInput = document.getElementById('searchInput');
+    const tabsEl = document.getElementById('tabs');
+    const cardsEl = document.getElementById('cards');
+
+    let activeCategory = DATA[0].category;
+
+    function riskBadgeClass(r){
+      const m = {
+        Critical: 'badge-critical', High:'badge-high', Medium:'badge-medium', Preventive:'badge-preventive', Emergency:'badge-critical', Low:'badge-low'
+      };
+      return m[r] || 'badge-low';
+    }
+
+    function renderTabs(){
+      tabsEl.innerHTML = '';
+      DATA.forEach(({category})=>{
+        const btn = document.createElement('button');
+        btn.className = 'tab px-3 py-2 rounded-full border shadow-sm hover:bg-gray-50';
+        btn.textContent = category;
+        btn.setAttribute('role','tab');
+        btn.setAttribute('aria-selected', String(category===activeCategory));
+        if(category===activeCategory){ btn.classList.add('tab-active'); }
+        btn.addEventListener('click', ()=>{ activeCategory = category; renderTabs(); renderCards(); });
+        tabsEl.appendChild(btn);
+      });
+    }
+
+    function matchesSearch(t){
+      const q = searchInput.value.trim().toLowerCase();
+      if(!q) return true;
+      const hay = [t.term, t.definition, t.example, t.risk].concat((t.links||[]).map(l=>l.label)).join(' ').toLowerCase();
+      return hay.includes(q);
+    }
+
+    function renderCards(){
+      cardsEl.innerHTML = '';
+      const cat = DATA.find(c=>c.category===activeCategory);
+      const list = (cat?.terms||[]).filter(matchesSearch);
+      if(list.length===0){
+        cardsEl.innerHTML = '<p class="text-center text-gray-500">No matches. Try a different search or tab.</p>';
+        return;
+      }
+      list.forEach(t=>{
+        const card = document.createElement('article');
+        card.className = 'rounded-2xl border bg-white shadow-sm';
+        card.innerHTML = `
+          <div class="p-4">
+            <div class="flex items-start gap-2">
+              <h3 class="font-semibold text-lg flex-1">${t.term}</h3>
+              <span class="badge ${riskBadgeClass(t.risk)}" title="Risk level">${t.risk}</span>
+            </div>
+            <p class="text-sm text-gray-700 mt-1">${t.definition}</p>
+            ${t.example ? `<p class="text-xs italic mt-2 text-gray-600">Example: ${t.example}</p>`:''}
+            ${Array.isArray(t.links) && t.links.length ? `<div class="mt-3 flex flex-wrap gap-2">${t.links.map(l=>`<a class="text-sm underline hover:no-underline" href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a>`).join('')}</div>`:''}
+          </div>`;
+        cardsEl.appendChild(card);
+      });
+    }
+
+    // Wire up search
+    searchInput.addEventListener('input', renderCards);
+
+    // Initial render
+    renderTabs();
+    renderCards();
+
+    // ----- Resources drawer -----
+    const drawer = document.getElementById('resourcesDrawer');
+    function openDrawer(){ drawer.style.transform = 'translateY(0)'; }
+    function closeDrawer(){ drawer.style.transform = 'translateY(100%)'; }
+    document.getElementById('resourcesBtn').addEventListener('click', openDrawer);
+    document.getElementById('resourcesBtnMobile').addEventListener('click', openDrawer);
+    document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+  </script>
+</body>
+</html>
