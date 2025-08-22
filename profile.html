@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile Builder</title>
+  <!-- Tailwind (CDN build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "ui-sans-serif", "system-ui"],
+          },
+          boxShadow: {
+            soft: "0 10px 25px rgba(0,0,0,0.05)",
+          },
+        },
+      },
+    };
+  </script>
+  <!-- Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Export libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhV1QdB2uZ2Qm2r8tRn1dGuXoF7d/8oK8pN1nUoQyD7Crf8CzC2m5++3f2Kf5Xf2M1a4Qf8kqQX5V0hA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.js" integrity="sha512-3kEw1nRv2iI2gLB9Zkn0lTgaG1qWJvVn5c3fGoszA2m4wQfV5Mwz0k3a+0x2m2r3nD5H6i2c0o4bB6YzYq8mcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha512-CdZ8bYIut05fQ7v0G3rG6m9b3k3kqs0e6h+e6Fv2e8t8gF9kQ6sYxwqkZcEwZyA6Jc5cJYz6TWKzG8iVQG8ZQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    /* Refinements for form elements */
+    input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="url"], input[type="date"], textarea, select {
+      @apply w-full rounded-xl border border-gray-200 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition;
+    }
+    label { @apply text-sm font-medium text-gray-700; }
+    .card { @apply bg-white rounded-2xl shadow-soft p-5; }
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition; }
+    .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
+    .btn-ghost { @apply bg-gray-100 text-gray-800 hover:bg-gray-200; }
+    .tag { @apply inline-block rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-gray-100">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-7 h-7 text-indigo-600" fill="currentColor"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 1 1-6 0V5a3 3 0 0 1 3-3Zm7 9a1 1 0 0 1 1 1v1a8 8 0 1 1-16 0v-1a1 1 0 1 1 2 0v1a6 6 0 1 0 12 0v-1a1 1 0 0 1 1-1Z"/></svg>
+        <h1 class="text-lg font-semibold">Profile Builder</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnExportPDF" class="btn btn-ghost" title="Download a PDF of the formatted profile">Export PDF</button>
+        <button id="btnExportDOCX" class="btn btn-primary" title="Download a Word (.docx) version of the profile">Export DOCX</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Left: Form Builder -->
+    <section class="card">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <h2 class="text-xl font-semibold">Create a Profile</h2>
+        <div class="flex items-center gap-2">
+          <button id="btnNew" class="btn btn-ghost" title="Clear all fields">New</button>
+          <button id="btnLoad" class="btn btn-ghost" title="Load a saved profile from this browser">Load</button>
+          <button id="btnSaveLocal" class="btn btn-ghost" title="Save to this browser (localStorage)">Save Local</button>
+        </div>
+      </div>
+
+      <!-- Profile Type -->
+      <div class="mb-4">
+        <label class="mb-1 block">Profile Type</label>
+        <select id="profileType"></select>
+        <p class="mt-2 text-xs text-gray-500">Choose what you are profiling. Fields will adapt automatically.</p>
+      </div>
+
+      <!-- Steps Nav -->
+      <div id="steps" class="flex flex-wrap items-center gap-2 mb-4"></div>
+
+      <!-- Dynamic Form Container -->
+      <form id="dynamicForm" class="space-y-5"></form>
+
+      <!-- Quick Helpers -->
+      <div class="mt-6 flex flex-wrap items-center gap-2">
+        <button id="btnAddNote" class="btn btn-ghost" type="button">Add Note</button>
+        <span class="text-xs text-gray-500">Use datalist dropdowns to minimize typing.</span>
+      </div>
+    </section>
+
+    <!-- Right: Preview -->
+    <section class="card">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Profile Preview</h2>
+        <button id="btnToggleRaw" class="btn btn-ghost text-xs">Show JSON</button>
+      </div>
+      <div id="preview" class="prose max-w-none">
+        <!-- Rendered preview -->
+      </div>
+      <pre id="rawJSON" class="hidden mt-4 overflow-auto rounded-xl bg-gray-900 p-4 text-gray-100 text-xs"></pre>
+    </section>
+  </main>
+
+  <!-- Datalists for suggestions (AJAX-like, no servers) -->
+  <datalist id="dlCountries"></datalist>
+  <datalist id="dlSports"></datalist>
+  <datalist id="dlIndustries"></datalist>
+  <datalist id="dlProvinces"></datalist>
+
+  <!-- Minimal Modal for Load -->
+  <dialog id="dlgLoad" class="rounded-2xl p-0 shadow-soft w-full max-w-lg">
+    <form method="dialog" class="card m-0">
+      <h3 class="text-lg font-semibold mb-2">Load a Saved Profile</h3>
+      <p class="text-sm text-gray-500 mb-3">Choose from profiles saved in this browser.</p>
+      <div id="savedList" class="space-y-2 max-h-72 overflow-auto mb-4"></div>
+      <div class="flex justify-end gap-2">
+        <button class="btn btn-ghost" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="mx-auto max-w-6xl px-4 pb-12 text-center text-xs text-gray-500">
+    <p>Fully client-side. Host on GitHub Pages by pushing this file as <code>index.html</code>.</p>
+  </footer>
+
+  <script>
+    /*******************
+     * Template Catalog *
+     *******************/
+    // Define flexible templates with steps & fields
+    // type: text | number | email | tel | url | date | textarea | select | multi | address
+    const TEMPLATES = {
+      Person: {
+        steps: [
+          { key: 'basic', title: 'Basic', fields: [
+            { key:'fullName', label:'Full Name', type:'text', required:true },
+            { key:'gender', label:'Gender', type:'select', options:['Female','Male','Non-binary','Prefer not to say'] },
+            { key:'dob', label:'Date of Birth', type:'date' },
+            { key:'nationality', label:'Country', type:'text', list:'dlCountries' },
+          ]},
+          { key: 'contact', title: 'Contact', fields: [
+            { key:'email', label:'Email', type:'email' },
+            { key:'phone', label:'Phone', type:'tel' },
+            { key:'website', label:'Website', type:'url' },
+            { key:'address', label:'Address', type:'address' },
+          ]},
+          { key: 'profile', title: 'Profile', fields: [
+            { key:'summary', label:'Summary', type:'textarea' },
+            { key:'strengths', label:'Strengths', type:'multi', options:['Leadership','Endurance','Creativity','Discipline','Teamwork'] },
+            { key:'weaknesses', label:'Weaknesses', type:'multi', options:['Time management','Injury risk','Confidence','Focus'] },
+            { key:'interests', label:'Interests', type:'text' },
+          ]},
+        ]
+      },
+
+      Athlete: {
+        steps: [
+          { key: 'basic', title:'Basic', fields:[
+            { key:'fullName', label:'Full Name', type:'text', required:true },
+            { key:'sport', label:'Sport', type:'text', list:'dlSports', required:true },
+            { key:'sex', label:'Sex', type:'select', options:['Female','Male','Intersex','Prefer not to say'] },
+            { key:'height', label:'Height (cm)', type:'number' },
+            { key:'weight', label:'Weight (kg)', type:'number' },
+          ]},
+          { key: 'training', title:'Training', fields:[
+            { key:'experience', label:'Experience (years)', type:'number' },
+            { key:'strengths', label:'Strengths', type:'multi', options:['Speed','Power','Endurance','Agility','Technique'] },
+            { key:'weaknesses', label:'Weaknesses', type:'multi', options:['Injury history','Mobility','Technique','Recovery','Mindset'] },
+            { key:'goals', label:'Goals', type:'textarea' },
+          ]},
+          { key: 'logistics', title:'Logistics', fields:[
+            { key:'location', label:'City / Region', type:'text' },
+            { key:'province', label:'State / Province', type:'text', list:'dlProvinces' },
+            { key:'coach', label:'Coach', type:'text' },
+            { key:'club', label:'Club / Team', type:'text' },
+          ]}
+        ]
+      },
+
+      Business: {
+        steps: [
+          { key:'company', title:'Company', fields:[
+            { key:'name', label:'Company Name', type:'text', required:true },
+            { key:'industry', label:'Industry', type:'text', list:'dlIndustries' },
+            { key:'founded', label:'Founded', type:'date' },
+            { key:'size', label:'Headcount', type:'number' },
+          ]},
+          { key:'contact', title:'Contact', fields:[
+            { key:'website', label:'Website', type:'url' },
+            { key:'email', label:'Email', type:'email' },
+            { key:'phone', label:'Phone', type:'tel' },
+            { key:'address', label:'HQ Address', type:'address' },
+          ]},
+          { key:'about', title:'About', fields:[
+            { key:'mission', label:'Mission', type:'textarea' },
+            { key:'products', label:'Products/Services', type:'textarea' },
+          ]}
+        ]
+      },
+
+      Club: {
+        steps: [
+          { key:'basics', title:'Basics', fields:[
+            { key:'name', label:'Club Name', type:'text', required:true },
+            { key:'category', label:'Category', type:'select', options:['Sports','Arts','STEM','Social','Nonprofit','Other'] },
+            { key:'members', label:'# Members', type:'number' },
+          ]},
+          { key:'contact', title:'Contact', fields:[
+            { key:'website', label:'Website', type:'url' },
+            { key:'email', label:'Email', type:'email' },
+            { key:'address', label:'Address', type:'address' },
+          ]},
+          { key:'notes', title:'Notes', fields:[
+            { key:'activities', label:'Activities', type:'textarea' },
+            { key:'schedule', label:'Meeting Schedule', type:'textarea' },
+          ]}
+        ]
+      },
+
+      Neighborhood: {
+        steps: [
+          { key:'overview', title:'Overview', fields:[
+            { key:'name', label:'Neighborhood Name', type:'text', required:true },
+            { key:'city', label:'City', type:'text' },
+            { key:'province', label:'State / Province', type:'text', list:'dlProvinces' },
+            { key:'country', label:'Country', type:'text', list:'dlCountries' },
+          ]},
+          { key:'features', title:'Features', fields:[
+            { key:'character', label:'Character / Vibe', type:'textarea' },
+            { key:'amenities', label:'Amenities', type:'textarea' },
+            { key:'transport', label:'Transit / Access', type:'textarea' },
+          ]},
+          { key:'stats', title:'Stats', fields:[
+            { key:'population', label:'Population (approx.)', type:'number' },
+            { key:'medianIncome', label:'Median Income', type:'number' },
+          ]}
+        ]
+      }
+    };
+
+    // Suggestion datasets (trimmed examples; extend freely)
+    const SUGGESTIONS = {
+      countries: [
+        'Canada','United States','Mexico','United Kingdom','Germany','France','Australia','New Zealand','India','Japan','South Korea','Brazil'
+      ],
+      sports: [
+        'Basketball','Soccer','Football','Hockey','Baseball','Tennis','Swimming','Track & Field','Cycling','Rowing','Volleyball','Rugby'
+      ],
+      industries: [
+        'Software','Finance','Healthcare','Education','Retail','Manufacturing','Energy','Real Estate','Media','Transportation','Hospitality'
+      ],
+      provinces: [
+        'Alberta','British Columbia','Manitoba','New Brunswick','Newfoundland and Labrador','Nova Scotia','Ontario','Prince Edward Island','Quebec','Saskatchewan'
+      ]
+    };
+
+    /*****************
+     * App State     *
+     *****************/
+    let currentType = 'Person';
+    let currentStepKey = null;
+    let state = {}; // { stepKey: { fieldKey: value } }
+
+    const el = (sel) => document.querySelector(sel);
+
+    function initDatalists() {
+      fillDatalist('#dlCountries', SUGGESTIONS.countries);
+      fillDatalist('#dlSports', SUGGESTIONS.sports);
+      fillDatalist('#dlIndustries', SUGGESTIONS.industries);
+      fillDatalist('#dlProvinces', SUGGESTIONS.provinces);
+    }
+    function fillDatalist(selector, arr) {
+      const dl = el(selector);
+      dl.innerHTML = arr.map(v => `<option value="${escapeHtml(v)}"></option>`).join('');
+    }
+
+    function populateProfileTypes() {
+      const select = el('#profileType');
+      select.innerHTML = Object.keys(TEMPLATES).map(t => `<option value="${t}">${t}</option>`).join('');
+      select.value = currentType;
+      select.addEventListener('change', () => {
+        currentType = select.value;
+        state = {};
+        renderSteps();
+        renderForm();
+        renderPreview();
+      });
+    }
+
+    function renderSteps() {
+      const steps = TEMPLATES[currentType].steps;
+      const stepsEl = el('#steps');
+      stepsEl.innerHTML = '';
+      steps.forEach((s, idx) => {
+        const isActive = currentStepKey ? currentStepKey===s.key : idx===0;
+        if (!currentStepKey && idx===0) currentStepKey = s.key;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `btn ${isActive? 'btn-primary' : 'btn-ghost'}`;
+        btn.textContent = `${idx+1}. ${s.title}`;
+        btn.addEventListener('click', ()=>{ currentStepKey = s.key; renderForm(); });
+        stepsEl.appendChild(btn);
+      });
+    }
+
+    function renderForm() {
+      const container = el('#dynamicForm');
+      container.innerHTML = '';
+      const step = TEMPLATES[currentType].steps.find(s => s.key===currentStepKey) || TEMPLATES[currentType].steps[0];
+      if (!step) return;
+      step.fields.forEach(field => {
+        const wrap = document.createElement('div');
+        wrap.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 items-start';
+        const label = document.createElement('label');
+        label.className = 'sm:pt-2';
+        label.textContent = field.label + (field.required ? ' *' : '');
+        wrap.appendChild(label);
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'sm:col-span-2';
+        inputWrap.appendChild(buildInput(field));
+        wrap.appendChild(inputWrap);
+        container.appendChild(wrap);
+      });
+      // Update preview on input
+      container.querySelectorAll('input, textarea, select').forEach(ctrl => {
+        ctrl.addEventListener('input', () => {
+          saveFieldToState(ctrl.dataset.step, ctrl.name, getControlValue(ctrl));
+          renderPreview();
+        });
+      });
+    }
+
+    function buildInput(field) {
+      const stepKey = currentStepKey;
+      const value = getStateField(stepKey, field.key) ?? '';
+      let ctrl;
+      switch (field.type) {
+        case 'textarea':
+          ctrl = document.createElement('textarea');
+          ctrl.rows = 3;
+          break;
+        case 'select':
+          ctrl = document.createElement('select');
+          ctrl.innerHTML = `<option value=""></option>` + (field.options||[]).map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+          break;
+        case 'multi':
+          ctrl = document.createElement('div');
+          ctrl.className = 'flex flex-wrap gap-2';
+          (field.options||[]).forEach(o=>{
+            const id = `${stepKey}_${field.key}_${o}`.replace(/\s+/g,'_');
+            const lab = document.createElement('label');
+            lab.className = 'inline-flex items-center gap-2 tag hover:bg-gray-200 cursor-pointer';
+            lab.innerHTML = `<input type="checkbox" class="accent-indigo-600" value="${escapeHtml(o)}" id="${id}"> <span>${escapeHtml(o)}</span>`;
+            ctrl.appendChild(lab);
+          });
+          // set initial
+          const selected = Array.isArray(value) ? value : [];
+          selected.forEach(v => {
+            const box = ctrl.querySelector(`input[value="${CSS.escape(v)}"]`);
+            if (box) box.checked = true;
+          });
+          // listen
+          ctrl.addEventListener('change', ()=>{
+            const vals = Array.from(ctrl.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+            saveFieldToState(stepKey, field.key, vals);
+            renderPreview();
+          });
+          ctrl.dataset.step = stepKey;
+          ctrl.name = field.key;
+          return ctrl;
+        case 'address':
+          ctrl = document.createElement('div');
+          ctrl.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+          ctrl.innerHTML = `
+            <input type="text" placeholder="Street" data-part="street" class="col-span-2"/>
+            <input type="text" placeholder="City" data-part="city"/>
+            <input type="text" placeholder="State/Province" data-part="region" list="dlProvinces"/>
+            <input type="text" placeholder="Postal Code" data-part="postal"/>
+            <input type="text" placeholder="Country" data-part="country" list="dlCountries"/>
+          `;
+          // set initial
+          if (value && typeof value === 'object') {
+            for (const k of ['street','city','region','postal','country']) {
+              const inp = ctrl.querySelector(`[data-part="${k}"]`);
+              if (inp && value[k]) inp.value = value[k];
+            }
+          }
+          ctrl.addEventListener('input', ()=>{
+            const obj = {};
+            ctrl.querySelectorAll('[data-part]').forEach(i => obj[i.dataset.part] = i.value);
+            saveFieldToState(stepKey, field.key, obj);
+            renderPreview();
+          });
+          ctrl.dataset.step = stepKey;
+          ctrl.name = field.key;
+          return ctrl;
+        default:
+          ctrl = document.createElement('input');
+          ctrl.type = field.type || 'text';
+          if (field.list) ctrl.setAttribute('list', field.list);
+      }
+      ctrl.value = value ?? '';
+      ctrl.required = !!field.required;
+      ctrl.dataset.step = stepKey;
+      ctrl.name = field.key;
+      return ctrl;
+    }
+
+    function getControlValue(ctrl) {
+      if (ctrl.tagName === 'DIV' && ctrl.dataset.step) return null; // handled separately
+      if (ctrl.tagName === 'TEXTAREA' || ctrl.tagName === 'SELECT' || ctrl.type !== 'checkbox') return ctrl.value;
+      return ctrl.checked;
+    }
+
+    function saveFieldToState(stepKey, fieldKey, value) {
+      state[stepKey] = state[stepKey] || {};
+      state[stepKey][fieldKey] = value;
+      persistDraft();
+    }
+    function getStateField(stepKey, fieldKey) {
+      return state?.[stepKey]?.[fieldKey];
+    }
+
+    /*****************
+     * Preview Render *
+     *****************/
+    function renderPreview() {
+      const preview = el('#preview');
+      const tpl = TEMPLATES[currentType];
+      const parts = [];
+      parts.push(`<h3 class="text-2xl font-semibold mb-1">${escapeHtml(currentType)} Profile</h3>`);
+      parts.push(`<p class="text-sm text-gray-500 mb-4">Generated ${new Date().toLocaleString()}</p>`);
+      tpl.steps.forEach(step => {
+        const data = state[step.key];
+        if (!data || Object.keys(data).length===0) return;
+        parts.push(`<h4 class="text-lg font-semibold mt-4 mb-2">${escapeHtml(step.title)}</h4>`);
+        parts.push('<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">');
+        step.fields.forEach(f => {
+          const v = data[f.key];
+          if (v==null || v==='' || (Array.isArray(v) && v.length===0)) return;
+          parts.push('<div class="mb-2">');
+          parts.push(`<div class="text-[0.8rem] uppercase tracking-wide text-gray-500">${escapeHtml(f.label)}</div>`);
+          if (f.type === 'address' && typeof v === 'object') {
+            const addr = [v.street, v.city, v.region, v.postal, v.country].filter(Boolean).join(', ');
+            parts.push(`<div class="mt-0.5">${escapeHtml(addr)}</div>`);
+          } else if (Array.isArray(v)) {
+            parts.push(`<div class="mt-0.5">${v.map(x=>`<span class='tag mr-1 mb-1'>${escapeHtml(x)}</span>`).join('')}</div>`);
+          } else if (f.type === 'url' && v) {
+            const safe = escapeHtml(v);
+            parts.push(`<a class="mt-0.5 text-indigo-600 underline break-all" href="${safe}" target="_blank" rel="noopener">${safe}</a>`);
+          } else {
+            parts.push(`<div class="mt-0.5 break-words">${escapeHtml(String(v))}</div>`);
+          }
+          parts.push('</div>');
+        });
+        parts.push('</div>');
+      });
+      preview.innerHTML = parts.join('\n');
+      // Raw JSON
+      el('#rawJSON').textContent = JSON.stringify({ type: currentType, data: state }, null, 2);
+    }
+
+    /*****************
+     * Export (PDF)  *
+     *****************/
+    function exportPDF() {
+      const element = el('#preview');
+      const opt = {
+        margin: 10,
+        filename: slugify(`${currentType}-profile-${Date.now()}`).slice(0,80)+'.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    }
+
+    /*******************
+     * Export (DOCX)   *
+     *******************/
+    function exportDOCX() {
+      const doc = new docx.Document({
+        styles: {
+          paragraphStyles: [
+            { id:'Heading1', name:'Heading 1', basedOn:'Heading1', next:'Normal', quickFormat:true, run:{ size:32, bold:true }, paragraph:{ spacing:{ after:240 } }},
+            { id:'Heading2', name:'Heading 2', basedOn:'Heading2', next:'Normal', quickFormat:true, run:{ size:26, bold:true }, paragraph:{ spacing:{ before:200, after:120 } }},
+            { id:'Small', name:'Small', basedOn:'Normal', run:{ size:20, color:'666666' }},
+          ]
+        }
+      });
+
+      const children = [];
+      children.push(new docx.Paragraph({ text: `${currentType} Profile`, style: 'Heading1' }));
+      children.push(new docx.Paragraph({ text: `Generated ${new Date().toLocaleString()}`, style: 'Small' }));
+
+      TEMPLATES[currentType].steps.forEach(step => {
+        const data = state[step.key];
+        if (!data || Object.keys(data).length===0) return;
+        children.push(new docx.Paragraph({ text: step.title, style: 'Heading2' }));
+        Object.entries(data).forEach(([k,v]) => {
+          const field = step.fields.find(f => f.key===k);
+          if (!field) return;
+          if (v==null || v==='' || (Array.isArray(v) && v.length===0)) return;
+          let valText = '';
+          if (field.type==='address' && typeof v==='object') {
+            valText = [v.street, v.city, v.region, v.postal, v.country].filter(Boolean).join(', ');
+          } else if (Array.isArray(v)) {
+            valText = v.join(', ');
+          } else {
+            valText = String(v);
+          }
+          children.push(new docx.Paragraph({ children:[
+            new docx.TextRun({ text: `${field.label}: `, bold:true }),
+            new docx.TextRun({ text: valText })
+          ]}));
+        });
+      });
+
+      doc.addSection({ children });
+      docx.Packer.toBlob(doc).then(blob => {
+        const fname = slugify(`${currentType}-profile-${Date.now()}`).slice(0,80)+'.docx';
+        saveAs(blob, fname);
+      });
+    }
+
+    /*****************
+     * Local Storage *
+     *****************/
+    const DRAFT_KEY = 'profilebuilder.draft';
+    const SAVED_KEY = 'profilebuilder.saved';
+
+    function persistDraft() {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ type: currentType, state }));
+    }
+    function restoreDraft() {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj && obj.type && TEMPLATES[obj.type]) {
+          currentType = obj.type;
+          state = obj.state || {};
+        }
+      } catch {}
+    }
+    function getSavedList() {
+      const raw = localStorage.getItem(SAVED_KEY);
+      try { return raw ? JSON.parse(raw) : []; } catch { return []; }
+    }
+    function setSavedList(arr) {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(arr));
+    }
+
+    function saveLocal() {
+      const list = getSavedList();
+      const item = { id: Date.now(), type: currentType, state, name: inferTitle() };
+      list.unshift(item);
+      setSavedList(list);
+      alert('Saved to this browser. Use "Load" to retrieve later.');
+    }
+
+    function openLoadDialog() {
+      const dlg = el('#dlgLoad');
+      const container = el('#savedList');
+      const list = getSavedList();
+      if (list.length===0) {
+        container.innerHTML = '<div class="text-sm text-gray-500">No saved profiles yet.</div>';
+      } else {
+        container.innerHTML = list.map(item => `
+          <div class="flex items-center justify-between gap-3 p-3 rounded-xl border border-gray-200">
+            <div>
+              <div class="font-medium">${escapeHtml(item.name || (item.type+' '+item.id))}</div>
+              <div class="text-xs text-gray-500">${escapeHtml(item.type)} • ${new Date(item.id).toLocaleString()}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-ghost text-xs" data-act="load" data-id="${item.id}">Load</button>
+              <button class="btn btn-ghost text-xs" data-act="del" data-id="${item.id}">Delete</button>
+            </div>
+          </div>`).join('');
+      }
+      container.onclick = (e)=>{
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const act = btn.dataset.act, id = Number(btn.dataset.id);
+        if (act==='load') {
+          const found = list.find(x=>x.id===id);
+          if (found) {
+            currentType = found.type;
+            state = found.state;
+            persistDraft();
+            populateProfileTypes();
+            renderSteps();
+            renderForm();
+            renderPreview();
+          }
+          dlg.close();
+        } else if (act==='del') {
+          const rest = list.filter(x=>x.id!==id);
+          setSavedList(rest);
+          openLoadDialog();
+        }
+      };
+      dlg.showModal();
+    }
+
+    /*****************
+     * Utilities     *
+     *****************/
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
+    function slugify(str) {
+      return String(str).toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,'').replace(/\-+/g,'-');
+    }
+    function inferTitle() {
+      const candidate =
+        getStateField('basic','fullName') ||
+        getStateField('company','name') ||
+        getStateField('basics','name') ||
+        getStateField('overview','name') ||
+        `${currentType} Profile`;
+      return candidate;
+    }
+
+    /*****************
+     * Events & Init *
+     *****************/
+    function wireEvents() {
+      el('#btnExportPDF').addEventListener('click', exportPDF);
+      el('#btnExportDOCX').addEventListener('click', exportDOCX);
+      el('#btnToggleRaw').addEventListener('click', () => {
+        const raw = el('#rawJSON');
+        raw.classList.toggle('hidden');
+      });
+      el('#btnNew').addEventListener('click', () => {
+        if (confirm('Clear current profile?')) { state = {}; persistDraft(); renderForm(); renderPreview(); }
+      });
+      el('#btnSaveLocal').addEventListener('click', saveLocal);
+      el('#btnLoad').addEventListener('click', openLoadDialog);
+      el('#btnAddNote').addEventListener('click', () => {
+        const txt = prompt('Note to add to Summary / Notes:');
+        if (!txt) return;
+        // Try to place into a reasonable field
+        const stepOrder = ['profile','notes','about','features'];
+        let placed = false;
+        for (const st of stepOrder) {
+          const field = (TEMPLATES[currentType].steps.find(s=>s.key===st)?.fields||[]).find(f=>f.key==='summary' || f.key==='activities' || f.key==='mission' || f.key==='character');
+          if (field) {
+            state[st] = state[st] || {};
+            const prev = state[st][field.key] || '';
+            state[st][field.key] = (prev ? prev + '\n' : '') + txt;
+            placed = true; break;
+          }
+        }
+        if (!placed) {
+          // fallback: first step, first textarea or summary-like field
+          const first = TEMPLATES[currentType].steps[0];
+          if (first) {
+            state[first.key] = state[first.key] || {};
+            state[first.key]['summary'] = ((state[first.key]['summary'])? state[first.key]['summary']+'\n' : '') + txt;
+          }
+        }
+        persistDraft();
+        renderForm();
+        renderPreview();
+      });
+    }
+
+    function init() {
+      initDatalists();
+      restoreDraft();
+      populateProfileTypes();
+      renderSteps();
+      renderForm();
+      renderPreview();
+      wireEvents();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
