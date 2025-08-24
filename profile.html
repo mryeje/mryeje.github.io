@@ -201,6 +201,7 @@
   </div>
 
   <script>
+  window.addEventListener('DOMContentLoaded', () => {
   /********************
    * UTILITIES
    ********************/
@@ -269,7 +270,7 @@
     };
     reader.readAsText(file);
   });
-
+  });
   $('#demoBtn').addEventListener('click', () => {
     // Minimal demo spec aligned to your schema
     const demo = {
