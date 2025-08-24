@@ -204,24 +204,24 @@
   /********************
    * UTILITIES
    ********************/
-const el = (tag, attrs = {}, ...kids) => {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs || {})) {
-    if (k === 'class') n.className = v;
-    else if (k === 'style') n.setAttribute('style', v);
-    else if (k.startsWith('on') && typeof v === 'function') {
-      // ✅ Normalize to lowercase DOM event names: onClick -> "click", onChange -> "change"
-      n.addEventListener(k.slice(2).toLowerCase(), v);
-    } else if (v !== null && v !== undefined) {
-      n.setAttribute(k, v);
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === 'class') n.className = v;
+      else if (k === 'style') n.setAttribute('style', v);
+      else if (k.startsWith('on') && typeof v === 'function') {
+        // ✅ Normalize event name case: onClick -> "click"
+        n.addEventListener(k.slice(2).toLowerCase(), v);
+      }
+      else if (v !== null && v !== undefined) n.setAttribute(k, v);
     }
-  }
-  for (const kid of kids) {
-    if (kid === null || kid === undefined) continue;
-    n.append(kid.nodeType ? kid : document.createTextNode(kid));
-  }
-  return n;
-};
+    for (const kid of kids) {
+      if (kid === null || kid === undefined) continue;
+      n.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+    return n;
+  };
   const safeId = s => String(s||'').replace(/[^a-zA-Z0-9_-]/g, '_');
 
   // Simple localStorage helpers
@@ -258,7 +258,15 @@ const el = (tag, attrs = {}, ...kids) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => { $('#specText').value = reader.result; };
+    reader.onload = () => {
+      $('#specText').value = reader.result;
+      try {
+        const json = JSON.parse(reader.result);
+        boot(json); // ✅ auto-boot after upload
+      } catch (err) {
+        alert('Invalid JSON file: ' + err.message);
+      }
+    };
     reader.readAsText(file);
   });
 
@@ -596,7 +604,7 @@ const el = (tag, attrs = {}, ...kids) => {
   function evalExpr(expr, answers={}, metadata={}){
     try{
       // Handle any(): answers.needs_01.any(v >= 4)
-      const anyRe = /answers\.([a-zA-Z0-9_]+)\.any\(([^)]+)\)/g;
+      const anyRe = /answers\.([a-zA-Z0-9_]+)\.any\\(([^)]+)\\)/g;
       let m; let replaced = expr;
       while ((m = anyRe.exec(expr)) !== null){
         const qid = m[1]; const pred = m[2];
@@ -612,22 +620,20 @@ const el = (tag, attrs = {}, ...kids) => {
       }
       // Replace simple paths
       replaced = replaced
-        .replace(/answers\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(answers?.[id]))
-        .replace(/metadata\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(metadata?.[id]));
+        .replace(/answers\\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(answers?.[id]))
+        .replace(/metadata\\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(metadata?.[id]));
       // Safe eval of boolean expression
-      // Allow: true/false, ==, ===, !=, !==, >, >=, <, <=, &&, ||, parentheses
-      // Block other characters
-      if (!/^[\s\w"'.,:!\=\<\>\&\|\-\+\(\)\[\]]+$/.test(replaced)) return false;
+      if (!/^[\\s\\w\"'.,:!\\=\\<\\>\\&\\|\\-\\+\\(\\)\\[\\]]+$/.test(replaced)) return false;
       // eslint-disable-next-line no-new-func
-      return !!Function(`return (${replaced});`)();
+      return !!Function(\`return (\${replaced});\`)();
     } catch(e){ console.warn('expr error', expr, e); return false; }
   }
   function evalPredicate(pred, v){
     try{
-      const replaced = pred.replace(/\bv\b/g, JSON.stringify(v));
-      if (!/^[\s\w"'.,:!\=\<\>\&\|\-\+\(\)\[\]]+$/.test(replaced)) return false;
+      const replaced = pred.replace(/\\bv\\b/g, JSON.stringify(v));
+      if (!/^[\\s\\w\"'.,:!\\=\\<\\>\\&\\|\\-\\+\\(\\)\\[\\]]+$/.test(replaced)) return false;
       // eslint-disable-next-line no-new-func
-      return !!Function(`return (${replaced});`)();
+      return !!Function(\`return (\${replaced});\`)();
     }catch{ return false; }
   }
 
@@ -745,7 +751,7 @@ const el = (tag, attrs = {}, ...kids) => {
   }
 
   function applyTemplate(str, ctx){
-    return String(str||'').replace(/\{\{([^}]+)\}\}/g, (_,key)=>{
+    return String(str||'').replace(/\\{\\{([^}]+)\\}\\}/g, (_,key)=>{
       const k = key.trim();
       return (ctx[k] ?? '');
     });
@@ -758,7 +764,7 @@ const el = (tag, attrs = {}, ...kids) => {
     URL.revokeObjectURL(url);
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+  function escapeHtml(s){ return String(s).replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#039;'}[c])); }
   </script>
 </body>
 </html>
