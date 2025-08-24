@@ -204,21 +204,24 @@
   /********************
    * UTILITIES
    ********************/
-  const $ = sel => document.querySelector(sel);
-  const el = (tag, attrs={}, ...kids) => {
-    const n = document.createElement(tag);
-    for (const [k,v] of Object.entries(attrs||{})){
-      if (k === 'class') n.className = v;
-      else if (k === 'style') n.setAttribute('style', v);
-      else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
-      else if (v !== null && v !== undefined) n.setAttribute(k, v);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') n.className = v;
+    else if (k === 'style') n.setAttribute('style', v);
+    else if (k.startsWith('on') && typeof v === 'function') {
+      // ✅ Normalize to lowercase DOM event names: onClick -> "click", onChange -> "change"
+      n.addEventListener(k.slice(2).toLowerCase(), v);
+    } else if (v !== null && v !== undefined) {
+      n.setAttribute(k, v);
     }
-    for (const kid of kids) {
-      if (kid === null || kid === undefined) continue;
-      n.append(kid.nodeType ? kid : document.createTextNode(kid));
-    }
-    return n;
-  };
+  }
+  for (const kid of kids) {
+    if (kid === null || kid === undefined) continue;
+    n.append(kid.nodeType ? kid : document.createTextNode(kid));
+  }
+  return n;
+};
   const safeId = s => String(s||'').replace(/[^a-zA-Z0-9_-]/g, '_');
 
   // Simple localStorage helpers
