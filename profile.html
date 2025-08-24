@@ -1,91 +1,761 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile Builder</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.3.0/docx.min.js"></script>
+  <meta charset="utf-8" />
+  <title>Profile Architect — Dynamic Question Runner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark">
   <style>
-    body { background-color: #f8fafc; }
-    .card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    input, select, textarea { background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.5rem; border-radius: 0.5rem; width: 100%; }
-    input:focus, select:focus, textarea:focus { outline: 2px solid #2563eb; background-color: #fff; }
+    :root{
+      --bg: #0b0c0f;
+      --panel: #111319;
+      --card: #151824;
+      --muted: #8a93a6;
+      --text: #e7ebf6;
+      --primary: #5b8cff;
+      --accent: #3ddc97;
+      --danger: #ff6b6b;
+      --focus: #ffd166;
+      --border: #242838;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f7f8fb; --panel:#ffffff; --card:#ffffff; --muted:#5a6172; --text:#0e1525;
+        --border:#e6e8ee; --shadow:0 8px 22px rgba(8,15,34,.08);
+      }
+    }
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91,140,255,.15), transparent 60%),
+                  radial-gradient(1000px 700px at -10% 20%, rgba(61,220,151,.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    a{ color: var(--primary); }
+    .wrap{ max-width: 1100px; margin: 28px auto; padding: 0 16px 80px; }
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      padding: 16px 0 8px;
+    }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:42px; height:42px; border-radius:12px; background:
+        radial-gradient(12px 12px at 70% 30%, rgba(255,255,255,.5), transparent),
+        linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: var(--shadow);
+    }
+    h1{ font-size: clamp(22px, 3vw, 28px); margin: 0; letter-spacing:.2px; }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+      border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .card{ background: var(--card); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .tools{ display:grid; grid-template-columns: 1fr; gap:12px; padding:16px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .btn{
+      appearance:none; border:1px solid var(--border); background:var(--panel); color:var(--text);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; transition:.2s transform, .2s box-shadow, .2s background;
+      box-shadow: 0 2px 0 rgba(0,0,0,.15);
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+    .btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+    .btn.primary{ background: linear-gradient(135deg, var(--primary), #7aa8ff); border-color: transparent; color:white; }
+    .btn.accent{ background: linear-gradient(135deg, var(--accent), #68eab4); border-color: transparent; color:#072b1e; }
+    .btn.ghost{ background:transparent; }
+    .btn.small{ padding:8px 10px; font-size: 14px; }
+    .muted{ color: var(--muted); }
+    textarea,input,select{
+      width:100%; background: var(--panel); color: var(--text); border:1px solid var(--border);
+      border-radius:12px; padding:12px 12px; font: inherit;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+    input[type="file"]{ padding:8px; }
+    .grid{ display:grid; gap:16px; }
+    .grid.cols-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid.cols-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+    @media (max-width: 860px){ .grid.cols-2, .grid.cols-3{ grid-template-columns: 1fr; } }
+    .progress{
+      height:12px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.08)); border:1px solid var(--border);
+      border-radius:999px; overflow:hidden;
+    }
+    .bar{ height:100%; width:0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
+    .sections{ margin-top:16px; display:grid; gap:18px; }
+    .section{ padding: 14px; border:1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+    .section h2{ margin: 0 0 8px; font-size: 18px; }
+    .pill{ display:inline-flex; align-items:center; gap:8px; background: rgba(91,140,255,.1); color: var(--primary);
+      border:1px solid rgba(91,140,255,.3); padding: 6px 10px; border-radius: 999px; font-weight:600; }
+    .q{ padding: 12px; border:1px dashed var(--border); border-radius:12px; display:grid; gap:10px; background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); }
+    .q label{ font-weight: 650; }
+    .hint{ font-size: 13px; color: var(--muted); }
+    .chipset{ display:flex; flex-wrap: wrap; gap:10px; }
+    .chip{
+      border:1px solid var(--border); background: var(--panel); color: var(--text); border-radius:999px; padding:8px 12px; cursor:pointer;
+      user-select:none; transition:.15s transform, .15s background, .15s border-color;
+    }
+    .chip[aria-pressed="true"]{ background: rgba(61,220,151,.18); border-color: var(--accent); color:#dffcf0; }
+    .error{ border-color: var(--danger)!important; box-shadow: 0 0 0 3px rgba(255,107,107,.2); }
+    .okpop{ animation: okpop .45s cubic-bezier(.2,.8,.2,1); }
+    @keyframes okpop{ 0%{transform:scale(.98)} 55%{transform:scale(1.012)} 100%{transform:scale(1)} }
+    .sticky-footer{
+      position: sticky; bottom:0; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.35)), var(--bg);
+      padding: 12px 16px; border-top:1px solid var(--border); display:flex; gap:12px; justify-content:flex-end;
+      backdrop-filter: blur(6px);
+    }
+    details{ background: var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px 12px; }
+    details[open]{ outline: 3px solid rgba(91,140,255,.18); }
+    summary{ cursor: pointer; font-weight:600; }
+    .tooltip{
+      display:inline-block; border-bottom:1px dotted var(--muted); cursor:help; position:relative;
+    }
+    .tooltip span{
+      visibility:hidden; opacity:0; transition:.15s; position:absolute; left:0; top:120%;
+      background: var(--panel); color: var(--text); border:1px solid var(--border); padding:8px 10px; border-radius:10px; width: 280px; z-index: 5;
+    }
+    .tooltip:focus-within span, .tooltip:hover span{ visibility:visible; opacity:1; }
+    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: rgba(255,255,255,.06); border:1px solid var(--border); padding:2px 6px; border-radius:6px; }
+    .trust{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .trust .badge{
+      font-weight:700; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: var(--panel); color: var(--muted);
+    }
+    .sr-only{ position:absolute!important; clip:rect(1px,1px,1px,1px); padding:0!important; border:0!important; height:1px!important; width:1px!important; overflow:hidden; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4">
-  <div class="max-w-lg w-full card rounded-2xl p-6 space-y-4">
-    <h1 class="text-2xl font-bold text-gray-800 text-center">Profile Builder</h1>
-    <label class="block text-gray-700 font-semibold">Select Profile Type</label>
-    <select id="profileType" class="mb-4">
-      <option value="person">Person</option>
-      <option value="athlete">Athlete</option>
-      <option value="business">Business</option>
-      <option value="club">Club</option>
-      <option value="neighborhood">Neighborhood</option>
-    </select>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Profile Architect — Dynamic Question Runner</h1>
+          <div class="muted" style="font-size:14px">Render & collect answers from your GPT’s JSON spec (No-Chat mode).</div>
+        </div>
+      </div>
+      <div class="trust" aria-label="Trust & transparency cues">
+        <span class="badge">Zero-party data</span>
+        <span class="badge">Progressive disclosure</span>
+        <span class="badge">WCAG-minded</span>
+      </div>
+    </header>
 
-    <div id="fieldsContainer" class="space-y-3"></div>
+    <!-- LOADER -->
+    <section class="panel tools" aria-labelledby="loader-title">
+      <h2 id="loader-title" class="sr-only">Load a JSON Spec</h2>
+      <div class="grid cols-2">
+        <div class="card" style="padding:14px">
+          <label for="specText"><strong>Paste your GPT’s JSON spec</strong> <span class="muted">(no markdown fence)</span></label>
+          <textarea id="specText" placeholder='{"metadata": {...}, "layout_rules": {...}, "questions": [...], "branching": [...], "predicted_profile_chunks": [...], "ethics": {...}}' aria-describedby="specHelp"></textarea>
+          <div id="specHelp" class="hint">Input contract: keys in order → <span class="kbd">metadata</span>, <span class="kbd">layout_rules</span>, <span class="kbd">questions</span>, <span class="kbd">branching</span>, <span class="kbd">predicted_profile_chunks</span>, <span class="kbd">ethics</span>.</div>
+          <div class="row">
+            <button id="loadSpecBtn" class="btn primary">Load Spec</button>
+            <button id="demoBtn" class="btn ghost">Load Demo</button>
+            <label class="btn ghost small" for="fileInput">Upload JSON</label>
+            <input id="fileInput" type="file" accept="application/json" class="sr-only" />
+          </div>
+        </div>
+        <div class="card" style="padding:14px">
+          <strong>Transparency</strong>
+          <p class="muted" style="margin-top:6px">
+            Your answers are only stored in your browser (localStorage) until you download them. You can clear data anytime.
+          </p>
+          <details>
+            <summary>How this interface works</summary>
+            <ul class="muted">
+              <li>Reads the GPT’s JSON spec and builds sections/questions.</li>
+              <li>Applies <em>show_when</em> and top-level <em>branching</em> rules in real time.</li>
+              <li>Shows purpose/help, progress, and micro-feedback for momentum.</li>
+              <li>Generates a profile summary from <em>predicted_profile_chunks</em> templates.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+    </section>
 
-    <div class="flex flex-wrap gap-2 justify-between">
-      <button onclick="saveLocal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow">Save</button>
-      <button onclick="exportPDF()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow">PDF</button>
-      <button onclick="exportDOCX()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">DOCX</button>
-    </div>
+    <!-- RUNTIME UI -->
+    <section id="runtime" class="panel" style="margin-top:16px; display:none" aria-live="polite" aria-atomic="true">
+      <div style="padding:14px; display:flex; align-items:center; gap:12px; justify-content:space-between;">
+        <div>
+          <div id="profileTitle" class="pill" aria-live="polite">Ready</div>
+          <div id="scopeNote" class="muted" style="margin-top:6px"></div>
+        </div>
+        <div style="min-width:260px; width:38%;">
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Completion">
+            <div id="progressBar" class="bar"></div>
+          </div>
+          <div class="muted" style="font-size:12px; margin-top:6px"><span id="progressText">0%</span> complete</div>
+        </div>
+      </div>
+      <div id="consentBlock" class="card" style="margin:0 14px 14px; padding:14px; display:none"></div>
+      <div id="sections" class="sections" style="padding:0 14px 14px"></div>
+      <div class="sticky-footer" id="footer" style="display:none">
+        <button id="downloadMd" class="btn accent">Download Profile (.md)</button>
+        <button id="downloadJson" class="btn">Download Answers (.json)</button>
+        <button id="clearData" class="btn ghost">Clear local data</button>
+      </div>
+    </section>
 
-    <h2 class="text-lg font-semibold text-gray-700 mt-6">Live Preview</h2>
-    <div id="preview" class="bg-gray-100 rounded-lg p-3 text-sm text-gray-800"></div>
   </div>
 
   <script>
-    const templates = {
-      person: ["Name","Age","Location","Occupation"],
-      athlete: ["Name","Sport","Height","Weight","Strengths","Weaknesses"],
-      business: ["Name","Industry","Location","Founded"],
-      club: ["Name","Purpose","Location","Members"],
-      neighborhood: ["Name","City","Population","Features"]
+  /********************
+   * UTILITIES
+   ********************/
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, attrs={}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k,v] of Object.entries(attrs||{})){
+      if (k === 'class') n.className = v;
+      else if (k === 'style') n.setAttribute('style', v);
+      else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+      else if (v !== null && v !== undefined) n.setAttribute(k, v);
+    }
+    for (const kid of kids) {
+      if (kid === null || kid === undefined) continue;
+      n.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+    return n;
+  };
+  const safeId = s => String(s||'').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  // Simple localStorage helpers
+  const LS = {
+    key(spec){ return 'profile-answers:' + (spec?.metadata?.profile_subject || 'default'); },
+    save(spec, answers){ try{ localStorage.setItem(LS.key(spec), JSON.stringify(answers)); }catch{} },
+    load(spec){ try{ return JSON.parse(localStorage.getItem(LS.key(spec)) || '{}'); }catch{ return {}; } },
+    clear(spec){ try{ localStorage.removeItem(LS.key(spec)); }catch{} }
+  };
+
+  /********************
+   * RUNTIME STATE
+   ********************/
+  let SPEC = null;
+  let ANSWERS = {};
+  let HIDDEN_QUESTIONS = new Set();
+  let HIDDEN_SECTIONS = new Set();
+
+  /********************
+   * SPEC LOADING
+   ********************/
+  $('#loadSpecBtn').addEventListener('click', () => {
+    try {
+      const text = $('#specText').value.trim();
+      if (!text) return alert('Paste your JSON spec first.');
+      const json = JSON.parse(text);
+      boot(json);
+    } catch (e) {
+      alert('Invalid JSON: ' + e.message);
+    }
+  });
+
+  $('#fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { $('#specText').value = reader.result; };
+    reader.readAsText(file);
+  });
+
+  $('#demoBtn').addEventListener('click', () => {
+    // Minimal demo spec aligned to your schema
+    const demo = {
+      "metadata":{
+        "profile_subject":"Child (ADHD)",
+        "user_goal":"Tailored home & school strategies",
+        "scope_note":"No-Chat mode: all clarifications occur in-form.",
+        "audience":"Parent & teacher",
+        "assumptions":["School specifics unknown → include clarify items"],
+        "consent_text":"Zero-party data. Skip sensitive questions anytime; data stays in your browser until you download.",
+        "privacy_mode":"explicit_zero_party"
+      },
+      "layout_rules":{
+        "progress_style":"bar",
+        "sections":[
+          {"id":"motives","title":"Why this profile","columns":1},
+          {"id":"context","title":"Context & strengths","columns":2},
+          {"id":"needs","title":"Needs & constraints","columns":2},
+          {"id":"plan","title":"Targets & supports","columns":1}
+        ],
+        "ui_hints":{"dense_mode":true,"show_purpose_inline":true,"show_help_icons":true}
+      },
+      "questions":[
+        {"id":"motives_01","section":"motives","type":"chips","text":"What outcomes should this profile enable in the next 2–4 weeks?","purpose":"Anchor all later questions to the user's stated goal.","options":["Smoother mornings","Homework flow","Calmer transitions","Sleep routine","Coordination with school","Other"],"priority":"core","skippable":false,"max_select":3},
+        {"id":"context_01","section":"context","type":"textarea","text":"Briefly describe a recent ‘good day’ and what worked.","purpose":"Strengths-first framing.","priority":"core","placeholder":"Example: He finished homework after a 10-min bike break and a visual checklist."},
+        {"id":"context_02","section":"context","type":"matrix","text":"Where does the subject typically thrive?","purpose":"Quick scan for strengths; follow-ups target weak areas.","rows":["Physical activity","Creative tasks","Solo focus","Teamwork","Hands-on tasks","Structured routines"],"columns":["Rarely","Sometimes","Often"],"priority":"core"},
+        {"id":"needs_01","section":"needs","type":"likert","text":"Rate current challenge level","purpose":"Quantify pain points to prioritize.","scale":{"min":1,"max":5,"labels":["Low","High"]},"items":["Morning routine","Transitions","Homework","Sleep","Emotions","Organization"],"priority":"core"},
+        {"id":"needs_01_fx","section":"needs","type":"textarea","text":"You marked high challenges. Which 1–2 are top priority and why?","purpose":"Target qualitative detail only where impact is high.","priority":"followup","show_when":"answers.needs_01.any(v >= 4)"},
+        {"id":"plan_01","section":"plan","type":"chips","text":"Supports in-bounds to try","purpose":"Converge on feasible options.","options":["Environmental tweaks","Visual schedule","Timers/intervals","Movement breaks","Task chunking","Positive reinforcement","Professional consult"],"priority":"core","max_select":5},
+        {"id":"feasibility_01","section":"plan","type":"likert","text":"How easy would your chosen supports be to set up daily?","purpose":"Ability check for realistic plans.","scale":{"min":1,"max":5,"labels":["Hard","Easy"]},"items":["Setup effort","Daily time","Consistency"],"priority":"core"},
+        {"id":"success_01","section":"plan","type":"chips","text":"Earliest sign it’s working?","purpose":"Define leading indicators.","options":["Fewer morning conflicts","Shorter homework time","Fewer reminders","Smoother transitions","Faster sleep onset"],"priority":"core","max_select":2},
+        {"id":"privacy_optout","section":"plan","type":"toggle","text":"Allow sensitive items? (You can still skip any item.)","purpose":"Consent gate for sensitive questions.","priority":"core","default":false},
+        {"id":"medical_summary","section":"plan","type":"textarea","text":"(Optional) Health context that affects routines.","purpose":"Only if consented; neutral phrasing.","priority":"clarify","skippable":true,"needs_explanation":true,"why_text":"This helps tailor realistic supports and handoffs.","show_when":"answers.privacy_optout == true"}
+      ],
+      "branching":[
+        {"if":"answers.privacy_optout == false","then_hide_prefix":["medical_"]}
+      ],
+      "predicted_profile_chunks":[
+        {"id":"summary_strengths","title":"Observed Strengths","template":"Thrives at {{top_strengths}}. Recent win: {{good_day_example}}."},
+        {"id":"priority_targets","title":"Priority Targets (Next 2–4 weeks)","template":"Focus on {{top_challenges}} with supports: {{chosen_supports}}."},
+        {"id":"success_metric","title":"What Success Looks Like","template":"You'll notice {{leading_indicator}} within {{time_window}}."}
+      ],
+      "ethics":{"disclaimer":"This profile supports planning and communication; it is not diagnosis or medical advice.","sensitive_handling":"Explain purpose; neutral phrasing; always allow 'Prefer not to say'."}
     };
+    $('#specText').value = JSON.stringify(demo, null, 2);
+  });
 
-    const fieldsContainer = document.getElementById('fieldsContainer');
-    const preview = document.getElementById('preview');
+  function boot(spec){
+    SPEC = spec;
+    ANSWERS = LS.load(spec) || {};
+    HIDDEN_QUESTIONS = new Set();
+    HIDDEN_SECTIONS = new Set();
 
-    function renderFields() {
-      fieldsContainer.innerHTML = '';
-      const type = document.getElementById('profileType').value;
-      templates[type].forEach(f => {
-        fieldsContainer.innerHTML += `<label class='block font-medium text-gray-700'>${f}<input id='${f}' /></label>`;
+    // Basic header
+    $('#runtime').style.display = 'block';
+    $('#footer').style.display = 'flex';
+    $('#profileTitle').textContent = (spec.metadata?.profile_subject || 'Profile');
+    $('#scopeNote').textContent = spec.metadata?.scope_note || '';
+
+    // Consent
+    const consent = spec.metadata?.consent_text;
+    const c = $('#consentBlock');
+    if (consent){
+      c.style.display = 'block';
+      c.innerHTML = `<strong>Consent</strong><p class="muted" style="margin:.4rem 0 0">${escapeHtml(consent)}</p>`;
+    } else c.style.display = 'none';
+
+    // Build sections
+    const host = $('#sections');
+    host.innerHTML = '';
+    const bySection = groupBy(spec.questions || [], q => q.section || 'default');
+
+    // Honor layout columns & progressive disclosure: collapse after first section
+    const sectionsOrder = (spec.layout_rules?.sections || []).map(s=>s.id);
+    const knownIds = new Set(Object.keys(bySection));
+    // Ensure every declared section exists, plus any stray
+    const allSections = [];
+    for (const s of (spec.layout_rules?.sections || [])) allSections.push(s);
+    for (const id of knownIds) if (!sectionsOrder.includes(id)) allSections.push({id, title: id, columns: 1});
+
+    for (let idx=0; idx<allSections.length; idx++){
+      const s = allSections[idx];
+      const sec = el('section',{class:'section', id:'sec_'+safeId(s.id)});
+      const title = el('h2',{}, s.title || s.id || 'Section');
+      const toggle = el('button',{class:'btn small ghost', style:'margin-left:auto', onClick:()=>collapseToggle(content)}, 'Collapse');
+      const header = el('div',{class:'row', style:'justify-content:space-between; align-items:center;'}, title, toggle);
+      sec.append(header);
+
+      const cols = Math.min(Math.max(parseInt(s.columns||1),1),3);
+      const content = el('div',{class:'grid ' + (cols===1?'':'cols-'+cols)});
+      sec.append(content);
+      host.append(sec);
+
+      // Render questions for this section
+      const questions = (bySection[s.id] || []).sort(prioritySort);
+      for (const q of questions){
+        content.append(renderQuestion(q));
+      }
+
+      // Progressive disclosure: collapse sections after the first
+      if (idx>0) collapse(content, true);
+    }
+
+    applyBranching();
+    updateProgress();
+  }
+
+  function prioritySort(a,b){
+    const order = {'core':0,'clarify':1,'followup':2};
+    return (order[a.priority] ?? 1) - (order[b.priority] ?? 1);
+  }
+
+  function groupBy(arr, keyFn){
+    const map = {};
+    for (const item of arr){ const k = keyFn(item); (map[k]=map[k]||[]).push(item); }
+    return map;
+  }
+
+  /********************
+   * RENDER QUESTIONS
+   ********************/
+  function renderQuestion(q){
+    const wrap = el('div',{class:'q', id:'q_'+safeId(q.id)});
+    const label = el('label', { for: 'ctl_'+safeId(q.id) }, q.text || q.id);
+    wrap.append(label);
+
+    if (q.purpose && (SPEC.layout_rules?.ui_hints?.show_purpose_inline !== false)){
+      wrap.append(el('div',{class:'hint'}, q.purpose));
+    }
+    if (q.needs_explanation && q.why_text){
+      const t = el('div',{class:'hint'}, 
+        'Why: ',
+        el('span',{class:'tooltip', tabIndex:0}, 'Learn more', el('span',{}, q.why_text))
+      );
+      wrap.append(t);
+    }
+
+    // Field by type
+    let field = null;
+    const v = getAnswer(q.id);
+    switch(q.type){
+      case 'chips': field = renderChips(q, v); break;
+      case 'textarea': field = renderTextarea(q, v); break;
+      case 'likert': field = renderLikert(q, v); break;
+      case 'matrix': field = renderMatrix(q, v); break;
+      case 'toggle': field = renderToggle(q, v); break;
+      case 'select': field = renderSelect(q, v); break;
+      case 'date': field = renderDate(q, v); break;
+      default:
+        field = el('div',{}, el('em', {class:'muted'}, 'Unsupported type: '+q.type));
+    }
+    field.id = 'ctl_'+safeId(q.id);
+    field.setAttribute('data-qid', q.id);
+    wrap.append(field);
+
+    // Required indicator (visual only; you can extend validators)
+    if (q.required){
+      label.append(el('span',{class:'muted'}, ' *'));
+      field.setAttribute('aria-required','true');
+    }
+
+    return wrap;
+  }
+
+  function renderChips(q, v){
+    const multiMax = (typeof q.max_select === 'number' && q.max_select>0) ? q.max_select : Infinity;
+    const set = new Set(Array.isArray(v)?v:(v? [v] : []));
+    const area = el('div',{class:'chipset', role:'group', 'aria-label': q.text});
+    (q.options || []).forEach(opt=>{
+      const on = set.has(opt);
+      const chip = el('button',{
+        class:'chip' + (on?' okpop':''), role:'button', 'aria-pressed': on ? 'true':'false',
+        onClick:()=> {
+          const isOn = chip.getAttribute('aria-pressed')==='true';
+          if (!isOn){
+            if (!set.has(opt) && set.size >= multiMax){ pulse(area); return; }
+            set.add(opt);
+          } else {
+            set.delete(opt);
+          }
+          chip.setAttribute('aria-pressed', (!isOn).toString());
+          saveAnswer(q.id, Array.from(set));
+        }
+      }, opt);
+      area.append(chip);
+    });
+    return area;
+  }
+
+  function renderTextarea(q, v){
+    const t = el('textarea',{ placeholder: q.placeholder||'', onInput: e=> saveAnswer(q.id, e.target.value) }, v || '');
+    return t;
+  }
+
+  function renderToggle(q, v){
+    const checked = (v === true) || (v === undefined && q.default === true);
+    const id = 'chk_'+safeId(q.id);
+    const input = el('input',{type:'checkbox', id, checked, onChange: e=> saveAnswer(q.id, e.target.checked)});
+    const lab = el('label',{for:id, style:'display:flex; align-items:center; gap:10px; cursor:pointer;'}, input, el('span',{}, q.text));
+    return el('div',{}, lab);
+  }
+
+  function renderSelect(q, v){
+    const s = el('select',{ onChange: e=> saveAnswer(q.id, e.target.value) },
+      el('option',{value:''}, '-- Select --'),
+      ...(q.options||[]).map(o=> el('option',{value:o, selected: v===o}, o))
+    );
+    return s;
+  }
+
+  function renderDate(q, v){
+    return el('input',{type:'date', value: v||'', onChange: e=> saveAnswer(q.id, e.target.value)});
+  }
+
+  function renderLikert(q, v){
+    // v is object: { item -> number }
+    const val = v && typeof v==='object' ? v : {};
+    const wrap = el('div', {class:'grid'});
+    const scale = q.scale || {min:1, max:5, labels:['Low','High']};
+    (q.items || []).forEach(item=>{
+      const rid = safeId(q.id+'_'+item);
+      const row = el('div',{class:'card', style:'padding:10px'});
+      row.append(el('div', {style:'display:flex; justify-content:space-between; align-items:center; gap:10px;'},
+        el('div', {style:'font-weight:600'}, item),
+        el('div', {class:'muted', style:'font-size:12px'}, `${scale.labels?.[0]||scale.min} – ${scale.labels?.[1]||scale.max}`)
+      ));
+      const choices = el('div',{class:'row', style:'margin-top:6px; flex-wrap:wrap;'});
+      for(let n=scale.min; n<=scale.max; n++){
+        const id = rid+'_'+n;
+        const input = el('input',{type:'radio', name: rid, id, checked: Number(val[item])===n, onChange: ()=>{
+          val[item]=n; saveAnswer(q.id, val);
+        }});
+        const lab = el('label',{for:id, class:'btn small ghost', style:'min-width:44px; text-align:center;'}, ''+n);
+        const cell = el('div',{class:'row', style:'align-items:center; gap:6px;'}, input, lab);
+        choices.append(cell);
+      }
+      row.append(choices);
+      wrap.append(row);
+    });
+    return wrap;
+  }
+
+  function renderMatrix(q, v){
+    // v: { row -> column }
+    const val = v && typeof v==='object' ? v : {};
+    const table = el('table',{ style:'width:100%; border-collapse:separate; border-spacing:0 8px;'});
+    const thead = el('thead',{}, el('tr',{}, el('th',{class:'sr-only'}, 'Item'), ...(q.columns||[]).map(c=> el('th',{class:'muted', style:'text-align:center; font-weight:600'}, c))));
+    const tbody = el('tbody');
+    (q.rows || []).forEach(rowLabel=>{
+      const rid = safeId(q.id+'_'+rowLabel);
+      const tr = el('tr',{}, el('td', {style:'font-weight:600; padding:6px 8px;'}, rowLabel));
+      (q.columns||[]).forEach(colLabel=>{
+        const id = rid+'_'+safeId(colLabel);
+        const checked = (val[rowLabel] === colLabel);
+        const cell = el('td',{style:'text-align:center; padding:6px;'},
+          el('input',{type:'radio', name: rid, id, checked, onChange: ()=>{
+            val[rowLabel]=colLabel; saveAnswer(q.id, val);
+          }}),
+          el('label',{for:id, class:'sr-only'}, colLabel)
+        );
+        tr.append(cell);
       });
-      updatePreview();
-      document.querySelectorAll('#fieldsContainer input').forEach(input => input.addEventListener('input', updatePreview));
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+    table.setAttribute('role','table'); table.setAttribute('aria-label', q.text);
+    return table;
+  }
+
+  function pulse(node){
+    node.classList.remove('okpop');
+    node.getBoundingClientRect(); // reflow
+    node.classList.add('okpop');
+  }
+
+  /********************
+   * ANSWERS + BRANCHING
+   ********************/
+  function getAnswer(qid){ return ANSWERS[qid]; }
+  function saveAnswer(qid, value){
+    ANSWERS[qid] = value;
+    LS.save(SPEC, ANSWERS);
+    applyBranching();
+    updateProgress();
+  }
+
+  function applyBranching(){
+    // Reset hidden sets
+    HIDDEN_QUESTIONS.clear();
+    HIDDEN_SECTIONS.clear();
+
+    // Per-question show_when
+    for (const q of (SPEC.questions||[])){
+      if (!q.show_when) continue;
+      const keep = evalExpr(q.show_when, ANSWERS, SPEC.metadata||{});
+      if (!keep) HIDDEN_QUESTIONS.add(q.id);
     }
 
-    function updatePreview() {
-      const type = document.getElementById('profileType').value;
-      const data = {};
-      templates[type].forEach(f => data[f] = document.getElementById(f).value);
-      preview.innerText = JSON.stringify(data, null, 2);
+    // Top-level branching rules
+    for (const rule of (SPEC.branching||[])){
+      const cond = evalExpr(rule.if, ANSWERS, SPEC.metadata||{});
+      if (!cond) continue;
+      if (Array.isArray(rule.then_hide_questions)) rule.then_hide_questions.forEach(id=> HIDDEN_QUESTIONS.add(id));
+      if (Array.isArray(rule.then_hide_prefix)){
+        rule.then_hide_prefix.forEach(pref=>{
+          (SPEC.questions||[]).forEach(q=> { if (String(q.id).startsWith(pref)) HIDDEN_QUESTIONS.add(q.id); });
+        });
+      }
+      if (Array.isArray(rule.then_hide_sections)) rule.then_hide_sections.forEach(id=> HIDDEN_SECTIONS.add(id));
+      if (Array.isArray(rule.then_show_sections)){
+        // Hide all others except listed? Here we show only these by hiding others present in spec
+        const showSet = new Set(rule.then_show_sections);
+        (SPEC.layout_rules?.sections||[]).forEach(s=> { if (!showSet.has(s.id)) HIDDEN_SECTIONS.add(s.id); });
+      }
     }
 
-    function saveLocal() {
-      localStorage.setItem('profileData', preview.innerText);
-      alert('Profile saved locally.');
+    // Apply visibility
+    for (const q of (SPEC.questions||[])){
+      const row = document.getElementById('q_'+safeId(q.id));
+      if (!row) continue;
+      const hide = HIDDEN_QUESTIONS.has(q.id);
+      row.style.display = hide ? 'none' : '';
+    }
+    for (const s of (SPEC.layout_rules?.sections||[])){
+      const sec = document.getElementById('sec_'+safeId(s.id));
+      if (!sec) continue;
+      sec.style.display = HIDDEN_SECTIONS.has(s.id) ? 'none' : '';
+    }
+  }
+
+  // Minimal expression evaluator for patterns used in specs
+  function evalExpr(expr, answers={}, metadata={}){
+    try{
+      // Handle any(): answers.needs_01.any(v >= 4)
+      const anyRe = /answers\.([a-zA-Z0-9_]+)\.any\(([^)]+)\)/g;
+      let m; let replaced = expr;
+      while ((m = anyRe.exec(expr)) !== null){
+        const qid = m[1]; const pred = m[2];
+        const val = answers[qid];
+        let truth = false;
+        if (val && typeof val === 'object'){
+          const arr = Array.isArray(val) ? val : Object.values(val);
+          for (const v of arr){
+            if (evalPredicate(pred, v)){ truth = true; break; }
+          }
+        }
+        replaced = replaced.replace(m[0], truth ? 'true' : 'false');
+      }
+      // Replace simple paths
+      replaced = replaced
+        .replace(/answers\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(answers?.[id]))
+        .replace(/metadata\.([a-zA-Z0-9_]+)/g, (_,id)=> JSON.stringify(metadata?.[id]));
+      // Safe eval of boolean expression
+      // Allow: true/false, ==, ===, !=, !==, >, >=, <, <=, &&, ||, parentheses
+      // Block other characters
+      if (!/^[\s\w"'.,:!\=\<\>\&\|\-\+\(\)\[\]]+$/.test(replaced)) return false;
+      // eslint-disable-next-line no-new-func
+      return !!Function(`return (${replaced});`)();
+    } catch(e){ console.warn('expr error', expr, e); return false; }
+  }
+  function evalPredicate(pred, v){
+    try{
+      const replaced = pred.replace(/\bv\b/g, JSON.stringify(v));
+      if (!/^[\s\w"'.,:!\=\<\>\&\|\-\+\(\)\[\]]+$/.test(replaced)) return false;
+      // eslint-disable-next-line no-new-func
+      return !!Function(`return (${replaced});`)();
+    }catch{ return false; }
+  }
+
+  /********************
+   * PROGRESS + EXPORT
+   ********************/
+  function updateProgress(){
+    const visibleQs = (SPEC.questions||[]).filter(q => !HIDDEN_QUESTIONS.has(q.id) && !HIDDEN_SECTIONS.has(q.section));
+    const answered = visibleQs.filter(q => hasValue(ANSWERS[q.id]));
+    const pct = visibleQs.length ? Math.round(100 * answered.length / visibleQs.length) : 0;
+    $('#progressBar').style.width = pct + '%';
+    $('#progressText').textContent = pct + '%';
+
+    // Build sections grid columns dynamically
+    for (const s of (SPEC.layout_rules?.sections||[])){
+      const sec = document.getElementById('sec_'+safeId(s.id));
+      if (!sec) continue;
+      const visibleChildren = [...sec.querySelectorAll('.q')].filter(x=> x.style.display !== 'none');
+      sec.style.display = visibleChildren.length ? '' : 'none';
+    }
+  }
+  function hasValue(x){
+    if (x === null || x === undefined) return false;
+    if (Array.isArray(x)) return x.length>0;
+    if (typeof x === 'object') return Object.keys(x).length>0;
+    if (typeof x === 'string') return x.trim().length>0;
+    return true;
+  }
+
+  // Collapsible sections
+  function collapse(node, to=true){
+    node.style.display = to ? 'none' : '';
+  }
+  function collapseToggle(node){
+    node.style.display = (node.style.display === 'none') ? '' : 'none';
+  }
+
+  // EXPORT: Markdown profile using predicted_profile_chunks templates
+  $('#downloadMd').addEventListener('click', ()=>{
+    const md = renderMarkdownProfile();
+    downloadText(md, 'profile-summary.md');
+  });
+  $('#downloadJson').addEventListener('click', ()=>{
+    downloadText(JSON.stringify({metadata: SPEC.metadata, answers: ANSWERS}, null, 2), 'answers.json');
+  });
+  $('#clearData').addEventListener('click', ()=>{
+    if (confirm('Clear local answers for this profile?')){
+      LS.clear(SPEC); ANSWERS = {}; applyBranching(); updateProgress();
+      // Clear UI controls
+      (SPEC.questions||[]).forEach(q=>{
+        const ctl = document.getElementById('ctl_'+safeId(q.id));
+        if (!ctl) return;
+        switch(q.type){
+          case 'chips': ctl.querySelectorAll('.chip[aria-pressed="true"]').forEach(c=> c.setAttribute('aria-pressed','false')); break;
+          case 'textarea': ctl.value=''; break;
+          case 'toggle': ctl.querySelector('input[type=checkbox]').checked = (q.default===true); break;
+          case 'select': ctl.value = ''; break;
+          case 'date': ctl.value = ''; break;
+          case 'likert': ctl.querySelectorAll('input[type=radio]').forEach(r=> r.checked=false); break;
+          case 'matrix': ctl.querySelectorAll('input[type=radio]').forEach(r=> r.checked=false); break;
+        }
+      });
+    }
+  });
+
+  function renderMarkdownProfile(){
+    const lines = [];
+    lines.push(`# ${SPEC.metadata?.profile_subject || 'Profile'}`);
+    if (SPEC.metadata?.user_goal) lines.push(`**Goal:** ${SPEC.metadata.user_goal}`);
+    if (SPEC.metadata?.audience) lines.push(`**Audience:** ${SPEC.metadata.audience}`);
+    if (SPEC.metadata?.assumptions?.length) lines.push(`**Assumptions:** ${SPEC.metadata.assumptions.join('; ')}`);
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    // Predicted chunks
+    const ctx = buildTemplateContext();
+    (SPEC.predicted_profile_chunks||[]).forEach(chunk=>{
+      lines.push(`## ${chunk.title || chunk.id}`);
+      lines.push(applyTemplate(chunk.template || '', ctx));
+      lines.push('');
+    });
+    lines.push('---');
+    if (SPEC.ethics?.disclaimer) lines.push(`> ${SPEC.ethics.disclaimer}`);
+    return lines.join('\n');
+  }
+
+  function buildTemplateContext(){
+    const ctx = { time_window:'2–4 weeks' };
+
+    // Strengths from matrix "Often"
+    const mat = ANSWERS['context_02'];
+    if (mat && typeof mat==='object'){
+      const strengths = Object.entries(mat).filter(([row,col])=> col==='Often').map(([row])=> row);
+      ctx.top_strengths = strengths.slice(0,3).join(', ') || 'emerging contexts';
     }
 
-    function exportPDF() {
-      html2pdf().from(preview).save('profile.pdf');
+    ctx.good_day_example = (ANSWERS['context_01'] || '').split('\n')[0];
+
+    // Top challenges (likert >=4)
+    const lik = ANSWERS['needs_01'];
+    if (lik && typeof lik==='object'){
+      const tops = Object.entries(lik).filter(([k,v])=> Number(v)>=4).map(([k])=> k);
+      ctx.top_challenges = tops.slice(0,3).join(', ') || 'no high-intensity challenges flagged';
     }
 
-    async function exportDOCX() {
-      const { Document, Packer, Paragraph, TextRun } = window.docx;
-      const doc = new Document({ sections: [{ properties: {}, children: [new Paragraph({ children: [new TextRun(preview.innerText)] })] }] });
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, 'profile.docx');
-    }
+    // Chosen supports
+    const sup = ANSWERS['plan_01'];
+    if (Array.isArray(sup)) ctx.chosen_supports = sup.join(', ');
 
-    renderFields();
-    document.getElementById('profileType').addEventListener('change', renderFields);
+    // Leading indicator
+    const lead = ANSWERS['success_01'];
+    if (Array.isArray(lead) && lead.length) ctx.leading_indicator = lead.join(', ');
+
+    return ctx;
+  }
+
+  function applyTemplate(str, ctx){
+    return String(str||'').replace(/\{\{([^}]+)\}\}/g, (_,key)=>{
+      const k = key.trim();
+      return (ctx[k] ?? '');
+    });
+  }
+
+  function downloadText(text, filename){
+    const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
   </script>
 </body>
 </html>
