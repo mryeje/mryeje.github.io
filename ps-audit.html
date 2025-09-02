@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Transcript + Comments Audit → Spreadsheet (YouTube Autofill)</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#151923; --ink:#e7eaf3; --muted:#a6accd; --brand:#6ee7b7; --accent:#8ab4ff; --warn:#fbbf24; --bad:#fb7185; --good:#34d399;
+      --border: #23283a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    header{position:sticky;top:0;background:linear-gradient(180deg,#0f1115,rgba(15,17,21,.8));backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:3}
+    header .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 16px}
+    h1{font-size:18px;margin:0}
+    .tag{padding:.25rem .5rem;border:1px solid var(--border);border-radius:999px;color:var(--muted)}
+    main{display:grid;grid-template-columns:360px 1fr;gap:16px;padding:16px}
+    @media (max-width: 1100px){main{grid-template-columns:1fr}}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .panel h2{font-size:16px;margin:0 0 8px}
+    .panel .body{padding:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    label{display:block;font-weight:600;color:var(--muted);margin:8px 0 4px}
+    input[type="text"], input[type="url"], input[type="number"], input[type="date"], textarea, select{
+      width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0d1018;color:var(--ink);
+    }
+    textarea{min-height:80px}
+    input[type="file"]{width:100%}
+    .hint{color:var(--muted);font-size:12px}
+    .btn{display:inline-flex;gap:8px;align-items:center;background:#1c2232;color:var(--ink);border:1px solid var(--border);padding:10px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{background:#20273a}
+    .btn.primary{background:var(--accent);color:#0b1020;border-color:#3e64d6}
+    .btn.good{background:var(--good);color:#052016;border-color:#0ea37f}
+    .btn.warn{background:var(--warn);color:#1f1503;border-color:#b7791f}
+    .btn.bad{background:var(--bad);color:#21070b;border-color:#be123c}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px}
+    .pill{display:inline-block;border:1px dashed var(--border);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px}
+    .grid{display:grid;gap:10px}
+    .kpi{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px dashed var(--border);border-radius:12px;color:var(--muted)}
+    .kpi b{color:var(--ink)}
+    table{width:100%;border-collapse:collapse}
+    th, td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+    th{position:sticky;top:0;background:#1a2030}
+    .small{font-size:12px;color:var(--muted)}
+    details{border:1px solid var(--border);border-radius:10px}
+    summary{cursor:pointer;padding:10px 12px;color:var(--muted)}
+    .flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .right{margin-left:auto}
+    .badge{padding:2px 6px;border-radius:6px;background:#0d1018;border:1px solid var(--border);color:var(--muted)}
+    .note{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="flex" style="gap:12px">
+      <h1>Transcript + Comments Audit → Spreadsheet</h1>
+      <span class="tag">YouTube Autofill</span>
+      <span class="tag">Single‑file UI</span>
+      <span class="tag">Exports: CSV / (XLSX if SheetJS loaded)</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="saveSession">Save session</button>
+      <button class="btn" id="loadSession">Load session</button>
+      <button class="btn bad" id="resetSession">Reset</button>
+      <button class="btn" id="toggleXLSX">Load XLSX engine</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Input panels -->
+  <section class="panel">
+    <div class="body">
+      <h2>Auto‑Fetch from YouTube</h2>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>YouTube Data API Key</label>
+            <input id="ytApiKey" type="text" placeholder="AIza... (only needed for metadata & comments)" />
+            <div class="hint">Create a key in Google Cloud → enable YouTube Data API v3. The key is used only in your browser.</div>
+          </div>
+          <div>
+            <label>Video URL or ID</label>
+            <input id="ytUrl" type="url" placeholder="https://www.youtube.com/watch?v=... or the ID" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Transcript Language (try in order)</label>
+            <input id="langCodes" type="text" value="en,en-US" />
+            <div class="hint">Tries each code against public timedtext endpoints. If captions are private or disabled, upload/paste manually.</div>
+          </div>
+          <div>
+            <label>Max Comments to Fetch</label>
+            <input id="maxComments" type="number" min="0" value="200" />
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="fetchYouTube" class="btn primary">🔎 Fetch & Autofill</button>
+          <span class="pill" id="ytStatus">Idle</span>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0"/>
+
+      <h2>Video Metadata</h2>
+      <div class="row">
+        <div>
+          <label>Brand</label>
+          <select id="brand">
+            <option>PartSelect</option>
+            <option>eReplacementParts</option>
+            <option>Fix.com</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Platform</label>
+          <select id="platform">
+            <option>YouTube</option>
+            <option>TikTok</option>
+            <option>Instagram</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Video ID</label>
+          <input id="videoId" type="text" placeholder="e.g. YT ID" />
+        </div>
+        <div>
+          <label>Publish Date</label>
+          <input id="publishDate" type="date" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Title</label>
+          <input id="title" type="text" placeholder="Video title" />
+        </div>
+        <div>
+          <label>URL</label>
+          <input id="url" type="url" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Video Type</label>
+          <select id="videoType">
+            <option>Install</option>
+            <option>Explainer</option>
+            <option>Hero</option>
+            <option>Short</option>
+          </select>
+        </div>
+        <div>
+          <label>Aspect</label>
+          <select id="aspect">
+            <option>Horizontal</option>
+            <option>Vertical</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Duration (sec)</label>
+          <input id="duration" type="number" min="0" placeholder="optional" />
+        </div>
+        <div>
+          <label>Has Chapters?</label>
+          <select id="chapters"><option>No</option><option>Yes</option></select>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0"/>
+
+      <h2>Transcript</h2>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>Upload Transcript (.srt / .vtt / .txt)</label>
+            <input id="transcriptFile" type="file" accept=".srt,.vtt,.txt" />
+          </div>
+          <div>
+            <label>Or paste transcript</label>
+            <textarea id="transcriptText" placeholder="Paste transcript text here..."></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Time to First Instruction (sec)</label>
+            <input id="ttfi" type="number" min="0" placeholder="auto after analyze" />
+            <div class="hint">Auto-suggested from imperative cues (remove, unplug, tighten...). You can override.</div>
+          </div>
+          <div>
+            <label>Sponsor/Intro Length (sec)</label>
+            <input id="sponsorLen" type="number" min="0" placeholder="auto after analyze" />
+            <div class="hint">Estimated from sponsor keywords (sponsor, promo code, brought to you by...).</div>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Safety Mentioned?</label>
+            <select id="safety"><option>Unknown</option><option>No</option><option>Yes</option></select>
+          </div>
+          <div>
+            <label>Steps Count (est.)</label>
+            <input id="stepsCount" type="number" min="0" placeholder="auto after analyze" />
+          </div>
+        </div>
+        <label>Value Density Notes</label>
+        <textarea id="valueNotes" placeholder="e.g., first actionable step at 0:38; repeated disclaimer; added torque specs"></textarea>
+        <div class="toolbar">
+          <button id="analyzeTranscript" class="btn">Analyze Transcript</button>
+          <span class="pill" id="transcriptStatus">No transcript loaded</span>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0"/>
+
+      <h2>Comments</h2>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>Upload Comments (.csv / .txt / .json)</label>
+            <input id="commentsFile" type="file" accept=".csv,.txt,.json" />
+          </div>
+          <div>
+            <label>Or paste comments (one per line)</label>
+            <textarea id="commentsText" placeholder="Paste comments here..."></textarea>
+          </div>
+        </div>
+        <div class="row3">
+          <div>
+            <label>Total Comments</label>
+            <input id="totalComments" type="number" min="0" />
+          </div>
+          <div>
+            <label>Pos / Neu / Neg</label>
+            <input id="sentPos" type="number" min="0" placeholder="auto" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <input id="sentNeu" type="number" min="0" placeholder="auto" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>&nbsp;</label>
+            <input id="sentNeg" type="number" min="0" placeholder="auto" />
+          </div>
+          <div>
+            <label>Creator Replies? / Pinned Clarification?</label>
+            <select id="creatorReplies"><option>Unknown</option><option>No</option><option>Yes</option></select>
+          </div>
+        </div>
+        <label>Top Compliments (themes; semicolon-separated)</label>
+        <input id="compliments" type="text" placeholder="e.g., clear close-ups; saved me money; concise"/>
+        <label>Top Frictions (themes; semicolon-separated)</label>
+        <input id="frictions" type="text" placeholder="e.g., too much talking; missing torque specs; camera angle"/>
+        <label>Common Questions (semicolon-separated)</label>
+        <input id="questions" type="text" placeholder="e.g., will this work on KUDS30FXSS5?; torque spec for bolts?"/>
+        <label>Key Quotes (verbatim; semicolon-separated)</label>
+        <textarea id="quotes" placeholder="Paste 1–3 representative quotes"></textarea>
+        <div class="toolbar">
+          <button id="analyzeComments" class="btn">Analyze Comments</button>
+          <span class="pill" id="commentsStatus">No comments loaded</span>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0"/>
+
+      <div class="toolbar">
+        <button id="addTranscriptRow" class="btn good">➕ Add Transcript Row</button>
+        <button id="addCommentsRow" class="btn good">➕ Add Comments Row</button>
+        <span class="note">Rows appear in the right panel for export.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Tables & Export -->
+  <section class="panel">
+    <div class="body">
+      <h2>Rows queued for export</h2>
+      <div class="grid">
+        <div class="kpi"><b id="k1">0</b> Transcript rows</div>
+        <div class="kpi"><b id="k2">0</b> Comments rows</div>
+      </div>
+      <details open style="margin-top:10px">
+        <summary>Transcript Audit Preview</summary>
+        <div class="small">Scroll horizontally if needed</div>
+        <div style="overflow:auto;max-height:280px;border:1px solid var(--border);border-radius:10px;margin-top:6px">
+          <table id="transcriptTable"></table>
+        </div>
+      </details>
+      <details style="margin-top:10px">
+        <summary>Comment Themes Preview</summary>
+        <div class="small">Scroll horizontally if needed</div>
+        <div style="overflow:auto;max-height:280px;border:1px solid var(--border);border-radius:10px;margin-top:6px">
+          <table id="commentsTable"></table>
+        </div>
+      </details>
+
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn" id="exportCSV">Export CSVs</button>
+        <button class="btn primary" id="exportXLSX">Export XLSX (multi‑sheet)</button>
+        <span class="pill">Tip: You can also export now and keep adding.</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ---------------------------
+// Utilities
+// ---------------------------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const byId = id => document.getElementById(id);
+const toSec = t => { // "HH:MM:SS,mmm" or "HH:MM:SS.mmm" or "MM:SS"
+  if (typeof t === 'number') return t;
+  if (!t) return 0;
+  const s = t.trim().replace(',', '.');
+  const parts = s.split(':').map(Number);
+  if (parts.length === 3){ return parts[0]*3600 + parts[1]*60 + parts[2]; }
+  if (parts.length === 2){ return parts[0]*60 + parts[1]; }
+  return parseFloat(s)||0;
+};
+const secToClock = s => {
+  s = Math.max(0, Math.round(s||0));
+  const h = Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return (h>0? (String(h).padStart(2,'0')+':'):'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+};
+function download(filename, text, mime="text/plain;charset=utf-8"){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:mime}));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+function csvEscape(v){
+  if (v==null) return '';
+  const s = String(v);
+  if (/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function toCSV(rows){
+  if (!rows.length) return '';
+  const cols = Object.keys(rows[0]);
+  const lines = [cols.map(csvEscape).join(',')];
+  for (const r of rows){ lines.push(cols.map(c=>csvEscape(r[c])).join(',')); }
+  return lines.join('\n');
+}
+function parseISODuration(iso){ // PT#H#M#S → seconds
+  if (!iso) return 0;
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return 0;
+  const h=+m[1]||0, min=+m[2]||0, s=+m[3]||0; return h*3600+min*60+s;
+}
+
+// ---------------------------
+// Simple CSV parser (quoted fields)
+// ---------------------------
+function parseCSV(text){
+  const rows=[]; let i=0, field='', row=[], inQ=false;
+  const pushField=()=>{ row.push(field); field=''; };
+  const pushRow=()=>{ rows.push(row); row=[]; };
+  while(i<text.length){
+    const ch=text[i++];
+    if (inQ){
+      if (ch=='"'){
+        if (text[i]=='"'){ field+='"'; i++; } else { inQ=false; }
+      } else field+=ch;
+    } else {
+      if (ch=='"') inQ=true;
+      else if (ch===','){ pushField(); }
+      else if (ch==='\n'){ pushField(); pushRow(); }
+      else if (ch==='\r'){ /* ignore */ }
+      else field+=ch;
+    }
+  }
+  if (field!==''||row.length){ pushField(); pushRow(); }
+  return rows;
+}
+
+// ---------------------------
+// Heuristics & Lexicons
+// ---------------------------
+const imperativeVerbs = [
+  'remove','unplug','disconnect','loosen','tighten','pull','push','press','lift','slide','rotate','unscrew','screw','install','replace','inspect','check','adjust','align','reconnect','clean','apply','secure','fit','seat','drain','drill','cut','heat','cool','test','measure','mark','lock','unlock'
+];
+const safetyTerms = ['unplug','power off','shut off','gas','propane','gloves','eye protection','safety','warning','caution','disconnect power','breaker'];
+const sponsorTerms = ['sponsor','sponsored','brought to you by','promo code','affiliate','this video is','today\'s sponsor'];
+const stepCues = ['step','1.','2.','3.','4.','5.'];
+const fillerWords = ['uh','um','erm'];
+
+const posWords = ['clear','helpful','thanks','thank you','awesome','great','perfect','worked','exactly','love','amazing','life saver','lifesaver','saved'];
+const negWords = ['too long','talking','sponsor','ad','confusing','unclear','wrong','doesn\'t work','didn\'t work','missing','bad','can\'t see','blurry','audio'];
+const questionCues = ['?'];
+
+function findFirstInstruction(cues){
+  // cues: [{start, end, text}]
+  let best=null;
+  for (const c of cues){
+    const t=c.text.toLowerCase();
+    // check imperative at start of sentence
+    if (imperativeVerbs.some(v=>new RegExp(`(^|[\n\.!?]\s*)${v}([\s]|$)`).test(t))){
+      best = (best==null || c.start<best)? c.start : best;
+    }
+    // explicit "step" cues
+    if (/\bstep\s*[0-9]+/i.test(t)) best = (best==null||c.start<best)? c.start:best;
+  }
+  return best==null? null : Math.max(0, Math.round(best));
+}
+function estimateSponsorLen(cues){
+  // if sponsor terms appear before first instruction, estimate segment length until they stop recurring
+  let first=null, last=null;
+  for (const c of cues){
+    const t=c.text.toLowerCase();
+    if (sponsorTerms.some(s=>t.includes(s))){
+      if (first==null) first=c.start; last=c.end;
+    }
+  }
+  if (first==null) return 0;
+  return Math.max(0, Math.round(last-first));
+}
+function countOccurrences(text, arr){
+  const t = text.toLowerCase();
+  return arr.reduce((acc, w)=>acc + (t.match(new RegExp(`\\b${w.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\b`, 'g'))||[]).length, 0);
+}
+
+// ---------------------------
+// Transcript parsing (.srt/.vtt/.txt)
+// ---------------------------
+function parseTranscript(raw){
+  const text = raw.replace(/\r/g,'').trim();
+  const cues=[];
+  // SRT & VTT time regex
+  const re = /(\d\d:\d\d:\d\d)[\.,](\d{3})\s+-->\s+(\d\d:\d\d:\d\d)[\.,](\d{3})\s*\n([\s\S]*?)(?=\n\n|$)/g;
+  let m; let lastEnd=0;
+  while((m = re.exec(text))){
+    const start = toSec(m[1]+'.'+m[2]);
+    const end = toSec(m[3]+'.'+m[4]);
+    const cueText = m[5].replace(/<[^>]*>/g,'').trim();
+    cues.push({start,end,text:cueText});
+    lastEnd = Math.max(lastEnd, end);
+  }
+  if (!cues.length){
+    // Try bare text: split into sentences ~ every line is 2s apart (fallback)
+    const lines = text.split(/\n+/).filter(Boolean);
+    let t=0; for (const ln of lines){ cues.push({start:t,end:t+2,text:ln}); t+=2; }
+    lastEnd = t;
+  }
+  return {cues, duration: Math.round(cues.length? Math.max(...cues.map(c=>c.end)):0) };
+}
+
+// ---------------------------
+// Comments parse & analyze
+// ---------------------------
+function extractCommentTextColumns(rows){
+  // rows: 2D array; first row is header
+  if (!rows.length) return [];
+  const header = rows[0].map(h=>h.trim().toLowerCase());
+  const idxText = header.findIndex(h=> ['comment','comments','text','content','comment text','body','content text'].includes(h));
+  if (idxText===-1){
+    // return all concatenated lines except header
+    return rows.slice(1).map(r=> r.join(',')).filter(Boolean);
+  }
+  return rows.slice(1).map(r=> (r[idxText]||'')).filter(Boolean);
+}
+
+function analyzeCommentsText(items){
+  const texts = items.map(t=> String(t||''));
+  let pos=0,neg=0,neu=0; const questions=[]; const compliments=[], frictions=[];
+  const themeCounts = (list)=>{
+    const map=new Map();
+    for(const word of list){ map.set(word,0); }
+    for (const t of texts){
+      const low=t.toLowerCase();
+      for(const w of list){ if (low.includes(w)) map.set(w,map.get(w)+1); }
+    }
+    return [...map.entries()].sort((a,b)=>b[1]-a[1]).filter(([,n])=>n>0).slice(0,6).map(([w])=>w);
+  };
+  for (const t of texts){
+    const low = t.toLowerCase();
+    const p = posWords.some(w=>low.includes(w));
+    const n = negWords.some(w=>low.includes(w));
+    if (p && !n) pos++; else if (n && !p) neg++; else neu++;
+    if (t.includes('?')) questions.push(t.trim());
+  }
+  const topCompliments = themeCounts(posWords);
+  const topFrictions = themeCounts(negWords);
+  return { total:texts.length, pos, neu, neg, topCompliments, topFrictions, questions: questions.slice(0,20) };
+}
+
+// ---------------------------
+// State & Tables
+// ---------------------------
+const state = {
+  transcriptRows: [],
+  commentsRows: []
+};
+function currentMeta(){
+  return {
+    Brand: byId('brand').value,
+    Platform: byId('platform').value,
+    VideoID: byId('videoId').value,
+    Title: byId('title').value,
+    URL: byId('url').value,
+    PublishDate: byId('publishDate').value,
+    VideoType: byId('videoType').value,
+    Aspect: byId('aspect').value,
+    DurationSec: Number(byId('duration').value||0)
+  };
+}
+function addTranscriptRow(){
+  const m = currentMeta();
+  const row = {
+    ...m,
+    HasChapters: byId('chapters').value,
+    TimeToFirstInstructionSec: Number(byId('ttfi').value||0),
+    SponsorIntroLenSec: Number(byId('sponsorLen').value||0),
+    SafetyMentioned: byId('safety').value,
+    StepsCountEst: Number(byId('stepsCount').value||0),
+    ValueDensityNotes: byId('valueNotes').value
+  };
+  state.transcriptRows.push(row); renderTables();
+}
+function addCommentsRow(){
+  const m = currentMeta();
+  const row = {
+    ...m,
+    TotalComments: Number(byId('totalComments').value||0),
+    SentPos: Number(byId('sentPos').value||0),
+    SentNeu: Number(byId('sentNeu').value||0),
+    SentNeg: Number(byId('sentNeg').value||0),
+    Compliments: byId('compliments').value,
+    Frictions: byId('frictions').value,
+    CommonQuestions: byId('questions').value,
+    KeyQuotes: byId('quotes').value,
+    CreatorRepliesOrPinned: byId('creatorReplies').value
+  };
+  state.commentsRows.push(row); renderTables();
+}
+function renderTable(el, rows){
+  const table = byId(el);
+  table.innerHTML='';
+  if (!rows.length){ table.innerHTML='<tr><td class="small">No rows yet</td></tr>'; return; }
+  const cols = Object.keys(rows[0]);
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  rows.forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = cols.map(c=>`<td>${(r[c]??'').toString().replace(/</g,'&lt;')}</td>`).join('');
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+}
+function renderTables(){
+  byId('k1').textContent = state.transcriptRows.length;
+  byId('k2').textContent = state.commentsRows.length;
+  renderTable('transcriptTable', state.transcriptRows);
+  renderTable('commentsTable', state.commentsRows);
+}
+
+// ---------------------------
+// Analyze actions
+// ---------------------------
+byId('analyzeTranscript').addEventListener('click', ()=>{
+  const file = byId('transcriptFile').files[0];
+  const pasted = byId('transcriptText').value.trim();
+  const proceed = (text)=>{
+    const parsed = parseTranscript(text);
+    const cues = parsed.cues; let duration = parsed.duration;
+    if (!byId('duration').value && duration) byId('duration').value = duration;
+    const ttfi = findFirstInstruction(cues);
+    if (ttfi!=null){ byId('ttfi').value = ttfi; }
+    const sponsorLen = estimateSponsorLen(cues);
+    if (sponsorLen){ byId('sponsorLen').value = sponsorLen; }
+    // Safety
+    const joined = cues.map(c=>c.text).join(' \n ');
+    const safetyHit = safetyTerms.some(s=>joined.toLowerCase().includes(s));
+    if (safetyHit) byId('safety').value = 'Yes';
+    // Steps count
+    const steps = (joined.match(/\bstep\s*\d+/ig)||[]).length || (joined.match(/\b(1\.|2\.|3\.|4\.|5\.)/g)||[]).length;
+    if (steps) byId('stepsCount').value = steps;
+    // Filler & value density hint
+    const words = joined.split(/\s+/).length;
+    const fillers = countOccurrences(joined, fillerWords);
+    const dur = Number(byId('duration').value||duration||0);
+    const fpm = dur? Math.round((fillers / (dur/60)) * 10)/10 : fillers;
+    const note = `Auto: ~${steps||0} steps; safety ${safetyHit?'mentioned':'not detected'}; filler/min ~${fpm}.`;
+    byId('valueNotes').value = (byId('valueNotes').value? byId('valueNotes').value+' ': '') + note;
+    byId('transcriptStatus').textContent = `Analyzed ${cues.length} cues; duration ≈ ${secToClock(dur)}`;
+  };
+  if (file){ const r = new FileReader(); r.onload = e=>proceed(e.target.result); r.readAsText(file);} 
+  else if (pasted){ proceed(pasted);} else { alert('Please upload or paste a transcript.'); }
+});
+
+byId('analyzeComments').addEventListener('click', ()=>{
+  const file = byId('commentsFile').files[0];
+  const pasted = byId('commentsText').value.trim();
+  const proceed = (texts)=>{
+    const res = analyzeCommentsText(texts);
+    byId('totalComments').value = res.total;
+    byId('sentPos').value = res.pos;
+    byId('sentNeu').value = res.neu;
+    byId('sentNeg').value = res.neg;
+    byId('compliments').value = res.topCompliments.join('; ');
+    byId('frictions').value = res.topFrictions.join('; ');
+    byId('questions').value = res.questions.join('; ');
+    byId('commentsStatus').textContent = `Analyzed ${res.total} comments`;
+  };
+  if (file){
+    const r = new FileReader(); r.onload = e=>{
+      const text = e.target.result;
+      if (file.name.endsWith('.json')){
+        try{ const arr = JSON.parse(text); const items = Array.isArray(arr)? arr: (arr.items||[]); const tx = items.map(x=> x.text || x.snippet || JSON.stringify(x)); proceed(tx); }catch(err){ alert('Invalid JSON.'); }
+      } else if (file.name.endsWith('.csv')){
+        const rows = parseCSV(text); const tx = extractCommentTextColumns(rows); proceed(tx);
+      } else { // txt
+        const tx = text.split(/\n+/).filter(Boolean); proceed(tx);
+      }
+    }; r.readAsText(file);
+  } else if (pasted){ proceed(pasted.split(/\n+/).filter(Boolean)); } else { alert('Please upload or paste comments.'); }
+});
+
+// ---------------------------
+// Add rows & Export
+// ---------------------------
+byId('addTranscriptRow').addEventListener('click', addTranscriptRow);
+byId('addCommentsRow').addEventListener('click', addCommentsRow);
+
+byId('exportCSV').addEventListener('click', ()=>{
+  if (!state.transcriptRows.length && !state.commentsRows.length){ alert('No rows to export.'); return; }
+  if (state.transcriptRows.length) download('Transcript_Audit.csv', toCSV(state.transcriptRows), 'text/csv');
+  if (state.commentsRows.length) download('Comment_Themes.csv', toCSV(state.commentsRows), 'text/csv');
+});
+
+byId('toggleXLSX').addEventListener('click', ()=>{
+  if (window.XLSX){ alert('XLSX engine already loaded.'); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+  s.onload = ()=> alert('XLSX engine loaded. You can now export to .xlsx');
+  s.onerror = ()=> alert('Failed to load XLSX engine. You can still export CSVs.');
+  document.head.appendChild(s);
+});
+
+byId('exportXLSX').addEventListener('click', ()=>{
+  if (!window.XLSX){ alert('Load XLSX engine first (top right). Or export CSVs.'); return; }
+  if (!state.transcriptRows.length && !state.commentsRows.length){ alert('No rows to export.'); return; }
+  const wb = XLSX.utils.book_new();
+  if (state.transcriptRows.length){
+    const ws1 = XLSX.utils.json_to_sheet(state.transcriptRows);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Transcript Audit');
+  }
+  if (state.commentsRows.length){
+    const ws2 = XLSX.utils.json_to_sheet(state.commentsRows);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Comment Themes');
+  }
+  const out = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  const blob = new Blob([out], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Transcript_Comments_Audit.xlsx'; a.click(); URL.revokeObjectURL(a.href);
+});
+
+// ---------------------------
+// Session save/load
+// ---------------------------
+byId('saveSession').addEventListener('click', ()=>{
+  const payload = {
+    meta: currentMeta(),
+    valueNotes: byId('valueNotes').value,
+    safety: byId('safety').value,
+    ttfi: byId('ttfi').value,
+    sponsorLen: byId('sponsorLen').value,
+    stepsCount: byId('stepsCount').value,
+    comments: {
+      total: byId('totalComments').value,
+      pos: byId('sentPos').value,
+      neu: byId('sentNeu').value,
+      neg: byId('sentNeg').value,
+      compliments: byId('compliments').value,
+      frictions: byId('frictions').value,
+      questions: byId('questions').value,
+      quotes: byId('quotes').value,
+      creator: byId('creatorReplies').value
+    },
+    rows: state
+  };
+  localStorage.setItem('auditSession', JSON.stringify(payload));
+  alert('Session saved locally.');
+});
+byId('loadSession').addEventListener('click', ()=>{
+  const s = localStorage.getItem('auditSession'); if (!s) return alert('No saved session.');
+  const p = JSON.parse(s);
+  // meta
+  byId('brand').value = p.meta.Brand; byId('platform').value = p.meta.Platform;
+  byId('videoId').value = p.meta.VideoID; byId('title').value = p.meta.Title; byId('url').value = p.meta.URL;
+  byId('publishDate').value = p.meta.PublishDate; byId('videoType').value = p.meta.VideoType; byId('aspect').value = p.meta.Aspect; byId('duration').value = p.meta.DurationSec || '';
+  byId('valueNotes').value = p.valueNotes || '';
+  byId('safety').value = p.safety || 'Unknown';
+  byId('ttfi').value = p.ttfi || '';
+  byId('sponsorLen').value = p.sponsorLen || '';
+  byId('stepsCount').value = p.stepsCount || '';
+  // comments
+  byId('totalComments').value = p.comments.total || '';
+  byId('sentPos').value = p.comments.pos || '';
+  byId('sentNeu').value = p.comments.neu || '';
+  byId('sentNeg').value = p.comments.neg || '';
+  byId('compliments').value = p.comments.compliments || '';
+  byId('frictions').value = p.comments.frictions || '';
+  byId('questions').value = p.comments.questions || '';
+  byId('quotes').value = p.comments.quotes || '';
+  byId('creatorReplies').value = p.comments.creator || 'Unknown';
+  // rows
+  state.transcriptRows = p.rows.transcriptRows || [];
+  state.commentsRows = p.rows.commentsRows || [];
+  renderTables();
+  alert('Session loaded.');
+});
+byId('resetSession').addEventListener('click', ()=>{
+  if (!confirm('Clear current fields and rows?')) return;
+  state.transcriptRows = []; state.commentsRows = []; renderTables();
+  $$('input, textarea').forEach(el=>{ if (el.type!=='file') el.value=''; });
+  $$('select').forEach(el=> el.value = el.querySelector('option')?.value || '');
+  byId('transcriptStatus').textContent='No transcript loaded';
+  byId('commentsStatus').textContent='No comments loaded';
+  byId('ytStatus').textContent='Idle';
+});
+
+// ---------------------------
+// NEW: YouTube Autofill (metadata + transcript + comments)
+// ---------------------------
+function extractVideoId(input){
+  if (!input) return '';
+  const s = input.trim();
+  // direct ID
+  if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
+  // URL patterns
+  const m = s.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || s.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/) || s.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);
+  return m? m[1] : '';
+}
+
+async function fetchJSON(url){
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return await r.json();
+}
+
+async function fetchYouTubeMetadata(apiKey, videoId){
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,status&key=${encodeURIComponent(apiKey)}&id=${encodeURIComponent(videoId)}`;
+  const data = await fetchJSON(url);
+  if (!data.items || !data.items.length) throw new Error('Video not found');
+  const v = data.items[0];
+  return {
+    title: v.snippet.title,
+    publishedAt: v.snippet.publishedAt, // ISO
+    durationSec: parseISODuration(v.contentDetails.duration),
+    hasChapters: (v.snippet.description||'').includes('00:'), // crude cue
+    url: `https://www.youtube.com/watch?v=${videoId}`
+  };
+}
+
+async function tryFetchTimedText(videoId, langCodes){
+  // Try a few public endpoints (works when captions are public). If private/disabled, this will fail.
+  const langs = langCodes.split(',').map(s=>s.trim()).filter(Boolean);
+  const endpoints = (lang)=>[
+    `https://video.google.com/timedtext?lang=${encodeURIComponent(lang)}&v=${encodeURIComponent(videoId)}`,
+    `https://video.google.com/timedtext?lang=${encodeURIComponent(lang)}&kind=asr&v=${encodeURIComponent(videoId)}`
+  ];
+  const pick = async (url)=>{
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const txt = await r.text();
+    if (!txt || txt.trim().length<10) return null;
+    return txt;
+  };
+  for (const lang of langs){
+    for (const url of endpoints(lang)){
+      try{
+        const xml = await pick(url);
+        if (xml) return {lang, xml};
+      }catch(e){ /* continue */ }
+    }
+  }
+  return null;
+}
+
+function xmlTimedtextToSRT(xml){
+  // Very small parser for <transcript><text start="0.5" dur="2.5">...</text>...
+  const texts = [...xml.matchAll(/<text[^>]*start="([0-9.]+)"[^>]*dur="([0-9.]+)"[^>]*>([\s\S]*?)<\/text>/g)]
+    .map((m,i)=>{
+      const start = parseFloat(m[1]);
+      const end = start + parseFloat(m[2]);
+      const text = decodeHTMLEntities(m[3].replace(/<[^>]*>/g,'').replace(/\n/g,' ').trim());
+      return {i:i+1, start, end, text};
+    });
+  return texts.map(c=>[
+    c.i,
+    toClockMs(c.start) + ' --> ' + toClockMs(c.end),
+    c.text,
+    ''
+  ].join('\n')).join('\n');
+}
+function toClockMs(sec){
+  const s = Math.max(0, sec||0);
+  const h = Math.floor(s/3600), m=Math.floor((s%3600)/60), x=s%60; const ms = Math.round((x%1)*1000); const whole = Math.floor(x);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(whole).padStart(2,'0')},${String(ms).padStart(3,'0')}`;
+}
+function decodeHTMLEntities(str){
+  const txt = document.createElement('textarea');
+  txt.innerHTML = str; return txt.value;
+}
+
+async function fetchAllComments(apiKey, videoId, maxCount){
+  let url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${encodeURIComponent(videoId)}&maxResults=100&textFormat=plainText&key=${encodeURIComponent(apiKey)}`;
+  const out=[]; let next=null;
+  while(true){
+    const data = await fetchJSON(url + (next? `&pageToken=${next}`:''));
+    for (const it of (data.items||[])){
+      const t = it.snippet.topLevelComment?.snippet?.textDisplay || it.snippet.topLevelComment?.snippet?.textOriginal || '';
+      if (t) out.push(t);
+      if (out.length>=maxCount) return out;
+    }
+    if (!data.nextPageToken) break; next = data.nextPageToken;
+  }
+  return out;
+}
+
+async function autofillFromYouTube(){
+  const key = byId('ytApiKey').value.trim();
+  const input = byId('ytUrl').value.trim();
+  const langs = byId('langCodes').value.trim() || 'en';
+  const limit = parseInt(byId('maxComments').value||'0',10)||0;
+  const vid = extractVideoId(input);
+  if (!vid){ alert('Provide a valid YouTube URL or ID.'); return; }
+  byId('ytStatus').textContent = 'Fetching metadata…';
+
+  // Fill base fields
+  byId('videoId').value = vid;
+  byId('url').value = `https://www.youtube.com/watch?v=${vid}`;
+
+  // 1) Metadata
+  if (!key){ byId('ytStatus').textContent = 'API key missing: metadata/comments skipped'; }
+  let gotMeta=false;
+  if (key){
+    try{
+      const meta = await fetchYouTubeMetadata(key, vid);
+      byId('title').value = meta.title;
+      if (meta.publishedAt){
+        const d = new Date(meta.publishedAt);
+        // Convert to yyyy-mm-dd in local time
+        const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+        byId('publishDate').value = `${yyyy}-${mm}-${dd}`;
+      }
+      if (meta.durationSec) byId('duration').value = meta.durationSec;
+      byId('chapters').value = meta.hasChapters? 'Yes' : 'No';
+      gotMeta=true; byId('ytStatus').textContent = 'Metadata ✓';
+    }catch(e){ byId('ytStatus').textContent = 'Metadata failed (check key/quotas)'; }
+  }
+
+  // 2) Transcript
+  byId('ytStatus').textContent = (byId('ytStatus').textContent+' | Transcript…').trim();
+  try{
+    const res = await tryFetchTimedText(vid, langs);
+    if (res){
+      const srt = xmlTimedtextToSRT(res.xml);
+      byId('transcriptText').value = srt;
+      byId('transcriptStatus').textContent = `Fetched ${res.lang} captions`;
+      // auto analyze + add row
+      byId('analyzeTranscript').click();
+      addTranscriptRow();
+    } else {
+      byId('transcriptStatus').textContent = 'No public captions detected; upload or paste.';
+    }
+  }catch(e){ byId('transcriptStatus').textContent = 'Transcript fetch error'; }
+
+  // 3) Comments
+  if (key && limit>0){
+    byId('ytStatus').textContent = (byId('ytStatus').textContent+' | Comments…').trim();
+    try{
+      const comments = await fetchAllComments(key, vid, limit);
+      if (comments.length){
+        byId('commentsText').value = comments.join('\n');
+        byId('analyzeComments').click();
+        addCommentsRow();
+        byId('commentsStatus').textContent = `Fetched ${comments.length} comments`;
+      } else {
+        byId('commentsStatus').textContent = 'No comments fetched';
+      }
+    }catch(e){ byId('commentsStatus').textContent = 'Comments fetch error'; }
+  }
+
+  byId('ytStatus').textContent = byId('ytStatus').textContent.replace(' | ',' | ').trim() || 'Done';
+}
+
+byId('fetchYouTube').addEventListener('click', ()=>{
+  autofillFromYouTube();
+});
+
+</script>
+</body>
+</html>
