@@ -1,412 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Profile DSL Demo (No Frameworks)</title>
-<style>
-  :root {
-    --fg: #111;
-    --bg: #fafafa;
-    --card: #fff;
-    --muted: #666;
-    --accent: #3b82f6;
-    --radius: 14px;
-  }
-  body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background: var(--bg); color: var(--fg); }
-  header { padding: 20px 24px; background: #fff; border-bottom: 1px solid #eee; position: sticky; top:0; z-index: 10; }
-  header h1 { margin: 0 0 6px; font-size: 18px; }
-  header .sub { color: var(--muted); font-size: 13px; }
-  main { max-width: 960px; margin: 24px auto 64px; padding: 0 16px; }
-  .card { background: var(--card); border: 1px solid #eee; border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,0.04); padding: 16px; margin-bottom: 16px; }
-  fieldset { border: 1px dashed #e6e6e6; border-radius: 12px; padding: 12px 12px 8px; margin: 12px 0; }
-  legend { font-weight: 600; padding: 0 6px; }
-  label { font-weight: 600; display: block; margin: 10px 0 6px; }
-  input[type="text"], textarea, select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 14px; }
-  textarea { min-height: 80px; resize: vertical; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { border: 1px solid #ddd; padding: 8px 12px; border-radius: 999px; cursor: pointer; user-select: none; background: #fff; }
-  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .row { display: grid; grid-template-columns: 1fr; gap: 12px; }
-  @media (min-width: 700px) { .row.cols-2 { grid-template-columns: 1fr 1fr; } }
-  .toolbar { display:flex; gap: 8px; }
-  .btn { appearance: none; border: 1px solid #ddd; background: #fff; padding: 8px 12px; border-radius: 12px; cursor: pointer; font-weight: 600; }
-  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .muted { color: var(--muted); font-size: 13px; }
-  .hide { display: none !important; }
-  .foot { margin-top: 8px; }
-  .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: #f3f4f6; padding: 6px 8px; border-radius: 8px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Personal Profile Builder (DSL → UI)</title>
+  <style>
+    :root{--bg:#0e0f12;--card:#14161b;--muted:#8a8f98;--text:#e8eaee;--accent:#8aa0ff;--border:#242733}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    .row{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:960px){.row{grid-template-columns:340px 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+    .card h2,.card h3{margin:0 0 6px 0}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .body{padding:16px 18px}
+    textarea,input,select{background:#0c0d10;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
+    textarea{width:100%;resize:vertical}
+    .muted{color:var(--muted)}
+    .btn{background:#171a22;border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .btn.secondary{background:#0c0d10}
+    .btn.accent{background:var(--accent);border-color:transparent;color:#101217}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .grid.two{grid-template-columns:1fr}
+    @media(min-width:740px){.grid.two{grid-template-columns:1fr 1fr}}
+    .q{display:flex;flex-direction:column;gap:8px}
+    .q label{font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{border:1px solid var(--border);background:#0c0d10;padding:8px 10px;border-radius:24px;cursor:pointer}
+    .chip.active{background:var(--accent);color:#101217;border-color:transparent}
+    .toggle{width:46px;height:26px;border-radius:20px;background:#2b3040;position:relative;border:1px solid var(--border);cursor:pointer}
+    .toggle .knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#e9ecf5;transition:transform .18s ease}
+    .toggle.on{background:var(--accent)} .toggle.on .knob{transform:translateX(20px)}
+    .steplist{display:flex;flex-direction:column;gap:8px}
+    .step{padding:10px 12px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:#0c0d10}
+    .step.active{outline:2px solid var(--accent)}
+    .summary{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:740px){.summary{grid-template-columns:1fr 1fr}}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#202433;border:1px solid var(--border);margin-right:6px}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:#0c0d10;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+    .row-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .small{font-size:12px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  </style>
 </head>
 <body>
-<header>
-  <h1>Profile DSL Demo</h1>
-  <div class="sub">A tiny, framework-free form renderer fed by a line-based spec. Copy this file or embed the script on your site.</div>
-</header>
+  <div class="wrap">
+    <div class="row">
 
-<main>
-  <div class="card">
-    <div class="toolbar">
-      <button id="downloadAnswers" class="btn">Download answers JSON</button>
-      <button id="resetForm" class="btn">Reset</button>
-      <button id="loadMother" class="btn">Load Mother Profile Example</button>
-      <button id="loadStartup" class="btn">Load Startup Team Example</button>
+      <!-- Left: DSL + Steps + Actions -->
+      <div class="col">
+        <div class="card">
+          <div class="head"><h2>Paste Your DSL</h2><span class="muted small">FORM / SECTION / Q / END</span></div>
+          <div class="body">
+            <textarea id="dsl" rows="12" class="mono" placeholder="Paste your line-based DSL here…"></textarea>
+            <div class="row-actions" style="margin-top:10px">
+              <button id="parseBtn" class="btn accent">Parse & Render</button>
+              <button id="loadDemo" class="btn">Load Minimal Demo</button>
+              <button id="saveDSL" class="btn">Save DSL</button>
+              <button id="clearDSL" class="btn secondary">Clear</button>
+            </div>
+            <div class="muted small" style="margin-top:8px">No build, no dependencies. Runs fully client-side on GitHub Pages.</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="head"><h3>Sections</h3><span class="muted small">Click to jump</span></div>
+          <div class="body">
+            <div id="steps" class="steplist"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="head"><h3>Exports</h3></div>
+          <div class="body">
+            <div class="row-actions">
+              <button id="exportJSON" class="btn">Export JSON</button>
+              <button id="exportMD" class="btn">Export Markdown</button>
+              <button id="resetAnswers" class="btn secondary">Reset Answers</button>
+            </div>
+            <div class="muted small" style="margin-top:8px">Answers autosave to <span class="kbd">localStorage</span>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Form + Summary -->
+      <div class="col">
+        <div class="card">
+          <div class="head">
+            <div>
+              <div class="muted small" id="sectionMeta">Section 0 of 0</div>
+              <h2 id="sectionTitle">No Section</h2>
+            </div>
+            <div class="row-actions">
+              <button id="prev" class="btn secondary">Back</button>
+              <button id="next" class="btn">Next</button>
+            </div>
+          </div>
+          <div class="body">
+            <div id="form" class="grid two"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="head"><h3>Live Summary</h3><span class="muted small">Click fields above to edit</span></div>
+          <div class="body">
+            <div id="summary" class="summary"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="foot muted">Paste your DSL into the box below and click “Apply Spec”.</div>
   </div>
 
-  <div class="card">
-    <label for="dsl">Profile DSL (edit me):</label>
-    <textarea id="dsl"></textarea>
-    <div style="margin-top:8px" class="toolbar">
-      <button id="applySpec" class="btn primary">Apply Spec</button>
-      <span class="muted">Format: one directive per line (see examples below).</span>
-    </div>
-  </div>
+  <script>
+  // ---------- Utilities ----------
+  const $ = (sel) => document.querySelector(sel);
+  const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt) n.textContent = txt; return n; };
+  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+  const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 
-  <div id="formMount" class="card"></div>
-
-  <div class="card">
-    <strong>Mini DSL</strong>
-    <div class="muted">Each line is one directive. Quotes optional if no spaces.</div>
-    <pre class="code" id="dslHelp"></pre>
-  </div>
-</main>
-
-<script>
-// ---------- Mini DSL Spec ----------
-// Directives (one per line):
-// FORM title="..." subject="..." audience="..." consent="..."
-// SECTION id=identity title="Identity & Dates" columns=2
-// Q type=text id=full_name section=identity label="Full name" required
-// Q type=textarea id=bio section=identity label="Short bio"
-// Q type=chips id=interests section=interests label="Core interests" options="Music|Movies|Books|Travel"
-// Q type=chips id=music_genres section=interests label="Music genres" options="60s|70s|Rock|Pop" show_if="interests:any_of:Music"
-// Q type=select id=country section=places label="Country" options="CA|US|UK"
-// Q type=multiselect id=tools section=resources label="Tools stack" options="Premiere|After Effects|Blender|Notion"
-// Q type=toggle id=privacy_optin section=privacy label="Allow sensitive items?"
-// END
-
-const helpText = `FORM title="Profile Builder" subject="Person" audience="Family" consent="You can skip any item."
-SECTION id=identity title="Identity & Dates" columns=2
-SECTION id=interests title="Interests" columns=2
-SECTION id=places title="Places" columns=1
-SECTION id=privacy title="Privacy" columns=1
-Q type=text id=full_name section=identity label="Full name" required
-Q type=text id=birthday section=identity label="Birthday (YYYY-MM-DD)"
-Q type=chips id=interests_core section=interests label="Core interests" options="Music|Movies/TV|Books|Cooking|Gardening|Travel"
-Q type=chips id=music_genres section=interests label="Music genres" options="60s|70s|80s|Rock|Pop|Jazz|Country" show_if="interests_core:any_of:Music"
-Q type=textarea id=places_prior section=places label="Notable places lived (with rough years)"
-Q type=toggle id=privacy_optin section=privacy label="Allow sensitive items?"
-END`;
-
-document.getElementById('dslHelp').textContent = helpText;
-
-// ---------- Parser ----------
-function parseLine(line) {
-  const parts = line.trim().split(/\s+/);
-  const directive = parts.shift();
-  const rest = parts.join(' ');
-
-  // Parse key=value pairs; value may be "quoted string" or bare token
-  const kv = {};
-  const rx = /(\w+)\s*=\s*("(?:[^"\\]|\\.)*"|[^"\s][^\s]*)/g;
-  let m;
-  while ((m = rx.exec(rest)) !== null) {
-    let key = m[1];
-    let val = m[2];
-    if (val.startsWith('"') && val.endsWith('"')) {
-      try { val = JSON.parse(val); } catch { val = val.slice(1,-1); }
-    }
-    kv[key] = val;
-  }
-  return { directive, ...kv };
-}
-
-function parseDSL(text) {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
-  const form = { meta: {}, sections: [], questions: [] };
-  for (const line of lines) {
-    const { directive, ...kv } = parseLine(line);
-    if (directive === 'FORM') {
-      form.meta = kv;
-    } else if (directive === 'SECTION') {
-      form.sections.push({
-        id: kv.id, title: kv.title || kv.id, columns: parseInt(kv.columns || '1', 10) || 1
-      });
-    } else if (directive === 'Q') {
-      // normalize options -> array
-      if (kv.options && typeof kv.options === 'string') {
-        kv.options = kv.options.split('|').map(s => s.trim()).filter(Boolean);
-      }
-      // normalize show_if "a:any_of:Music|Books" or "toggle_id:equals:true"
-      if (kv.show_if && typeof kv.show_if === 'string') {
-        const [target, op, rest] = kv.show_if.split(':');
-        let value = rest;
-        if (op === 'any_of') value = rest.split('|').map(s => s.trim());
-        form.questions.push({ ...kv, show_if: { target, op, value } });
-      } else {
-        form.questions.push(kv);
-      }
-    } else if (directive === 'END') {
-      break;
-    }
-  }
-  return form;
-}
-
-// ---------- Renderer ----------
-function render(form, mount) {
-  mount.innerHTML = "";
-  const header = document.createElement('div');
-  header.innerHTML = `<div><strong>${form.meta.title || 'Profile'}</strong> — <span class="muted">${form.meta.subject || ''}</span></div>
-    <div class="muted">${form.meta.consent || 'You can skip any item.'}</div>`;
-  mount.appendChild(header);
-
-  const sectionMap = new Map();
-  for (const s of form.sections) {
-    const fs = document.createElement('fieldset');
-    fs.dataset.sectionId = s.id;
-    const legend = document.createElement('legend');
-    legend.textContent = s.title;
-    fs.appendChild(legend);
-    const row = document.createElement('div');
-    row.className = 'row ' + (s.columns >= 2 ? 'cols-2' : '');
-    fs.appendChild(row);
-    mount.appendChild(fs);
-    sectionMap.set(s.id, row);
-  }
-
-  const state = {};
-  const dependents = new Map(); // targetId -> list of question elements
-
-  const createChip = (label) => {
-    const b = document.createElement('span');
-    b.className = 'chip';
-    b.textContent = label;
-    b.dataset.value = label;
-    return b;
-  };
-
-  const controls = new Map(); // id -> control API {get,set,el,type}
-
-  function addDependent(targetId, el, cond) {
-    if (!dependents.has(targetId)) dependents.set(targetId, []);
-    dependents.get(targetId).push({ el, cond });
-  }
-
-  function evalCondition(cond) {
-    const { target, op, value } = cond;
-    const ctrl = controls.get(target);
-    if (!ctrl) return false;
-    const current = ctrl.get();
-    if (op === 'any_of') {
-      if (!Array.isArray(current)) return false;
-      return current.some(v => value.includes(v));
-    }
-    if (op === 'equals') {
-      return String(current) === String(value);
-    }
-    return false;
-  }
-
-  function refreshVisibility(targetId) {
-    const deps = dependents.get(targetId) || [];
-    for (const { el, cond } of deps) {
-      const ok = evalCondition(cond);
-      el.classList.toggle('hide', !ok);
-    }
-  }
-
-  for (const q of form.questions) {
-    const wrap = document.createElement('div');
-    wrap.className = 'cell';
-    const label = document.createElement('label');
-    label.textContent = q.label || q.id;
-    wrap.appendChild(label);
-
-    let inputEl;
-    const id = q.id;
-    const t = (q.type || 'text').toLowerCase();
-
-    if (t === 'text') {
-      inputEl = document.createElement('input');
-      inputEl.type = 'text';
-      inputEl.addEventListener('input', () => { state[id] = inputEl.value; });
-      wrap.appendChild(inputEl);
-      controls.set(id, { el: inputEl, type: t, get: () => inputEl.value, set: (v) => inputEl.value = v || "" });
-    }
-    else if (t === 'textarea') {
-      inputEl = document.createElement('textarea');
-      inputEl.addEventListener('input', () => { state[id] = inputEl.value; });
-      wrap.appendChild(inputEl);
-      controls.set(id, { el: inputEl, type: t, get: () => inputEl.value, set: (v) => inputEl.value = v || "" });
-    }
-    else if (t === 'toggle') {
-      inputEl = document.createElement('input');
-      inputEl.type = 'checkbox';
-      inputEl.addEventListener('change', () => { state[id] = inputEl.checked; refreshVisibility(id); });
-      const lab = document.createElement('div');
-      lab.appendChild(inputEl);
-      const span = document.createElement('span');
-      span.style.marginLeft = "8px";
-      span.textContent = q.label || q.id;
-      lab.appendChild(span);
-      wrap.innerHTML = "";
-      wrap.appendChild(lab);
-      controls.set(id, { el: inputEl, type: t, get: () => !!inputEl.checked, set: (v) => { inputEl.checked = !!v; refreshVisibility(id); } });
-    }
-    else if (t === 'chips') {
-      const box = document.createElement('div');
-      box.className = 'chips';
-      const sel = new Set();
-      for (const opt of (q.options || [])) {
-        const chip = createChip(opt);
-        chip.addEventListener('click', () => {
-          if (chip.classList.contains('active')) { chip.classList.remove('active'); sel.delete(opt); }
-          else { chip.classList.add('active'); sel.add(opt); }
-          state[id] = Array.from(sel);
-          refreshVisibility(id);
-        });
-        box.appendChild(chip);
-      }
-      wrap.appendChild(box);
-      controls.set(id, { el: box, type: t, get: () => Array.from(sel), set: (arr) => {
-        const want = new Set(arr || []);
-        sel.clear();
-        box.querySelectorAll('.chip').forEach(ch => {
-          const v = ch.dataset.value;
-          if (want.has(v)) { ch.classList.add('active'); sel.add(v); }
-          else { ch.classList.remove('active'); }
-        });
-        refreshVisibility(id);
-      }});
-    }
-    else if (t === 'select') {
-      const sel = document.createElement('select');
-      (q.options || []).forEach(opt => {
-        const o = document.createElement('option');
-        o.value = opt; o.textContent = opt;
-        sel.appendChild(o);
-      });
-      sel.addEventListener('change', () => { state[id] = sel.value; refreshVisibility(id); });
-      wrap.appendChild(sel);
-      controls.set(id, { el: sel, type: t, get: () => sel.value, set: (v) => { sel.value = v || ""; refreshVisibility(id); } });
-    }
-    else if (t === 'multiselect') {
-      const sel = document.createElement('select');
-      sel.multiple = true;
-      (q.options || []).forEach(opt => {
-        const o = document.createElement('option');
-        o.value = opt; o.textContent = opt;
-        sel.appendChild(o);
-      });
-      sel.addEventListener('change', () => {
-        const vals = Array.from(sel.selectedOptions).map(o => o.value);
-        state[id] = vals; refreshVisibility(id);
-      });
-      wrap.appendChild(sel);
-      controls.set(id, { el: sel, type: t, get: () => Array.from(sel.selectedOptions).map(o => o.value), set: (arr) => {
-        const want = new Set(arr || []);
-        Array.from(sel.options).forEach(o => { o.selected = want.has(o.value); });
-        refreshVisibility(id);
-      }});
-    }
-    else {
-      const msg = document.createElement('div');
-      msg.className = 'muted';
-      msg.textContent = `Unsupported type: ${t}`;
-      wrap.appendChild(msg);
-    }
-
-    // Conditional show_if
-    if (q.show_if) {
-      wrap.classList.add('hide'); // hidden until condition true
-      addDependent(q.show_if.target, wrap, q.show_if);
-    }
-
-    const secRow = sectionMap.get(q.section || form.sections[0]?.id);
-    (secRow || mount).appendChild(wrap);
-  }
-
-  // Initialize visibility from default state
-  for (const [targetId] of dependents) refreshVisibility(targetId);
-
-  // Export helper
-  function download(data, filename = "answers.json") {
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  function download(name, text) {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 500);
+    const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
   }
 
-  // Wire toolbar
-  document.getElementById('downloadAnswers').onclick = () => download(state, "answers.json");
-  document.getElementById('resetForm').onclick = () => {
-    for (const [id, api] of controls) {
-      if (api.type === 'toggle') api.set(false);
-      else if (api.type === 'chips') api.set([]);
-      else if (api.type === 'multiselect') api.set([]);
-      else api.set("");
+  // ---------- Parser ----------
+  function parseAttrs(str){
+    const attrs={};
+    const re=/(\w+)=\"([^\"]*)\"|(\w+)=([^\s]+)/g; let m;
+    while((m=re.exec(str))!==null){ if(m[1]) attrs[m[1]]=m[2]; else if(m[3]) attrs[m[3]]=m[4]; }
+    return attrs;
+  }
+
+  function parseDSL(text){
+    const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const out = { form:{ keys:{} }, sections:[] };
+    const sectionById = new Map(); let current=null;
+    for(const line of lines){
+      if(line.startsWith('FORM ')){
+        out.form.keys = parseAttrs(line.slice(5));
+      } else if(line.startsWith('SECTION ')){
+        const a = parseAttrs(line.slice(8));
+        current = { id:a.id, title:a.title||a.id, columns:parseInt(a.columns||'1',10), questions:[] };
+        out.sections.push(current); sectionById.set(current.id,current);
+      } else if(line.startsWith('Q ')){
+        const a = parseAttrs(line.slice(2));
+        const q = { type:a.type, id:a.id, section:a.section, label:a.label||a.id, options:a.options? a.options.split('|'):undefined, show_if:a.show_if||null };
+        const target = sectionById.get(q.section)||current; if(!target) throw new Error('Unknown section: '+q.section);
+        target.questions.push(q);
+      } else if(line==='END'){ current=null; }
     }
-  };
-}
-
-// ---------- Examples ----------
-const MOTHER_EXAMPLE = `FORM title="Mother Gift Profile" subject="Person" consent="You can skip any item."
-SECTION id=identity title="Identity & Dates" columns=2
-SECTION id=places title="Places" columns=1
-SECTION id=interests title="Interests & Passions" columns=2
-SECTION id=humor title="Humor" columns=1
-SECTION id=dislikes title="Dislikes" columns=1
-SECTION id=constraints title="Constraints" columns=2
-SECTION id=directions title="Gift Directions" columns=1
-Q type=text id=name section=identity label="What’s her name?"
-Q type=text id=birthday section=identity label="Birthday (YYYY-MM-DD)"
-Q type=text id=formative_places section=identity label="Where did she live during ~ages 7–14?"
-Q type=text id=current_city section=places label="Current city/region & climate"
-Q type=chips id=interests_core section=interests label="Core interests" options="Music|Movies/TV|Books|Cooking/Baking|Gardening|Travel|Fitness/Outdoors|Crafts/DIY|Tech/Gadgets|Games/Puzzles|Spiritual/Community|Pets/Animals|Sports|Collecting"
-Q type=chips id=music_genres section=interests label="Music: favorite eras/genres" options="60s|70s|80s|90s|Rock|Pop|Jazz|Classical|Country|Folk|Soul/R&B" show_if="interests_core:any_of:Music"
-Q type=textarea id=screen_favs section=interests label="Movies/TV: favorite titles/quotes" show_if="interests_core:any_of:Movies/TV"
-Q type=chips id=humor_style section=humor label="Sense of humor" options="Dry/deadpan|Witty/wordplay|Physical/slapstick|Heartwarming|Satire|Dark (lightly)|Clean only"
-Q type=chips id=hard_nos section=dislikes label="Hard nos" options="Scented items|Cluttery knick-knacks|Novelty gadgets|Expensive consumables|Brand logos|Noisy devices|Religious themes|Alcohol-related"
-Q type=chips id=constraints_set section=constraints label="Practical constraints" options="Budget|Limited space|Prefers low-maintenance|Mobility/energy limits|Tech-light|Sustainability-focused|None"
-Q type=chips id=directions_first section=directions label="Explore first" options="Experiences/classes|Personalized keepsake|Practical upgrade|Wellness/comfort|Nostalgia-themed|Art/creative tools|Charity/cause-aligned"
-END`;
-
-const STARTUP_EXAMPLE = `FORM title="Startup Team Profile" subject="Organization" consent="You can skip any item."
-SECTION id=identity title="Identity" columns=2
-SECTION id=stack title="Tools/Stack" columns=2
-SECTION id=goals title="Goals & KPIs" columns=2
-SECTION id=audience title="Audience & ICP" columns=2
-SECTION id=directions title="Research Directions" columns=1
-Q type=text id=team_name section=identity label="Team name"
-Q type=text id=company section=identity label="Company"
-Q type=chips id=stack_tools section=stack label="Core tools" options="Premiere|After Effects|Blender|Notion|Slack|Asana|Figma|DaVinci Resolve"
-Q type=chips id=goals_kpis section=goals label="Primary goals/KPIs" options="Watch time|CTR|Conversion|Retention|Lead quality|Engagement rate"
-Q type=chips id=audience_icp section=audience label="Audience/ICP" options="DIY Homeowners|Prosumer Video Editors|Enterprise Marketers|SMB Owners|Students"
-Q type=chips id=directions_first section=directions label="Explore first" options="Comparative landscape|How-to guides|Case studies|Tooling/workflow|Risks/pitfalls"
-END`;
-
-// Prefill text area
-document.getElementById('dsl').value = MOTHER_EXAMPLE;
-
-// Wire buttons
-document.getElementById('applySpec').onclick = () => {
-  try {
-    const spec = parseDSL(document.getElementById('dsl').value);
-    const mount = document.getElementById('formMount');
-    render(spec, mount);
-  } catch (e) {
-    alert("Parse error: " + e.message);
+    return out;
   }
-};
-document.getElementById('loadMother').onclick = () => { document.getElementById('dsl').value = MOTHER_EXAMPLE; };
-document.getElementById('loadStartup').onclick = () => { document.getElementById('dsl').value = STARTUP_EXAMPLE; };
 
-// Auto-apply on load
-document.getElementById('applySpec').click();
-</script>
+  // ---------- Conditions ----------
+  function evalShowIf(cond, answers){
+    if(!cond) return true;
+    const any = cond.match(/^(\w+):any_of:(.+)$/); if(any){
+      const id=any[1], opts=any[2].split('|'); const v=answers[id];
+      return Array.isArray(v) ? v.some(x=>opts.includes(String(x))) : opts.includes(String(v));
+    }
+    const eq = cond.match(/^(\w+):equals:(.+)$/); if(eq){
+      const id=eq[1], expect=eq[2]; return String(answers[id])===expect;
+    }
+    return true;
+  }
+
+  // ---------- State ----------
+  let schema = { sections:[] };
+  let answers = load('profile_answers', {});
+  let sectionIdx = 0;
+
+  // ---------- Rendering ----------
+  function renderSteps(){
+    const steps = $('#steps'); steps.innerHTML='';
+    schema.sections.forEach((s, i)=>{
+      const b = el('button','step'+(i===sectionIdx?' active':''));
+      b.textContent = s.title; b.onclick=()=>{sectionIdx=i; renderSection();}; steps.appendChild(b);
+    });
+  }
+
+  function setAnswer(id, val){ answers[id]=val; save('profile_answers', answers); renderSummary(); }
+
+  function inputText(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label); const inp = el('input');
+    inp.value = answers[q.id]||''; inp.oninput = ()=> setAnswer(q.id, inp.value);
+    wrap.append(lab, inp); return wrap;
+  }
+
+  function inputTextarea(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label); const ta = el('textarea');
+    ta.rows=4; ta.value = answers[q.id]||''; ta.oninput=()=> setAnswer(q.id, ta.value);
+    wrap.append(lab, ta); return wrap;
+  }
+
+  function inputToggle(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label);
+    const t = el('div','toggle'+(answers[q.id]? ' on':'')); const k = el('div','knob'); t.appendChild(k);
+    t.onclick=()=>{ const v=!answers[q.id]; t.classList.toggle('on', v); setAnswer(q.id, v); renderSection(); };
+    wrap.append(lab, t); return wrap;
+  }
+
+  function inputChips(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label); const box = el('div','chips');
+    const sel = Array.isArray(answers[q.id])? answers[q.id] : [];
+    (q.options||[]).forEach(opt=>{
+      const c = el('button','chip'+(sel.includes(opt)?' active':''), opt);
+      c.onclick=()=>{
+        const arr = Array.isArray(answers[q.id])? [...answers[q.id]] : [];
+        const i = arr.indexOf(opt); if(i>=0) arr.splice(i,1); else arr.push(opt);
+        setAnswer(q.id, arr); renderSection();
+      };
+      box.appendChild(c);
+    });
+    wrap.append(lab, box); return wrap;
+  }
+
+  function inputSelect(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label); const sel = el('select');
+    const def = el('option',null,'Select…'); def.disabled=true; def.selected = !(q.id in answers); def.value=''; sel.appendChild(def);
+    (q.options||[]).forEach(opt=>{ const o = el('option',null,opt); o.value=opt; if(answers[q.id]===opt) o.selected=true; sel.appendChild(o); });
+    sel.onchange=()=> setAnswer(q.id, sel.value);
+    wrap.append(lab, sel); return wrap;
+  }
+
+  function inputMultiSelect(q){
+    const wrap = el('div','q'); const lab = el('label',null,q.label); const box = el('div','chips');
+    const sel = Array.isArray(answers[q.id])? answers[q.id] : [];
+    (q.options||[]).forEach(opt=>{
+      const c = el('button','chip'+(sel.includes(opt)?' active':''), opt);
+      c.onclick=()=>{
+        const arr = Array.isArray(answers[q.id])? [...answers[q.id]] : [];
+        const i = arr.indexOf(opt); if(i>=0) arr.splice(i,1); else arr.push(opt);
+        setAnswer(q.id, arr); renderSection();
+      };
+      box.appendChild(c);
+    });
+    wrap.append(lab, box); return wrap;
+  }
+
+  const renderers = { text:inputText, textarea:inputTextarea, toggle:inputToggle, chips:inputChips, select:inputSelect, multiselect:inputMultiSelect };
+
+  function renderSection(){
+    const sections = schema.sections; if(!sections.length){ $('#form').innerHTML=''; $('#sectionTitle').textContent='No Section'; $('#sectionMeta').textContent=''; return; }
+    const sec = sections[sectionIdx];
+    $('#sectionTitle').textContent = sec.title;
+    $('#sectionMeta').textContent = `Section ${sectionIdx+1} of ${sections.length}`;
+    const form = $('#form'); form.innerHTML = '';
+
+    // grid columns
+    form.className = 'grid ' + (sec.columns===2? 'two':'');
+
+    // visible questions
+    const qs = sec.questions.filter(q=> evalShowIf(q.show_if, answers));
+    if(!qs.length){ form.appendChild(el('div','muted','No visible questions. Adjust toggles or complete prior steps.')); }
+    qs.forEach(q=>{
+      const renderer = renderers[q.type] || (()=> el('div','muted',`Unsupported type: ${q.type}`));
+      form.appendChild(renderer(q));
+    });
+
+    renderSteps();
+    renderSummary();
+  }
+
+  function renderSummary(){
+    const box = $('#summary'); box.innerHTML='';
+    schema.sections.forEach(sec=>{
+      sec.questions.forEach(q=>{
+        const v = answers[q.id]; if(v===undefined || v==='' || (Array.isArray(v)&&!v.length)) return;
+        const card = el('div','card');
+        const head = el('div','head'); const h = el('div'); h.innerHTML = `<div class="muted small">${sec.title}</div><strong>${q.label}</strong>`; head.appendChild(h); card.appendChild(head);
+        const body = el('div','body');
+        body.textContent = Array.isArray(v)? v.join(', ') : String(v);
+        card.appendChild(body);
+        box.appendChild(card);
+      });
+    });
+  }
+
+  // ---------- Markdown ----------
+  function toMarkdown(){
+    const lines = ['# Profile Summary',''];
+    schema.sections.forEach(sec=>{
+      lines.push(`## ${sec.title}`);
+      sec.questions.forEach(q=>{
+        const v = answers[q.id]; if(v===undefined || v==='' || (Array.isArray(v)&&!v.length)) return;
+        lines.push(`- **${q.label}**: ${Array.isArray(v)? v.join(', '): String(v)}`);
+      });
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
+
+  // ---------- Controls ----------
+  $('#parseBtn').onclick = ()=>{ try{ schema = parseDSL($('#dsl').value); sectionIdx = 0; renderSection(); } catch(e){ alert('Parse error: '+e.message); } };
+  $('#loadDemo').onclick = ()=>{
+    const demo = `FORM key="universal"
+SECTION id=baseline title="Universal Baseline" columns=2
+Q type=text id=identity section=baseline label="Identity or label"
+Q type=textarea id=purpose section=baseline label="Purpose or success criteria"
+Q type=text id=time_horizon section=baseline label="Time anchors or horizon"
+Q type=text id=context section=baseline label="Places or context"
+Q type=textarea id=attributes section=baseline label="Key attributes, specs, traits"
+Q type=chips id=preferences section=baseline label="Preferences or likes" options="Speed|Reliability|Cost|Simplicity|Aesthetics"
+Q type=chips id=dislikes section=baseline label="Dislikes or constraints" options="Complexity|Noise|High Cost|Maintenance"
+Q type=toggle id=ready_subjects section=baseline label="Ready for subject-specific probes?"
+END
+SECTION id=subjects title="Choose Subject" columns=1
+Q type=select id=subject section=subjects label="Subject" options="Person|Product/Item"
+Q type=toggle id=helper_tips section=subjects label="Show helper examples?"
+END
+SECTION id=person title="Person Probes" columns=2
+Q type=chips id=interests section=person label="Interests" options="Music|Movies/TV|Books|Cooking|Travel|Fitness|Tech|Games|Sports" show_if="subject:any_of:Person"
+Q type=select id=humor_style section=person label="Humor style" options="Dry|Witty|Slapstick|Sarcastic" show_if="subject:any_of:Person"
+Q type=text id=aesthetics section=person label="Aesthetic preferences" show_if="subject:any_of:Person"
+Q type=text id=nostalgia section=person label="Nostalgia window" show_if="helper_tips:equals:true"
+END
+SECTION id=product title="Product Probes" columns=2
+Q type=select id=form_factor section=product label="Form factor" options="Handheld|Desktop|Wearable|Appliance|Tool|Other" show_if="subject:any_of:Product/Item|Product"
+Q type=chips id=key_specs section=product label="Key specs" options="Power|Weight|Capacity|Speed|Runtime|Safety" show_if="subject:any_of:Product/Item|Product"
+Q type=text id=compatibility section=product label="Compatibility" show_if="subject:any_of:Product/Item|Product"
+Q type=chips id=budget_band section=product label="Budget band" options="<$50|$50–$199|$200–$499|$500+" show_if="subject:any_of:Product/Item|Product"
+END`;
+    $('#dsl').value = demo; save('profile_dsl', demo);
+    schema = parseDSL(demo); sectionIdx=0; renderSection();
+  };
+  $('#saveDSL').onclick = ()=>{ save('profile_dsl', $('#dsl').value); alert('Saved to localStorage.'); };
+  $('#clearDSL').onclick = ()=>{ $('#dsl').value=''; save('profile_dsl',''); };
+  $('#exportJSON').onclick = ()=> download('profile.json', JSON.stringify(answers,null,2));
+  $('#exportMD').onclick = ()=> download('profile.md', toMarkdown());
+  $('#resetAnswers').onclick = ()=>{ answers={}; save('profile_answers', answers); renderSection(); };
+  $('#prev').onclick = ()=>{ if(sectionIdx>0){ sectionIdx--; renderSection(); } };
+  $('#next').onclick = ()=>{ if(sectionIdx<schema.sections.length-1){ sectionIdx++; renderSection(); } };
+
+  // ---------- Init ----------
+  (function init(){
+    const cached = load('profile_dsl',''); if(cached) $('#dsl').value=cached;
+    if($('#dsl').value.trim()) { try{ schema=parseDSL($('#dsl').value); }catch{} }
+    renderSection(); renderSteps(); renderSummary();
+  })();
+  </script>
 </body>
 </html>
