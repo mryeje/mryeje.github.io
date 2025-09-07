@@ -22,7 +22,7 @@
     }
     
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -81,6 +81,26 @@
       margin: 0 20px;
       font-size: 2.2rem;
       text-shadow: 0 0 5px rgba(111, 221, 139, 0.5);
+    }
+    
+    .mission-overview {
+      background: rgba(40, 80, 40, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    
+    .mission-overview h2 {
+      color: #6fdd8b;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .mission-overview p {
+      line-height: 1.6;
+      margin-bottom: 10px;
     }
     
     .mission-section {
@@ -195,6 +215,15 @@
       animation: fadeIn 0.5s ease;
     }
     
+    .story-image {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 15px;
+      margin: 15px auto;
+      display: block;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+    
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -259,10 +288,17 @@
       <div></div> <!-- Empty div for spacing -->
     </header>
     
+    <div class="mission-overview">
+      <h2>Mission Overview</h2>
+      <p>Welcome to the QR Forest Adventure! You are an explorer in a mysterious forest filled with hidden QR codes that unlock items, challenges, and story elements.</p>
+      <p>Your mission is to explore each day, scan QR codes to collect items, and survive the forest's challenges. Each day brings new opportunities and dangers.</p>
+      <p>Use the arrows to navigate between days, and open the scanner to scan QR codes you find in the forest. Be careful - some codes might trigger enemy encounters!</p>
+    </div>
+    
     <section class="mission-section">
-      <h2>Forest Mission</h2>
-      <p>Scan QR codes to collect items, forage for supplies, and avoid enemies!</p>
-      <button class="mission-btn" id="startMission">Start Mission</button>
+      <h2>Current Mission</h2>
+      <p id="missionText">Day 1: Explore the starting area and find your first QR code.</p>
+      <img id="storyImage" class="story-image" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%233d6b3d%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EForest%20Image%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Forest Image">
     </section>
     
     <section class="scanner-section">
@@ -285,7 +321,7 @@
   
   <div class="scanner-overlay" id="scannerOverlay">
     <div class="scanner-container">
-      <div id="reader"></div>
+      <div id="overlayReader"></div>
       <button class="close-scanner" id="closeScanner">×</button>
     </div>
   </div>
@@ -316,11 +352,34 @@
       "🍓 Wild berries — +1 health."
     ];
 
+    // Mission narratives for each day
+    const missionNarratives = [
+      "Day 1: Explore the starting area and find your first QR code.",
+      "Day 2: Venture deeper into the forest. Watch out for Night Wolves!",
+      "Day 3: Follow the river to discover hidden treasures.",
+      "Day 4: Climb the ancient tree to get a better view of the forest.",
+      "Day 5: Search for the hidden cave behind the waterfall.",
+      "Day 6: Discover the abandoned forest temple and its secrets.",
+      "Day 7: Find the legendary Golden Oak tree deep in the forest."
+    ];
+
+    // Story images (in a real app, these would be actual image paths)
+    const storyImages = [
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%233d6b3d%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%201%3A%20Forest%20Entrance%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23264d26%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%202%3A%20Deep%20Forest%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23153a15%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%203%3A%20Forest%20River%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23447e44%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%204%3A%20Ancient%20Tree%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%231e461e%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%205%3A%20Waterfall%20Cave%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23599959%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%206%3A%20Forest%20Temple%3C%2Ftext%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%236fdd8b%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23333333%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22120%22%20y%3D%22125%22%3EDay%207%3A%20Golden%20Oak%20Tree%3C%2Ftext%3E%3C%2Fsvg%3E"
+    ];
+
     // DOM Elements
     const currentDayElement = document.getElementById('currentDay');
     const prevDayButton = document.getElementById('prevDay');
     const nextDayButton = document.getElementById('nextDay');
-    const startMissionButton = document.getElementById('startMission');
+    const missionTextElement = document.getElementById('missionText');
+    const storyImageElement = document.getElementById('storyImage');
     const openScannerButton = document.getElementById('openScanner');
     const closeScannerButton = document.getElementById('closeScanner');
     const scannerOverlay = document.getElementById('scannerOverlay');
@@ -330,18 +389,18 @@
     // Initialize the game
     function initGame() {
       updateDayDisplay();
+      updateMissionText();
       updateInventoryUI();
       updateEventLogUI();
       
       // Add event listeners
       prevDayButton.addEventListener('click', goToPreviousDay);
       nextDayButton.addEventListener('click', goToNextDay);
-      startMissionButton.addEventListener('click', startMission);
       openScannerButton.addEventListener('click', openScanner);
       closeScannerButton.addEventListener('click', closeScanner);
       
       // Add initial log entry
-      addLogEntry("Welcome to QR Forest Adventure! Start your mission and scan QR codes to begin.");
+      addLogEntry("Welcome to QR Forest Adventure! Your mission begins today.");
     }
 
     // Day navigation functions
@@ -349,6 +408,8 @@
       if (currentDay > 1) {
         currentDay--;
         updateDayDisplay();
+        updateMissionText();
+        startMission();
         addLogEntry(`Traveled back to day ${currentDay}`);
       }
     }
@@ -356,43 +417,55 @@
     function goToNextDay() {
       currentDay++;
       updateDayDisplay();
+      updateMissionText();
+      startMission();
       addLogEntry(`Advanced to day ${currentDay}`);
-      
-      // Random event when advancing days
-      if (Math.random() > 0.7) {
-        const enemy = enemies[Math.floor(Math.random() * enemies.length)];
-        addLogEntry(`🌑 ${enemy} spotted in the distance! Be cautious.`);
-      }
     }
 
     function updateDayDisplay() {
       currentDayElement.textContent = currentDay;
     }
 
+    function updateMissionText() {
+      const missionIndex = Math.min(currentDay - 1, missionNarratives.length - 1);
+      missionTextElement.textContent = missionNarratives[missionIndex];
+      
+      // Update the story image
+      const imageIndex = Math.min(currentDay - 1, storyImages.length - 1);
+      storyImageElement.src = storyImages[imageIndex];
+      storyImageElement.alt = `Day ${currentDay} Story Image`;
+    }
+
     // Mission functions
     function startMission() {
-      addLogEntry(`Starting mission on day ${currentDay}`);
+      addLogEntry(`Starting mission for day ${currentDay}`);
       
-      // Disable button temporarily
-      startMissionButton.disabled = true;
-      startMissionButton.textContent = "Mission in Progress...";
-      
-      // Simulate mission progress
+      // Simulate mission progress with a random outcome
       setTimeout(() => {
         const success = Math.random() > 0.3;
         if (success) {
-          const foundItem = "Map Fragment";
-          inventory.push(foundItem);
-          updateInventoryUI();
-          addLogEntry(`Mission successful! Found ${foundItem}`);
+          const foundItems = ["Compass", "Map", "Rope", "Flashlight", "Water Bottle"];
+          const foundItem = foundItems[Math.floor(Math.random() * foundItems.length)];
+          
+          if (!inventory.includes(foundItem)) {
+            inventory.push(foundItem);
+            updateInventoryUI();
+            addLogEntry(`Mission successful! Found ${foundItem}`);
+            
+            // Special events for certain days
+            if (currentDay === 3) {
+              addLogEntry("You discovered a hidden path along the river!");
+            } else if (currentDay === 5) {
+              addLogEntry("You found a secret cave behind the waterfall!");
+            }
+          } else {
+            addLogEntry("Mission completed, but you didn't find anything new.");
+          }
         } else {
-          addLogEntry("Mission failed! Better luck next time.");
+          const enemy = enemies[Math.floor(Math.random() * enemies.length)];
+          addLogEntry(`Mission failed! You encountered a ${enemy} and had to retreat.`);
         }
-        
-        // Re-enable button
-        startMissionButton.disabled = false;
-        startMissionButton.textContent = "Start Mission";
-      }, 2000);
+      }, 1500);
     }
 
     // Scanner functions
@@ -415,7 +488,7 @@
     function startScanner() {
       if (scannerActive) return;
       
-      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode = new Html5Qrcode("overlayReader");
       html5QrCode.start(
         { facingMode: "environment" },
         {
@@ -451,6 +524,10 @@
       else if (code === "forage") {
         const find = forageTable[Math.floor(Math.random() * forageTable.length)];
         addLogEntry("🌲 You foraged: " + find);
+      }
+      else if (code === "trampoline") {
+        addLogEntry("You found a magical trampoline! Bounced to a new area.");
+        storyImageElement.src = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%236fdd8b%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23333333%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22120%22%20y%3D%22125%22%3EMagical%20Trampoline%3C%2Ftext%3E%3C%2Fsvg%3E";
       }
       else {
         addLogEntry("❓ Unknown code: " + code);
