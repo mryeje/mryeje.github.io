@@ -18,13 +18,14 @@
   .day-display{font-size:18px;font-weight:700;color:#fff;padding:6px 12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));}
   .main-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.6);}
   .title{font-size:18px;font-weight:800;margin:6px 0;color:var(--accent);}
-  .image-container{height:300px;background:var(--glass);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;margin-bottom:12px;}
+  .image-container{height:260px;background:var(--glass);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;margin-bottom:12px;}
   .image-container img{width:100%;height:100%;object-fit:contain;}
   textarea{width:100%;min-height:64px;border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;resize:vertical;font-size:15px;}
   label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;}
   .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
   .muted{color:var(--muted);font-size:13px;}
   .footer{font-size:13px;color:var(--muted);text-align:center;padding:8px 0;}
+  #scanner{width:100%;height:300px;border-radius:12px;overflow:hidden;background:#000;display:none;margin-top:12px;}
 </style>
 </head>
 <body>
@@ -32,7 +33,7 @@
   <header>
     <div style="flex:1">
       <h1>🌲 99 Nights — Playbook</h1>
-      <div class="muted">Scan items with QR codes to build your inventory!</div>
+      <div class="muted">Portrait-friendly iPad UI — with QR scanner</div>
     </div>
     <div style="width:120px;text-align:right">
       <div class="day-display" id="selectedDayDisplay">Day 1</div>
@@ -61,24 +62,19 @@
     <label for="missionText" style="margin-top:8px;">🎯 Mission / Instructions</label>
     <textarea id="missionText" readonly></textarea>
 
-    <label for="inventoryText" style="margin-top:8px;">🎒 Inventory</label>
-    <textarea id="inventoryText" readonly></textarea>
-
     <div class="action-row">
       <button class="big-btn" id="startBtn">Start Mission ▶</button>
       <button class="big-btn" id="previewBtn">Read Aloud 📝</button>
-      <button class="big-btn" id="scanBtn">📷 Scan Item</button>
+      <button class="big-btn" id="scanBtn">Scan QR 📷</button>
     </div>
 
-    <div id="qr-reader" style="width:100%; max-width:400px; margin-top:12px; display:none;"></div>
+    <div id="scanner"></div>
   </section>
 
-  <div class="footer">Made for adventures — works offline. Only the current scenario's image is visible.</div>
+  <div class="footer">Made for adventures — open on iPad Safari. QR tags change the game dynamically.</div>
 </div>
 
-<!-- QR code scanner library -->
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
 <script>
 (() => {
   const scenarios = [
@@ -87,15 +83,24 @@
     {id:3,title:"The Floating Market",items:"Stories as currency",locations:"Gazebo, Front Deck",mission:"Roleplay a trader in the gazebo who trades glowing badges for stories. Tell three short tales to win a badge.",image:"gazebo.jpg"},
     {id:4,title:"The Nocturne Leap",items:"Sky Boots, Cloud Marker",locations:"Trampoline, Treehouse",mission:"Complete 10 controlled jumps on the trampoline, then climb to the treehouse and describe the Sky Bridge.",image:"trampoline.jpg"},
     {id:5,title:"Shadow Scout",items:"Echo Call, Quiet Boots",locations:"Cul-de-sac, Front Deck",mission:"Sneak from treehouse to front deck without making noise. If you are heard, freeze for 10 seconds and try again.",image:"culdesac.jpg"},
-    {id:6,title:"The Gazebo Council",items:"Council Tokens, Voice Charm",locations:"Gazebo, Treehouse",mission:"Hold a council in the gazebo, appoint three allies and give each a role to defend the treehouse tonight.",image:"gazebo.jpg"},
-    {id:7,title:"Tide of the Trampoline",items:"Sky Vision, Jump Count",locations:"Trampoline, Pool Deck",mission:"Slow controlled hops on the trampoline to 'scan' the lake. Call out five enemy positions.",image:"trampoline.jpg"},
-    {id:8,title:"The Fence-Line Mystery",items:"Clue Finder, Track Reader",locations:"Backyard fence, Cul-de-sac",mission:"Walk the fence line and name five different sounds or sights. For each unique find, point and declare a trap location.",image:"culdesac.jpg"},
-    {id:9,title:"Echoes Under the Deck",items:"Listening Shell, Flash Word",locations:"Front Deck, Under Back Deck",mission:"Sit quietly for 60 seconds and listen. Report any forest messages and use one message to make a plan.",image:"front_deck.jpg"},
-    {id:10,title:"The Night of Many Lights",items:"Star Catcher, Glow Talk",locations:"Treehouse, Gazebo, Front Deck",mission:"Place imaginary lights by naming landmarks (count to 10). Each saved light gives one safe hour.",image:"treehouse.jpg"},
-    {id:11,title:"The Pool’s Secret Gate",items:"Gate Riddle, Calm Breath",locations:"Pool, Gazebo",mission:"Create a riddle at the gazebo. If the riddle is solved, a calm path across the Pool of Shadows opens.",image:"pool.jpg"},
-    {id:12,title:"Last Watch of the Cul-de-sac",items:"Banner of Dawn, Victory Call",locations:"Front Deck, Cul-de-sac, Treehouse",mission:"Make a victory signal (clap/song) from the front deck. If it's loud and proud, the forest retreats until morning.",image:"front_deck.jpg"}
+    {id:6,title:"The Gazebo Council",items:"Council Tokens, Voice Charm",locations:"Gazebo, Treehouse",mission:"Hold a council in the gazebo, appoint three allies and give each a role to defend the treehouse tonight.",image:"gazebo.jpg"}
   ];
 
+  // --- Game State ---
+  let inventory = [];
+  let eventsLog = [];
+
+  // Enemy + forage tables
+  const enemies = ["Night Wolf","Burrower","Shadow Owl","Echo Beast","Forest Shade"];
+  const forageTable = [
+    "🥕 Roots — add 1 food supply.",
+    "🐇 Rabbit caught — +1 meat.",
+    "🍄 Mushrooms — are they safe? Discuss before eating.",
+    "🌰 Nuts — +2 energy.",
+    "🍓 Wild berries — +1 health."
+  ];
+
+  // DOM references
   const daySelect = document.getElementById("daySelect");
   const selectedDayDisplay = document.getElementById("selectedDayDisplay");
   const scenarioTitle = document.getElementById("scenarioTitle");
@@ -107,29 +112,10 @@
   const nextBtn = document.getElementById("nextBtn");
   const startBtn = document.getElementById("startBtn");
   const previewBtn = document.getElementById("previewBtn");
-  const inventoryText = document.getElementById("inventoryText");
   const scanBtn = document.getElementById("scanBtn");
-  const qrReader = document.getElementById("qr-reader");
+  const scannerDiv = document.getElementById("scanner");
 
-  // ----- Inventory -----
-  let inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
-
-  function addToInventory(item) {
-    if (!inventory.includes(item)) {
-      inventory.push(item);
-      localStorage.setItem("inventory", JSON.stringify(inventory));
-      updateInventoryUI();
-      alert(`✅ You found: ${item}!`);
-    } else {
-      alert(`Already in your bag: ${item}`);
-    }
-  }
-
-  function updateInventoryUI() {
-    inventoryText.value = inventory.join(", ") || "Empty";
-  }
-
-  // ----- Populate day selector -----
+  // populate day selector
   scenarios.forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id;
@@ -152,7 +138,6 @@
       scenarioImage.style.display = "none";
     }
     daySelect.value = id;
-    localStorage.setItem("lastDay", id);
   }
 
   prevBtn.addEventListener("click",()=>{
@@ -185,45 +170,51 @@
     }
   });
 
-  // ----- QR Scanner -----
-  let qrScanner = null;
-
-  scanBtn.addEventListener("click", () => {
-    if (qrReader.style.display === "none") {
-      qrReader.style.display = "block";
-
-      if (!qrScanner) {
-        qrScanner = new Html5Qrcode("qr-reader");
+  // --- QR Handling ---
+  function handleQRCommand(code){
+    if(code.startsWith("item:")){
+      const item = code.split(":")[1];
+      if(!inventory.includes(item)){
+        inventory.push(item);
+        alert("✨ Rare item found: " + item);
       }
+    } 
+    else if(code === "event:enemy_chase"){
+      const enemy = enemies[Math.floor(Math.random()*enemies.length)];
+      const condition = "Survive by reaching the treehouse before being tagged!";
+      eventsLog.push({enemy,condition});
+      alert("🌑 " + enemy + " is chasing you! " + condition);
+    }
+    else if(code === "forage"){
+      const find = forageTable[Math.floor(Math.random()*forageTable.length)];
+      eventsLog.push({forage:find});
+      alert("🌲 You foraged: " + find);
+    }
+    else {
+      alert("❓ Unknown code: " + code);
+    }
+  }
 
-      qrScanner.start(
-        { facingMode: "environment" }, // back camera
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          if (decodedText.startsWith("item:")) {
-            const item = decodedText.split(":")[1];
-            addToInventory(item);
-          } else {
-            alert("QR not recognized: " + decodedText);
-          }
-          qrScanner.stop();
-          qrReader.style.display = "none";
-        },
-        (errorMessage) => { /* ignore scan errors */ }
-      ).catch(err => {
-        alert("Unable to start scanner: " + err);
-      });
-
+  // --- Scanner setup ---
+  let html5QrcodeScanner;
+  scanBtn.addEventListener("click",()=>{
+    if(scannerDiv.style.display==="block"){
+      html5QrcodeScanner.stop().then(()=>{scannerDiv.style.display="none";});
     } else {
-      qrScanner.stop();
-      qrReader.style.display = "none";
+      scannerDiv.style.display="block";
+      html5QrcodeScanner = new Html5Qrcode("scanner");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps:10, qrbox:250 },
+        qrCodeMessage => {
+          handleQRCommand(qrCodeMessage.trim());
+        }
+      );
     }
   });
 
-  // ----- Init -----
-  const saved = localStorage.getItem("lastDay");
-  showScenario(saved ? Number(saved) : 1);
-  updateInventoryUI();
+  // init
+  showScenario(1);
 
 })();
 </script>
