@@ -250,12 +250,81 @@
       width: 100%;
     }
     
+    /* Enemy Encounter Display */
+    .enemy-display {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
+      border: 2px solid #ff3c3c;
+      opacity: 0;
+      transition: all 0.5s ease;
+      width: 320px;
+      pointer-events: none;
+    }
+    
+    .enemy-display.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    
+    .enemy-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 3px solid #ff5e5e;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    }
+    
+    .enemy-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff5e5e;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+    
+    .enemy-description {
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .close-enemy {
+      background: #ff3c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
     @media (max-width: 920px) {
       .app {
         grid-template-columns: 1fr;
       }
       
       .image-area {
+        height: 180px;
+      }
+      
+      .enemy-display {
+        width: 90%;
+        max-width: 300px;
+      }
+      
+      .enemy-image {
+        width: 180px;
         height: 180px;
       }
     }
@@ -326,6 +395,14 @@
   </div>
 </div>
 
+<!-- Enemy Encounter Display -->
+<div class="enemy-display" id="enemyDisplay">
+  <div class="enemy-name" id="enemyName">Enemy Encounter!</div>
+  <img class="enemy-image" id="enemyImage" src="" alt="Enemy">
+  <div class="enemy-description" id="enemyDescription">An enemy is approaching!</div>
+  <button class="close-enemy" id="closeEnemy">Continue</button>
+</div>
+
 <script>
 (() => {
   // Scenarios based on the research document and your yard landmarks
@@ -388,16 +465,38 @@
     }
   ];
 
-  let inventory = JSON.parse(localStorage.getItem("inv")||"[]");
-  let eventsLog = JSON.parse(localStorage.getItem("log")||"[]");
-  let health = Number(localStorage.getItem("hp")||"100");
-
+  // Enemies with images and descriptions
   const enemies = [
-    {name:"The Deer",emoji:"🦌"},
-    {name:"The Owl",emoji:"🦉"},
-    {name:"Forest Cultists",emoji:"👤"},
-    {name:"Alpha Wolf",emoji:"🐺"},
-    {name:"Bear",emoji:"🐻"}
+    {
+      name: "The Deer", 
+      emoji: "🦌",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cpath%20fill%3D%22%23b08d57%22%20d%3D%22M100%2030L120%2070%2080%2070Z%22%2F%3E%3Cellipse%20fill%3D%22%23755%22%20cx%3D%22100%22%20cy%3D%22120%22%20rx%3D%2260%22%20ry%3D%2280%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2275%22%20cy%3D%22100%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22125%22%20cy%3D%22100%22%20r%3D%225%22%2F%3E%3C%2Fsvg%3E",
+      description: "A tall, thin, bipedal creature that stalks the forest at night. Fears bright light."
+    },
+    {
+      name: "The Owl", 
+      emoji: "🦉",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Ccircle%20fill%3D%22%23666%22%20cx%3D%22100%22%20cy%3D%22100%22%20r%3D%2260%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%2215%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%2215%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23ff6%22%20d%3D%22M90%20130L110%20130%20100%20115Z%22%2F%3E%3C%2Fsvg%3E",
+      description: "A flying monstrosity that appears after night 5. Completely unkillable and gets faster when chasing."
+    },
+    {
+      name: "Forest Cultists", 
+      emoji: "👤",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Ccircle%20fill%3D%22%23755%22%20cx%3D%22100%22%20cy%3D%2280%22%20r%3D%2230%22%2F%3E%3Crect%20fill%3D%22%23444%22%20x%3D%2270%22%20y%3D%22110%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3Cpath%20fill%3D%22%23f00%22%20d%3D%22M70%20110L130%20110%20140%20140%2060%20140Z%22%2F%3E%3C%2Fsvg%3E",
+      description: "Robed figures who worship The Deer. They raid your camp every few nights."
+    },
+    {
+      name: "Alpha Wolf", 
+      emoji: "🐺",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cellipse%20fill%3D%22%23888%22%20cx%3D%22100%22%20cy%3D%22100%22%20rx%3D%2260%22%20ry%3D%2240%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%2210%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%2210%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23f55%22%20d%3D%22M90%20110L110%20110%20100%20120Z%22%2F%3E%3C%2Fsvg%3E",
+      description: "A larger, more powerful wolf that often leads wolf packs. Drops Alpha Wolf Pelt."
+    },
+    {
+      name: "Bear", 
+      emoji: "🐻",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cellipse%20fill%3D%22%23855%22%20cx%3D%22100%22%20cy%3D%22120%22%20rx%3D%2270%22%20ry%3D%2280%22%2F%3E%3Ccircle%20fill%3D%22%23855%22%20cx%3D%2260%22%20cy%3D%2280%22%20r%3D%2220%22%2F%3E%3Ccircle%20fill%3D%22%23855%22%20cx%3D%22140%22%20cy%3D%2280%22%20r%3D%2220%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2265%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22135%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23f55%22%20d%3D%22M90%20110L110%20110%20100%20120Z%22%2F%3E%3C%2Fsvg%3E",
+      description: "A powerful predator that guards the caves containing missing children. Very high health and damage."
+    }
   ];
   
   const forageTable = [
@@ -423,7 +522,12 @@
         prevBtn=document.getElementById("prevBtn"),
         nextBtn=document.getElementById("nextBtn"),
         scannerOverlay=document.getElementById("scannerOverlay"),
-        closeScanner=document.getElementById("closeScanner");
+        closeScanner=document.getElementById("closeScanner"),
+        enemyDisplay=document.getElementById("enemyDisplay"),
+        enemyName=document.getElementById("enemyName"),
+        enemyImage=document.getElementById("enemyImage"),
+        enemyDescription=document.getElementById("enemyDescription"),
+        closeEnemy=document.getElementById("closeEnemy");
 
   // Populate day selector
   scenarios.forEach(s=>{
@@ -459,6 +563,25 @@
     
     daySelect.value=id;
     localStorage.setItem("day",id);
+  }
+
+  function showEnemyEncounter(enemy) {
+    enemyName.textContent = enemy.name + " " + enemy.emoji;
+    enemyImage.src = enemy.image;
+    enemyImage.alt = enemy.name;
+    enemyDescription.textContent = enemy.description;
+    
+    // Show the enemy display
+    enemyDisplay.classList.add('active');
+    
+    // Auto-hide after 7 seconds
+    setTimeout(() => {
+      hideEnemyEncounter();
+    }, 7000);
+  }
+  
+  function hideEnemyEncounter() {
+    enemyDisplay.classList.remove('active');
   }
 
   function addEvent(t){
@@ -507,9 +630,14 @@
       }
       return;
     }
-    if(code==="event:enemy_chase"){startEncounter();return;}
+    if(code==="event:enemy_chase"){
+      const enemy = enemies[Math.floor(Math.random() * enemies.length)];
+      showEnemyEncounter(enemy);
+      addEvent("🌑 " + enemy.emoji + " " + enemy.name + " is approaching!");
+      return;
+    }
     if(code==="forage"){
-      const f=forageTable[Math.random()*forageTable.length|0];
+      const f=forageTable[Math.floor(Math.random()*forageTable.length)];
       health=Math.max(0,Math.min(100,health+f.hp));
       renderHealth();
       addEvent("🌲 Foraged: "+f.text);
@@ -543,15 +671,7 @@
     }
   });
 
-  // Encounter system
-  function startEncounter(){
-    const e=enemies[Math.random()*enemies.length|0];
-    addEvent(`🌑 ${e.emoji} ${e.name} is approaching!`);
-    
-    if(e.name === "The Deer" || e.name === "The Owl") {
-      addEvent("Use light to defend yourself!");
-    }
-  }
+  closeEnemy.addEventListener("click", hideEnemyEncounter);
 
   startBtn.addEventListener("click", () => {
     const currentScenario = scenarios.find(s => s.id == daySelect.value);
@@ -566,7 +686,7 @@
       const success = Math.random() > 0.3;
       if(success){
         const items = ["Flashlight", "Wood", "Bandage", "Rabbit's Foot", "Wolf Pelt"];
-        const foundItem = items[Math.random()*items.length|0];
+        const foundItem = items[Math.floor(Math.random()*items.length)];
         if(!inventory.includes(foundItem)){
           inventory.push(foundItem);
           renderInventory();
