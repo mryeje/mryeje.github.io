@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Forest Adventure</title>
+  <title>99 Nights in the Susan Court Forest</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     * {
@@ -12,224 +12,176 @@
       padding: 0;
     }
     
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0b1d0b 0%, #163016 100%);
-      color: #eee;
-      text-align: center;
-      padding: 20px;
-      min-height: 100vh;
+    :root {
+      --bg: #071621;
+      --card: #0b1722;
+      --accent: #6ee7b7;
+      --muted: #9aa8bb;
+      --glass: rgba(255,255,255,0.03);
+      --good: #8ef08e;
+      --bad: #ffb2b2;
+      --gold: #ffd36b;
     }
     
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: linear-gradient(180deg, #04101a 0, var(--bg) 100%);
+      color: #eaf7f2;
+      min-height: 100vh;
+      padding: 14px;
+    }
+    
+    .app {
+      max-width: 920px;
+      margin: 12px auto;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 14px;
+      box-sizing: border-box;
     }
     
     header {
+      grid-column: 1/-1;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 2px solid #6fdd8b;
-    }
-    
-    .day-navigation {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .nav-btn {
-      background: #2c5e2c;
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    
-    .nav-btn:hover {
-      background: #3a7a3a;
-      transform: scale(1.1);
-    }
-    
-    .nav-btn:active {
-      transform: scale(0.95);
-    }
-    
-    .day-display {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #6fdd8b;
-      min-width: 120px;
-    }
-    
-    h1 {
-      color: #6fdd8b;
-      text-align: center;
-      flex-grow: 1;
-      margin: 0 20px;
-      font-size: 2.2rem;
-      text-shadow: 0 0 5px rgba(111, 221, 139, 0.5);
-    }
-    
-    .mission-overview {
-      background: rgba(40, 80, 40, 0.3);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      text-align: left;
-      margin-bottom: 20px;
-    }
-    
-    .mission-overview h2 {
-      color: #6fdd8b;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    
-    .mission-overview p {
-      line-height: 1.6;
+      gap: 12px;
       margin-bottom: 10px;
     }
     
-    .mission-section {
-      background: rgba(40, 80, 40, 0.3);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    h1 {
+      font-size: 24px;
+      margin: 0;
+      color: var(--accent);
+    }
+    
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.6);
+    }
+    
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    
+    .selector {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .big-icon-btn {
+      background: transparent;
+      border: 2px solid var(--muted);
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 10px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .image-area {
+      height: 220px;
+      border-radius: 10px;
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 12px;
     }
     
     .scenario-image {
       width: 100%;
-      max-width: 400px;
-      height: 250px;
-      border-radius: 15px;
-      margin: 15px auto;
-      display: block;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      height: 100%;
       object-fit: cover;
-      border: 2px solid #6fdd8b;
+      border-radius: 10px;
     }
     
-    .mission-btn {
-      background: linear-gradient(to bottom, #4caf50, #2e7d32);
-      color: white;
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 6px 0;
+    }
+    
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.03);
+      background: transparent;
+      color: inherit;
+      resize: vertical;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    
+    .big-btn {
+      background: var(--accent);
+      color: #042023;
       border: none;
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      border-radius: 50px;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 16px;
       cursor: pointer;
-      margin: 15px 0;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      flex: 1;
+      min-width: 120px;
     }
     
-    .mission-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(to bottom, #5cbf60, #3e8e41);
-    }
-    
-    .mission-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    }
-    
-    .mission-btn:disabled {
-      background: #555;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .scanner-section {
+    .side {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 15px;
+      gap: 14px;
     }
     
-    .scanner-btn {
-      background: #2c5e2c;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      font-size: 1rem;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .inventory-list, .log-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 260px;
+      overflow: auto;
     }
     
-    .scanner-btn:hover {
-      background: #3a7a3a;
-    }
-    
-    #reader {
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
-    }
-    
-    .panels {
+    .inventory-item {
       display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 20px;
-    }
-    
-    .panel {
-      flex: 1;
-      min-width: 300px;
-      background: rgba(30, 60, 30, 0.4);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .panel h2 {
-      color: #6fdd8b;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #6fdd8b;
-    }
-    
-    .inventory-items, .event-log {
-      list-style-type: none;
-      text-align: left;
-      max-height: 300px;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-    
-    .inventory-items li, .event-log li {
-      padding: 10px;
-      margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
       border-radius: 8px;
-      border-left: 3px solid #6fdd8b;
-    }
-    
-    .event-log li {
-      animation: fadeIn 0.5s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
     }
     
     .scanner-overlay {
@@ -238,7 +190,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -267,418 +219,369 @@
       cursor: pointer;
     }
     
-    .scenario-details {
-      text-align: left;
-      margin: 15px 0;
+    .health-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 6px;
     }
     
-    .scenario-details label {
-      display: block;
-      font-size: 14px;
-      color: #6fdd8b;
-      margin-top: 12px;
-    }
-    
-    .scenario-details textarea {
+    .health-fill {
+      height: 100%;
+      background: linear-gradient(90deg,#66ff88,#2fb74a);
       width: 100%;
-      min-height: 60px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(111, 221, 139, 0.3);
-      border-radius: 8px;
-      padding: 10px;
-      color: #eee;
-      resize: vertical;
-      margin-top: 5px;
     }
     
-    .image-placeholder {
-      width: 100%;
-      height: 250px;
-      background: rgba(30, 60, 30, 0.4);
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #6fdd8b;
-      font-style: italic;
-      margin: 15px 0;
-    }
-    
-    @media (max-width: 768px) {
-      .panels {
-        flex-direction: column;
+    @media (max-width: 920px) {
+      .app {
+        grid-template-columns: 1fr;
       }
       
-      header {
-        flex-direction: column;
-        gap: 15px;
-      }
-      
-      .scenario-image {
-        height: 200px;
+      .image-area {
+        height: 180px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="day-navigation">
-        <button class="nav-btn" id="prevDay">←</button>
-        <div class="day-display">Day <span id="currentDay">1</span></div>
-        <button class="nav-btn" id="nextDay">→</button>
-      </div>
-      <h1>🌲 QR Forest Adventure</h1>
-      <div></div> <!-- Empty div for spacing -->
-    </header>
-    
-    <div class="mission-overview">
-      <h2>Mission Overview</h2>
-      <p>Welcome to the QR Forest Adventure! You are an explorer in a mysterious forest filled with hidden QR codes that unlock items, challenges, and story elements.</p>
-      <p>Your mission is to explore each day, scan QR codes to collect items, and survive the forest's challenges. Each day brings new opportunities and dangers.</p>
-      <p>Use the arrows to navigate between days, and open the scanner to scan QR codes you find in the forest. Be careful - some codes might trigger enemy encounters!</p>
+<div class="app">
+  <header>
+    <div>
+      <h1>🌲 99 Nights — Susan Court Forest</h1>
+      <div class="subtitle">Scan QR tags to change the story! Featuring your yard's magical landmarks.</div>
     </div>
-    
-    <section class="mission-section">
-      <h2 id="scenarioTitle">First Watch</h2>
-      
-      <div id="imageContainer">
-        <img id="scenarioImage" class="scenario-image" src="culdesac.jpg" alt="Forest Scene" onerror="handleImageError()">
+    <div style="text-align:right">
+      <div class="card" style="padding:8px;border-radius:10px;text-align:center">
+        <div id="healthLabel" style="font-weight:800">100%</div>
+        <div class="health-bar"><div id="healthFill" class="health-fill"></div></div>
       </div>
-      
-      <div class="scenario-details">
-        <label>🧰 Scenario Items</label>
-        <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
-        
-        <label>📍 Locations</label>
-        <textarea id="locationText" readonly>Sentinel Porch, Shadow Edge</textarea>
-        
-        <label>🎯 Mission</label>
-        <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds. Return to Sentinel Porch.</textarea>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="card">
+      <div class="selector">
+        <button class="big-icon-btn" id="prevBtn">◀</button>
+        <select id="daySelect"></select>
+        <button class="big-icon-btn" id="nextBtn">▶</button>
       </div>
 
-      <button class="mission-btn" id="startMission">Start Mission ▶</button>
-    </section>
-    
-    <section class="scanner-section">
-      <button class="scanner-btn" id="openScanner">Open QR Scanner</button>
-      <div id="reader"></div>
-    </section>
-    
-    <div class="panels">
-      <div class="panel inventory">
-        <h2>🎒 Inventory</h2>
-        <ul id="inventoryList" class="inventory-items"></ul>
+      <div class="image-area" id="imageArea">
+        <img src="culdesac.jpg" alt="Forest Scene" class="scenario-image" id="scenarioImage" onerror="handleImageError()">
       </div>
+      <div class="title" id="scenarioTitle">First Watch</div>
+
+      <label>🧰 Scenario Items</label>
+      <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
       
-      <div class="panel">
-        <h2>📖 Event Log</h2>
-        <ul id="eventLog" class="event-log"></ul>
+      <label>📍 Locations</label>
+      <textarea id="locationText" readonly>Sentinel Porch, Shadow Edge</textarea>
+      
+      <label>🎯 Mission</label>
+      <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds. Return to Sentinel Porch before nightfall.</textarea>
+
+      <div class="actions">
+        <button class="big-btn" id="startBtn">Start Mission ▶</button>
+        <button class="big-btn" id="scanBtn">Scan QR 📷</button>
       </div>
     </div>
+
+    <div class="card">
+      <div style="font-weight:800">📖 Event Log</div>
+      <ul id="eventLog" class="log-list"></ul>
+    </div>
   </div>
+
+  <aside class="side">
+    <div class="card">
+      <div style="font-weight:800">🎒 Inventory</div>
+      <ul id="inventoryList" class="inventory-list"></ul>
+    </div>
+  </aside>
+</div>
+
+<!-- Scanner Overlay -->
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-container">
+    <div id="overlayReader"></div>
+    <button class="close-scanner" id="closeScanner">×</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Scenarios based on the research document and your yard landmarks
+  const scenarios = [
+    {
+      id: 1,
+      title: "First Watch",
+      items: "Campfire Torch, Whisper Map",
+      locations: "Sentinel Porch (front deck), Shadow Edge (cul-de-sac)",
+      mission: "Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching...",
+      image: "culdesac.jpg"
+    },
+    {
+      id: 2,
+      title: "Leap of Clouds",
+      items: "Sky Boots, Cloud Marker",
+      locations: "Cloudspring (trampoline), Sky Tower (treehouse)",
+      mission: "Do 10 jumps on the Cloudspring to attract The Owl's attention. Then climb Sky Tower and describe what you see to spot the missing children's location. Beware of its unkillable nature!",
+      image: "trampoline.jpg"
+    },
+    {
+      id: 3,
+      title: "Council Gathering",
+      items: "Council Tokens, Voice Charm",
+      locations: "Council Ring (gazebo), Sky Tower (treehouse)",
+      mission: "Hold a council at the Council Ring. Pick 2 allies and assign them roles to defend Sky Tower from the approaching Cultists. They raid every few nights!",
+      image: "gazebo.jpg"
+    },
+    {
+      id: 4,
+      title: "Moonlit Waters",
+      items: "Star Mirror, Beacon Flash",
+      locations: "Moonlit Lake (pool), Dock",
+      mission: "Walk the dock. Use the Star Mirror to name 3 things reflected in the Moonlit Lake. The children might have seen their reflections here before disappearing.",
+      image: "pool.jpg"
+    },
+    {
+      id: 5,
+      title: "Return to the Tower",
+      items: "Banner of Dawn, Victory Call",
+      locations: "Sky Tower (treehouse), Sentinel Porch (front deck)",
+      mission: "Make a loud victory signal from the Sentinel Porch. If it's strong enough, the forest retreats for the night. But beware - The Deer fears light but grows bolder each night.",
+      image: "front_deck.JPG"
+    },
+    {
+      id: 6,
+      title: "Sky Tower Watch",
+      items: "Night Lantern, Quiet Boots",
+      locations: "Sky Tower (treehouse)",
+      mission: "Climb Sky Tower and describe three stars you can see. Give each star a secret name. The Owl appears after night 5 and cannot be killed - only stunned with light!",
+      image: "treehouse.jpg"
+    },
+    {
+      id: 7,
+      title: "The Experiment Gone Wrong",
+      items: "Research Notes, Laboratory Key",
+      locations: "Ancient Laboratory (shed), Council Ring (gazebo)",
+      mission: "Investigate the Ancient Laboratory where the Deer was created. Find the broken cage and research notes. The Cultists are former scientists who now worship what they created!",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%231e461e%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22120%22%20y%3D%22125%22%3EAncient%20Laboratory%3C%2Ftext%3E%3C%2Fsvg%3E"
+    }
+  ];
+
+  let inventory = JSON.parse(localStorage.getItem("inv")||"[]");
+  let eventsLog = JSON.parse(localStorage.getItem("log")||"[]");
+  let health = Number(localStorage.getItem("hp")||"100");
+
+  const enemies = [
+    {name:"The Deer",emoji:"🦌"},
+    {name:"The Owl",emoji:"🦉"},
+    {name:"Forest Cultists",emoji:"👤"},
+    {name:"Alpha Wolf",emoji:"🐺"},
+    {name:"Bear",emoji:"🐻"}
+  ];
   
-  <div class="scanner-overlay" id="scannerOverlay">
-    <div class="scanner-container">
-      <div id="overlayReader"></div>
-      <button class="close-scanner" id="closeScanner">×</button>
-    </div>
-  </div>
+  const forageTable = [
+    {text:"🥕 Roots — +2 health",hp:+2},
+    {text:"🐇 Rabbit — +5 health",hp:+5},
+    {text:"🍓 Berries — +3 health",hp:+3},
+    {text:"🍄 Mushrooms — -5 health",hp:-5}
+  ];
 
-  <script>
-    // Game State
-    let currentDay = 1;
-    let inventory = [];
-    let eventsLog = [];
-    let scannerActive = false;
-    let html5QrCode = null;
+  const daySelect=document.getElementById("daySelect"),
+        scenarioTitle=document.getElementById("scenarioTitle"),
+        itemsText=document.getElementById("itemsText"),
+        locationText=document.getElementById("locationText"),
+        missionText=document.getElementById("missionText"),
+        imageArea=document.getElementById("imageArea"),
+        scenarioImage=document.getElementById("scenarioImage"),
+        inventoryList=document.getElementById("inventoryList"),
+        eventLog=document.getElementById("eventLog"),
+        healthLabel=document.getElementById("healthLabel"),
+        healthFill=document.getElementById("healthFill"),
+        startBtn=document.getElementById("startBtn"),
+        scanBtn=document.getElementById("scanBtn"),
+        prevBtn=document.getElementById("prevBtn"),
+        nextBtn=document.getElementById("nextBtn"),
+        scannerOverlay=document.getElementById("scannerOverlay"),
+        closeScanner=document.getElementById("closeScanner");
 
-    // Enemy list
-    const enemies = [
-      "Night Wolf", 
-      "Burrower", 
-      "Shadow Owl", 
-      "Echo Beast", 
-      "Forest Shade"
-    ];
+  // Populate day selector
+  scenarios.forEach(s=>{
+    const o=document.createElement("option");
+    o.value=s.id;
+    o.textContent=`Night ${s.id} — ${s.title}`;
+    daySelect.appendChild(o);
+  });
 
-    // Forage outcomes
-    const forageTable = [
-      "🥕 Roots — add 1 food supply.",
-      "🐇 Rabbit caught — +1 meat.",
-      "🍄 Mushrooms — are they safe? Discuss before eating.",
-      "🌰 Nuts — +2 energy.",
-      "🍓 Wild berries — +1 health."
-    ];
+  function showScenario(id){
+    const s=scenarios.find(x=>x.id==id);
+    if(!s) return;
+    scenarioTitle.textContent=s.title;
+    itemsText.value=s.items;
+    locationText.value=s.locations;
+    missionText.value=s.mission;
+    scenarioImage.src = s.image;
+    scenarioImage.alt = s.title;
+    daySelect.value=id;
+    localStorage.setItem("day",id);
+  }
 
-    // Scenarios with images and details
-    const scenarios = [
-      {
-        id: 1,
-        title: "First Watch",
-        items: "Campfire Torch, Whisper Map",
-        locations: "Sentinel Porch, Shadow Edge",
-        mission: "Patrol the Shadow Edge and call out 3 animal sounds. Return to Sentinel Porch.",
-        image: "culdesac.jpg"
-      },
-      {
-        id: 2,
-        title: "Leap of Clouds",
-        items: "Sky Boots, Cloud Marker",
-        locations: "Cloudspring, Sky Tower",
-        mission: "Do 10 jumps on the Cloudspring. Then climb Sky Tower and describe what you see.",
-        image: "trampoline.jpg"
-      },
-      {
-        id: 3,
-        title: "Council Gathering",
-        items: "Council Tokens, Voice Charm",
-        locations: "Council Ring, Sky Tower",
-        mission: "Hold a council at the Council Ring. Pick 2 allies and assign them roles to defend Sky Tower.",
-        image: "gazebo.jpg"
-      },
-      {
-        id: 4,
-        title: "Moonlit Waters",
-        items: "Star Mirror, Beacon Flash",
-        locations: "Moonlit Lake, Dock",
-        mission: "Walk the dock. Use the Star Mirror to name 3 things reflected in the Moonlit Lake.",
-        image: "pool.jpg"
-      },
-      {
-        id: 5,
-        title: "Return to the Tower",
-        items: "Banner of Dawn, Victory Call",
-        locations: "Sky Tower, Sentinel Porch",
-        mission: "Make a loud victory signal from the Sentinel Porch. If it's strong, the forest retreats for the night.",
-        image: "front_deck.JPG"
-      },
-      {
-        id: 6,
-        title: "Sky Tower Watch",
-        items: "Night Lantern, Quiet Boots",
-        locations: "Sky Tower",
-        mission: "Climb Sky Tower and describe three stars you can see. Give each star a secret name.",
-        image: "treehouse.jpg"
+  function handleImageError() {
+    scenarioImage.style.display = 'none';
+    imageArea.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Image not available<br><span style="font-size:12px">Placeholder for scenario visual</span></div>';
+  }
+
+  function addEvent(t){
+    eventsLog.push(t);
+    if(eventsLog.length>10) eventsLog.shift();
+    renderLog();
+    localStorage.setItem("log",JSON.stringify(eventsLog));
+  }
+  
+  function renderLog(){
+    eventLog.innerHTML="";
+    eventsLog.slice().reverse().forEach(e=>{
+      const li=document.createElement("li");
+      li.textContent=e;
+      li.style.padding = "8px";
+      li.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+      eventLog.appendChild(li);
+    });
+  }
+  
+  function renderInventory(){
+    inventoryList.innerHTML="";
+    inventory.forEach(it=>{
+      const li=document.createElement("li");
+      li.className="inventory-item";
+      li.textContent=it;
+      inventoryList.appendChild(li);
+    });
+    localStorage.setItem("inv",JSON.stringify(inventory));
+  }
+  
+  function renderHealth(){
+    healthLabel.textContent=health+"%";
+    healthFill.style.width=health+"%";
+    localStorage.setItem("hp",health);
+  }
+
+  function handleQR(code){
+    code=code.trim().toLowerCase();
+    if(code.startsWith("item:")){
+      const item=code.split(":")[1];
+      if(!inventory.includes(item)){
+        inventory.push(item);
+        renderInventory();
+        addEvent("✨ Found "+item);
       }
-    ];
-
-    // DOM Elements
-    const currentDayElement = document.getElementById('currentDay');
-    const prevDayButton = document.getElementById('prevDay');
-    const nextDayButton = document.getElementById('nextDay');
-    const scenarioTitleElement = document.getElementById('scenarioTitle');
-    const itemsTextElement = document.getElementById('itemsText');
-    const locationTextElement = document.getElementById('locationText');
-    const missionTextElement = document.getElementById('missionText');
-    const scenarioImageElement = document.getElementById('scenarioImage');
-    const startMissionButton = document.getElementById('startMission');
-    const openScannerButton = document.getElementById('openScanner');
-    const closeScannerButton = document.getElementById('closeScanner');
-    const scannerOverlay = document.getElementById('scannerOverlay');
-    const inventoryList = document.getElementById('inventoryList');
-    const eventLog = document.getElementById('eventLog');
-    const imageContainer = document.getElementById('imageContainer');
-
-    // Initialize the game
-    function initGame() {
-      updateDayDisplay();
-      showScenario(currentDay);
-      updateInventoryUI();
-      updateEventLogUI();
-      
-      // Add event listeners
-      prevDayButton.addEventListener('click', goToPreviousDay);
-      nextDayButton.addEventListener('click', goToNextDay);
-      startMissionButton.addEventListener('click', startMission);
-      openScannerButton.addEventListener('click', openScanner);
-      closeScannerButton.addEventListener('click', closeScanner);
-      
-      // Add initial log entry
-      addLogEntry("Welcome to QR Forest Adventure! Your mission begins today.");
+      return;
     }
-
-    // Show scenario based on day
-    function showScenario(day) {
-      const scenarioIndex = day - 1;
-      if (scenarioIndex >= 0 && scenarioIndex < scenarios.length) {
-        const scenario = scenarios[scenarioIndex];
-        
-        scenarioTitleElement.textContent = scenario.title;
-        itemsTextElement.value = scenario.items;
-        locationTextElement.value = scenario.locations;
-        missionTextElement.value = scenario.mission;
-        
-        // Update image
-        scenarioImageElement.src = scenario.image;
-        scenarioImageElement.alt = scenario.title;
-      }
+    if(code==="event:enemy_chase"){startEncounter();return;}
+    if(code==="forage"){
+      const f=forageTable[Math.random()*forageTable.length|0];
+      health=Math.max(0,Math.min(100,health+f.hp));
+      renderHealth();
+      addEvent("🌲 Foraged: "+f.text);
+      return;
     }
-
-    // Handle image loading errors
-    function handleImageError() {
-      const placeholder = document.createElement('div');
-      placeholder.className = 'image-placeholder';
-      placeholder.innerHTML = 'Image not available<br><span style="font-size: 12px;">(' + scenarios[currentDay-1].image + ')</span>';
-      
-      imageContainer.innerHTML = '';
-      imageContainer.appendChild(placeholder);
+    if(code.startsWith("set:day=")){
+      const n=parseInt(code.split("=")[1]);
+      if(!isNaN(n)) showScenario(n);
     }
+  }
 
-    // Day navigation functions
-    function goToPreviousDay() {
-      if (currentDay > 1) {
-        currentDay--;
-        updateDayDisplay();
-        showScenario(currentDay);
-        startMission();
-        addLogEntry(`Traveled back to day ${currentDay}`);
-      }
+  let qrScanner=null;
+  scanBtn.addEventListener("click",async()=>{
+    scannerOverlay.style.display = "flex";
+    if(qrScanner) return;
+    qrScanner=new Html5Qrcode("overlayReader");
+    try{
+      await qrScanner.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},msg=>{
+        qrScanner.pause();
+        handleQR(msg);
+        setTimeout(()=>qrScanner.resume(),1000);
+      });
+    }catch(e){console.error(e);}
+  });
+
+  closeScanner.addEventListener("click", () => {
+    scannerOverlay.style.display = "none";
+    if (qrScanner) {
+      qrScanner.stop().catch(e => console.error(e));
+      qrScanner = null;
     }
+  });
 
-    function goToNextDay() {
-      if (currentDay < scenarios.length) {
-        currentDay++;
-        updateDayDisplay();
-        showScenario(currentDay);
-        startMission();
-        addLogEntry(`Advanced to day ${currentDay}`);
-      }
+  // Encounter system
+  function startEncounter(){
+    const e=enemies[Math.random()*enemies.length|0];
+    addEvent(`🌑 ${e.emoji} ${e.name} is approaching!`);
+    
+    if(e.name === "The Deer" || e.name === "The Owl") {
+      addEvent("Use light to defend yourself!");
     }
+  }
 
-    function updateDayDisplay() {
-      currentDayElement.textContent = currentDay;
-    }
-
-    // Mission functions
-    function startMission() {
-      addLogEntry(`Starting mission for day ${currentDay}`);
-      
-      // Disable button temporarily
-      startMissionButton.disabled = true;
-      startMissionButton.textContent = "Mission in Progress...";
-      
-      // Simulate mission progress with a random outcome
-      setTimeout(() => {
-        const success = Math.random() > 0.3;
-        if (success) {
-          const foundItems = ["Compass", "Map", "Rope", "Flashlight", "Water Bottle"];
-          const foundItem = foundItems[Math.floor(Math.random() * foundItems.length)];
-          
-          if (!inventory.includes(foundItem)) {
-            inventory.push(foundItem);
-            updateInventoryUI();
-            addLogEntry(`Mission successful! Found ${foundItem}`);
-          } else {
-            addLogEntry("Mission completed, but you didn't find anything new.");
-          }
+  startBtn.addEventListener("click", () => {
+    const currentScenario = scenarios.find(s => s.id == daySelect.value);
+    addEvent(`🚀 Starting mission: ${currentScenario.title}`);
+    
+    // Disable button during mission
+    startBtn.disabled = true;
+    startBtn.textContent = "Mission in progress...";
+    
+    // Simulate mission completion after delay
+    setTimeout(() => {
+      const success = Math.random() > 0.3;
+      if(success){
+        const items = ["Flashlight", "Wood", "Bandage", "Rabbit's Foot", "Wolf Pelt"];
+        const foundItem = items[Math.random()*items.length|0];
+        if(!inventory.includes(foundItem)){
+          inventory.push(foundItem);
+          renderInventory();
+          addEvent(`✅ Mission success! Found ${foundItem}`);
         } else {
-          const enemy = enemies[Math.floor(Math.random() * enemies.length)];
-          addLogEntry(`Mission failed! You encountered a ${enemy} and had to retreat.`);
+          addEvent("✅ Mission completed");
         }
-        
-        // Re-enable button
-        startMissionButton.disabled = false;
-        startMissionButton.textContent = "Start Mission ▶";
-      }, 2000);
-    }
-
-    // Scanner functions
-    function openScanner() {
-      scannerOverlay.style.display = 'flex';
-      startScanner();
-    }
-
-    function closeScanner() {
-      scannerOverlay.style.display = 'none';
-      if (scannerActive && html5QrCode) {
-        html5QrCode.stop().then(() => {
-          scannerActive = false;
-        }).catch((err) => {
-          console.error("Failed to stop scanner", err);
-        });
-      }
-    }
-
-    function startScanner() {
-      if (scannerActive) return;
-      
-      html5QrCode = new Html5Qrcode("overlayReader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: 250
-        },
-        qrCodeMessage => {
-          handleQRCommand(qrCodeMessage.trim());
-        },
-        errorMessage => {}
-      ).then(() => {
-        scannerActive = true;
-      }).catch(err => {
-        console.error("Unable to start scanner:", err);
-      });
-    }
-
-    // Handle QR commands
-    function handleQRCommand(code) {
-      if (code.startsWith("item:")) {
-        const item = code.split(":")[1];
-        if (!inventory.includes(item)) {
-          inventory.push(item);
-          addLogEntry("✨ Rare item found: " + item);
-          updateInventoryUI();
-        }
-      } 
-      else if (code === "event:enemy_chase") {
-        const enemy = enemies[Math.floor(Math.random() * enemies.length)];
-        const condition = "Survive by reaching the treehouse before being tagged!";
-        addLogEntry("🌑 " + enemy + " is chasing you! " + condition);
-      }
-      else if (code === "forage") {
-        const find = forageTable[Math.floor(Math.random() * forageTable.length)];
-        addLogEntry("🌲 You foraged: " + find);
-      }
-      else if (code === "trampoline") {
-        addLogEntry("You found a magical trampoline! Bounced to a new area.");
-        // Show the trampoline image
-        scenarioImageElement.src = "trampoline.jpg";
-      }
-      else {
-        addLogEntry("❓ Unknown code: " + code);
+      } else {
+        health = Math.max(0, health - 10);
+        renderHealth();
+        addEvent("❌ Mission failed! Lost 10% health");
       }
       
-      // Close scanner after successful scan
-      setTimeout(closeScanner, 1000);
-    }
+      // Re-enable button
+      startBtn.disabled = false;
+      startBtn.textContent = "Start Mission ▶";
+    }, 2000);
+  });
 
-    // UI update functions
-    function updateInventoryUI() {
-      inventoryList.innerHTML = "";
-      inventory.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = `✔ ${item}`;
-        inventoryList.appendChild(li);
-      });
-    }
+  // Day navigation
+  prevBtn.addEventListener("click", () => {
+    const currentDay = parseInt(daySelect.value);
+    if(currentDay > 1) showScenario(currentDay - 1);
+  });
 
-    function addLogEntry(message) {
-      eventsLog.push(message);
-      updateEventLogUI();
-    }
+  nextBtn.addEventListener("click", () => {
+    const currentDay = parseInt(daySelect.value);
+    if(currentDay < scenarios.length) showScenario(currentDay + 1);
+  });
 
-    function updateEventLogUI() {
-      eventLog.innerHTML = "";
-      eventsLog.slice().reverse().forEach(event => {
-        const li = document.createElement("li");
-        li.textContent = event;
-        eventLog.appendChild(li);
-      });
-    }
+  daySelect.addEventListener("change", () => {
+    showScenario(parseInt(daySelect.value));
+  });
 
-    // Initialize the game when the page loads
-    window.addEventListener('load', initGame);
-  </script>
+  // Initialize
+  const d=localStorage.getItem("day")||1;
+  showScenario(d);
+  renderInventory();
+  renderLog();
+  renderHealth();
+  addEvent("Welcome to Susan Court Forest. Your mission begins...");
+})();
+</script>
 </body>
 </html>
