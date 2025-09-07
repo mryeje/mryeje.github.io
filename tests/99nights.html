@@ -465,36 +465,36 @@
     }
   ];
 
-  // Enemies with images and descriptions
+  // Enemies with images and descriptions - UPDATED PATHS
   const enemies = [
     {
       name: "The Deer", 
       emoji: "🦌",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cpath%20fill%3D%22%23b08d57%22%20d%3D%22M100%2030L120%2070%2080%2070Z%22%2F%3E%3Cellipse%20fill%3D%22%23755%22%20cx%3D%22100%22%20cy%3D%22120%22%20rx%3D%2260%22%20ry%3D%2280%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2275%22%20cy%3D%22100%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22125%22%20cy%3D%22100%22%20r%3D%225%22%2F%3E%3C%2Fsvg%3E",
+      image: "enemies/deer.png",
       description: "A tall, thin, bipedal creature that stalks the forest at night. Fears bright light."
     },
     {
       name: "The Owl", 
       emoji: "🦉",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Ccircle%20fill%3D%22%23666%22%20cx%3D%22100%22%20cy%3D%22100%22%20r%3D%2260%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%2215%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%2215%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23ff6%22%20d%3D%22M90%20130L110%20130%20100%20115Z%22%2F%3E%3C%2Fsvg%3E",
+      image: "enemies/owl.png",
       description: "A flying monstrosity that appears after night 5. Completely unkillable and gets faster when chasing."
     },
     {
       name: "Forest Cultists", 
       emoji: "👤",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Ccircle%20fill%3D%22%23755%22%20cx%3D%22100%22%20cy%3D%2280%22%20r%3D%2230%22%2F%3E%3Crect%20fill%3D%22%23444%22%20x%3D%2270%22%20y%3D%22110%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3Cpath%20fill%3D%22%23f00%22%20d%3D%22M70%20110L130%20110%20140%20140%2060%20140Z%22%2F%3E%3C%2Fsvg%3E",
+      image: "enemies/cultists.png",
       description: "Robed figures who worship The Deer. They raid your camp every few nights."
     },
     {
-      name: "Alpha Wolf", 
+      name: "Wolf", 
       emoji: "🐺",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cellipse%20fill%3D%22%23888%22%20cx%3D%22100%22%20cy%3D%22100%22%20rx%3D%2260%22%20ry%3D%2240%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%2210%22%2F%3E%3Ccircle%20fill%3D%22%23fff%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%2210%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22120%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23f55%22%20d%3D%22M90%20110L110%20110%20100%20120Z%22%2F%3E%3C%2Fsvg%3E",
-      description: "A larger, more powerful wolf that often leads wolf packs. Drops Alpha Wolf Pelt."
+      image: "enemies/wolf.png", // Changed from alpha_wolf.png to wolf.png
+      description: "A fierce wolf that hunts in packs. Faster and more dangerous than regular wolves."
     },
     {
       name: "Bear", 
       emoji: "🐻",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22200%22%2F%3E%3Cellipse%20fill%3D%22%23855%22%20cx%3D%22100%22%20cy%3D%22120%22%20rx%3D%2270%22%20ry%3D%2280%22%2F%3E%3Ccircle%20fill%3D%22%23855%22%20cx%3D%2260%22%20cy%3D%2280%22%20r%3D%2220%22%2F%3E%3Ccircle%20fill%3D%22%23855%22%20cx%3D%22140%22%20cy%3D%2280%22%20r%3D%2220%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%2265%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Ccircle%20fill%3D%22%23000%22%20cx%3D%22135%22%20cy%3D%2280%22%20r%3D%225%22%2F%3E%3Cpath%20fill%3D%22%23f55%22%20d%3D%22M90%20110L110%20110%20100%20120Z%22%2F%3E%3C%2Fsvg%3E",
+      image: "enemies/bear.png",
       description: "A powerful predator that guards the caves containing missing children. Very high health and damage."
     }
   ];
