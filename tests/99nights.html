@@ -129,7 +129,6 @@
     
     textarea {
       width: 100%;
-      min-height: 56px;
       border-radius: 10px;
       padding: 10px;
       border: 1px solid rgba(255,255,255,0.03);
@@ -138,6 +137,18 @@
       resize: vertical;
       font-size: 14px;
       margin-bottom: 10px;
+    }
+    
+    /* Standard textarea size */
+    #itemsText, #locationText {
+      min-height: 56px;
+    }
+    
+    /* Larger mission textarea */
+    #missionText {
+      min-height: 120px; /* Increased from 56px to 120px */
+      font-size: 15px;   /* Slightly larger font for better readability */
+      line-height: 1.5;  /* Better line spacing */
     }
     
     .actions {
@@ -268,7 +279,7 @@
       </div>
 
       <div class="image-area" id="imageArea">
-        <img src="culdesac.jpg" alt="Forest Scene" class="scenario-image" id="scenarioImage" onerror="handleImageError()">
+        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%233d6b3d%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%201%3A%20Forest%20Entrance%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Forest Scene" class="scenario-image" id="scenarioImage" onerror="handleImageError()">
       </div>
       <div class="title" id="scenarioTitle">First Watch</div>
 
@@ -276,10 +287,10 @@
       <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
       
       <label>📍 Locations</label>
-      <textarea id="locationText" readonly>Sentinel Porch, Shadow Edge</textarea>
+      <textarea id="locationText" readonly>Sentinel Porch (front deck), Shadow Edge (cul-de-sac)</textarea>
       
       <label>🎯 Mission</label>
-      <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds. Return to Sentinel Porch before nightfall.</textarea>
+      <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching... The Deer is a silent predator that stalks the forest exclusively at night, its presence often signaled by unsettling noises. It fears the player's campfire and can be temporarily stunned by a flashlight.</textarea>
 
       <div class="actions">
         <button class="big-btn" id="startBtn">Start Mission ▶</button>
@@ -318,55 +329,55 @@
       title: "First Watch",
       items: "Campfire Torch, Whisper Map",
       locations: "Sentinel Porch (front deck), Shadow Edge (cul-de-sac)",
-      mission: "Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching...",
-      image: "culdesac.jpg"
+      mission: "Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching... The Deer is a silent predator that stalks the forest exclusively at night, its presence often signaled by unsettling noises. It fears the player's campfire and can be temporarily stunned by a flashlight.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%233d6b3d%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%201%3A%20Forest%20Entrance%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 2,
       title: "Leap of Clouds",
       items: "Sky Boots, Cloud Marker",
       locations: "Cloudspring (trampoline), Sky Tower (treehouse)",
-      mission: "Do 10 jumps on the Cloudspring to attract The Owl's attention. Then climb Sky Tower and describe what you see to spot the missing children's location. Beware of its unkillable nature!",
-      image: "trampoline.jpg"
+      mission: "Do 10 jumps on the Cloudspring to attract The Owl's attention. Then climb Sky Tower and describe what you see to spot the missing children's location. Beware of its unkillable nature! The Owl is a flying monstrosity introduced after the fifth night. It is completely unkillable and serves as a persistent environmental hazard. It swoops down on players who venture too far from their camp at night.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23264d26%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%202%3A%20Deep%20Forest%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 3,
       title: "Council Gathering",
       items: "Council Tokens, Voice Charm",
       locations: "Council Ring (gazebo), Sky Tower (treehouse)",
-      mission: "Hold a council at the Council Ring. Pick 2 allies and assign them roles to defend Sky Tower from the approaching Cultists. They raid every few nights!",
-      image: "gazebo.jpg"
+      mission: "Hold a council at the Council Ring. Pick 2 allies and assign them roles to defend Sky Tower from the approaching Cultists. They raid every few nights! These robed figures launch coordinated attacks on the player's camp every few nights, serving as a recurring test of the camp's defenses. They appear in various forms, including melee combatants and dangerous ranged attackers equipped with crossbows.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23153a15%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%203%3A%20Forest%20River%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 4,
       title: "Moonlit Waters",
       items: "Star Mirror, Beacon Flash",
       locations: "Moonlit Lake (pool), Dock",
-      mission: "Walk the dock. Use the Star Mirror to name 3 things reflected in the Moonlit Lake. The children might have seen their reflections here before disappearing.",
-      image: "pool.jpg"
+      mission: "Walk the dock. Use the Star Mirror to name 3 things reflected in the Moonlit Lake. The children might have seen their reflections here before disappearing. The forest was once the site of a secret research laboratory experimenting on animals. An experiment involving a deer went horribly wrong, creating the monstrous entity that now stalks the woods.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23447e44%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%204%3A%20Ancient%20Tree%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 5,
       title: "Return to the Tower",
       items: "Banner of Dawn, Victory Call",
       locations: "Sky Tower (treehouse), Sentinel Porch (front deck)",
-      mission: "Make a loud victory signal from the Sentinel Porch. If it's strong enough, the forest retreats for the night. But beware - The Deer fears light but grows bolder each night.",
-      image: "front_deck.JPG"
+      mission: "Make a loud victory signal from the Sentinel Porch. If it's strong enough, the forest retreats for the night. But beware - The Deer fears light but grows bolder each night. The Deer in the game displays a level of intelligence; it is often observed watching the player from a distance and, notably, does not attack players while they are being raided by Cultists, suggesting a possible awareness or even a tacit alliance.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%231e461e%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%205%3A%20Waterfall%20Cave%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 6,
       title: "Sky Tower Watch",
       items: "Night Lantern, Quiet Boots",
       locations: "Sky Tower (treehouse)",
-      mission: "Climb Sky Tower and describe three stars you can see. Give each star a secret name. The Owl appears after night 5 and cannot be killed - only stunned with light!",
-      image: "treehouse.jpg"
+      mission: "Climb Sky Tower and describe three stars you can see. Give each star a secret name. The Owl appears after night 5 and cannot be killed - only stunned with light! Like The Deer, its primary weakness is light; shining a flashlight on it will stun it, but it grows faster while in pursuit, making a prolonged escape impossible. Fan lore connects The Owl's behavior to the Kikiyaon, a mythical creature said to hunt at night.",
+      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%23599959%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22150%22%20y%3D%22125%22%3EDay%206%3A%20Forest%20Temple%3C%2Ftext%3E%3C%2Fsvg%3E"
     },
     {
       id: 7,
       title: "The Experiment Gone Wrong",
       items: "Research Notes, Laboratory Key",
       locations: "Ancient Laboratory (shed), Council Ring (gazebo)",
-      mission: "Investigate the Ancient Laboratory where the Deer was created. Find the broken cage and research notes. The Cultists are former scientists who now worship what they created!",
+      mission: "Investigate the Ancient Laboratory where the Deer was created. Find the broken cage and research notes. The Cultists are former scientists who now worship what they created! The origin of the Cultists is one of the game's central mysteries, with a popular and cohesive fan theory suggesting a scientific rather than purely occult backstory. According to this theory, the forest was once the site of a secret research laboratory experimenting on animals.",
       image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%231e461e%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22120%22%20y%3D%22125%22%3EAncient%20Laboratory%3C%2Ftext%3E%3C%2Fsvg%3E"
     }
   ];
