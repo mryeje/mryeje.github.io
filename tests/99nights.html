@@ -6,416 +6,45 @@
   <title>99 Nights in the Susan Court Forest</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #071621;
-      --card: #0b1722;
-      --accent: #6ee7b7;
-      --muted: #9aa8bb;
-      --glass: rgba(255,255,255,0.03);
-      --good: #8ef08e;
-      --bad: #ffb2b2;
-      --gold: #ffd36b;
+      --bg: #071621; --card: #0b1722; --accent: #6ee7b7; --muted: #9aa8bb;
+      --glass: rgba(255,255,255,0.03); --good: #8ef08e; --bad: #ffb2b2; --gold: #ffd36b;
     }
-    
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
       background: linear-gradient(180deg, #04101a 0, var(--bg) 100%);
-      color: #eaf7f2;
-      min-height: 100vh;
-      padding: 14px;
+      color: #eaf7f2; min-height: 100vh; padding: 14px;
     }
-    
-    .app {
-      max-width: 920px;
-      margin: 12px auto;
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 14px;
-      box-sizing: border-box;
-    }
-    
-    header {
-      grid-column: 1/-1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    
-    h1 {
-      font-size: 24px;
-      margin: 0;
-      color: var(--accent);
-    }
-    
-    .subtitle {
-      color: var(--muted);
-      font-size: 13px;
-    }
-    
+    .app { max-width: 920px; margin: 12px auto; display: grid; grid-template-columns: 1fr 360px; gap: 14px; }
+    header { grid-column: 1/-1; display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    h1 { font-size: 24px; color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 13px; }
     .card {
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 8px 20px rgba(2,6,23,0.6);
+      border-radius: 12px; padding: 16px; box-shadow: 0 8px 20px rgba(2,6,23,0.6);
     }
-    
-    .main {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    
-    .scenario-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    
-    .scenario-details {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .scenario-enemy-status {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .selector {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 12px;
-      grid-column: 1 / -1;
-    }
-    
-    .big-icon-btn {
-      background: transparent;
-      border: 2px solid var(--muted);
-      color: var(--muted);
-      padding: 10px;
-      border-radius: 10px;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    
-    .image-area {
-      height: 220px;
-      border-radius: 10px;
-      background: var(--glass);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 12px;
-      grid-column: 1 / -1;
-    }
-    
-    .scenario-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-    
-    .image-placeholder {
-      padding: 20px;
-      text-align: center;
-      color: var(--muted);
-    }
-    
-    .title {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--accent);
-      margin: 6px 0;
-      grid-column: 1 / -1;
-    }
-    
-    label {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display: block;
-    }
-    
-    textarea {
-      width: 100%;
-      border-radius: 10px;
-      padding: 10px;
-      border: 1px solid rgba(255,255,255,0.03);
-      background: transparent;
-      color: inherit;
-      resize: vertical;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    
-    /* Reduced textarea sizes */
-    #itemsText, #locationText {
-      min-height: 70px; /* Reduced from 80px */
-    }
-    
-    /* Larger mission textarea */
-    #missionText {
-      min-height: 120px;
-      font-size: 15px;
-      line-height: 1.5;
-      grid-column: 1 / -1;
-    }
-    
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      grid-column: 1 / -1;
-    }
-    
-    .big-btn {
-      background: var(--accent);
-      color: #042023;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 800;
-      font-size: 16px;
-      cursor: pointer;
-      flex: 1;
-      min-width: 120px;
-    }
-    
-    .side {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    
-    .inventory-list, .log-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 260px;
-      overflow: auto;
-    }
-    
-    .log-list li {
-      padding: 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 14px;
-    }
-    
-    .inventory-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
-    }
-    
-    .scanner-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      display: none;
-    }
-    
-    .scanner-container {
-      width: 90%;
-      max-width: 500px;
-      position: relative;
-    }
-    
-    .close-scanner {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: #f44336;
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    
-    .health-bar {
-      height: 10px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    
-    .health-fill {
-      height: 100%;
-      background: linear-gradient(90deg,#66ff88,#2fb74a);
-      width: 100%;
-    }
-    
-    /* Enemy Encounter Display */
-    .enemy-display {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      z-index: 999;
-      background: rgba(0, 0, 0, 0.85);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
-      border: 2px solid #ff3c3c;
-      opacity: 0;
-      transition: all 0.5s ease;
-      width: 320px;
-      pointer-events: none;
-    }
-    
-    .enemy-display.active {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-      pointer-events: auto;
-    }
-    
-    .enemy-image {
-      width: 200px;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      border: 3px solid #ff5e5e;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-    }
-    
-    .enemy-name {
-      font-size: 24px;
-      font-weight: bold;
-      color: #ff5e5e;
-      margin-bottom: 10px;
-      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-    }
-    
-    .enemy-description {
-      color: #fff;
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-    
-    .close-enemy {
-      background: #ff3c3c;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    
-    /* Enemy Status Window - Moved to top right */
-    .enemy-status {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 8px 20px rgba(2,6,23,0.6);
-      height: 100%;
-    }
-    
-    .enemy-status h3 {
-      color: var(--accent);
-      margin: 0 0 12px 0;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .enemy-status-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .enemy-status-image {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 2px solid #ff5e5e;
-    }
-    
-    .enemy-status-info {
-      flex: 1;
-      text-align: center;
-    }
-    
-    .enemy-status-name {
-      font-weight: bold;
-      color: #ff5e5e;
-      margin-bottom: 4px;
-      font-size: 16px;
-    }
-    
-    .enemy-status-description {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    
-    .no-enemy {
-      text-align: center;
-      color: var(--muted);
-      font-style: italic;
-      padding: 20px 10px;
-    }
-    
-    @media (max-width: 920px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
-      
-      .scenario-container {
-        grid-template-columns: 1fr;
-      }
-      
-      .image-area {
-        height: 180px;
-      }
-      
-      .enemy-display {
-        width: 90%;
-        max-width: 300px;
-      }
-      
-      .enemy-image {
-        width: 180px;
-        height: 180px;
-      }
-    }
+    .main { display: flex; flex-direction: column; gap: 14px; }
+    .scenario-container { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .scenario-details { display: flex; flex-direction: column; }
+    .scenario-enemy-status > div { display: flex; gap: 10px; }
+    .enemy-status { flex: 1; min-width: 140px; max-width: 160px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius: 12px; padding: 12px; }
+    .enemy-status h3 { color: var(--accent); font-size: 15px; margin-bottom: 6px; }
+    .enemy-status-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .enemy-status-image { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 2px solid #ff5e5e; }
+    .enemy-status-name { font-weight: bold; color: #ff5e5e; font-size: 14px; text-align: center; }
+    .inventory-list, .log-list { list-style: none; padding: 0; margin: 0; max-height: 260px; overflow: auto; }
+    .inventory-item { padding: 6px; margin-bottom: 6px; border-radius: 8px; cursor: pointer; }
+    .inventory-item.disabled { opacity: 0.4; pointer-events: none; }
+    .no-enemy { text-align: center; color: var(--muted); font-style: italic; padding: 10px; }
+    .enemy-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(0,0,0,0.85); border-radius: 16px; padding: 20px; text-align: center; border: 2px solid #ff3c3c; box-shadow: 0 0 30px rgba(255,0,0,0.4); opacity: 0; transition: 0.5s; width: 320px; pointer-events: none; z-index: 999; }
+    .enemy-display.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+    .enemy-image { width: 200px; height: 200px; border-radius: 12px; border: 3px solid #ff5e5e; margin-bottom: 15px; }
+    .enemy-name { font-size: 24px; font-weight: bold; color: #ff5e5e; margin-bottom: 10px; }
+    .enemy-description { color: #fff; font-size: 16px; margin-bottom: 15px; }
+    .close-enemy { background: #ff3c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+    .health-bar { height: 10px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; margin-top: 6px; }
+    .health-fill { height: 100%; background: linear-gradient(90deg,#66ff88,#2fb74a); width: 100%; }
   </style>
 </head>
 <body>
@@ -423,7 +52,7 @@
   <header>
     <div>
       <h1>🌲 99 Nights — Susan Court Forest</h1>
-      <div class="subtitle">Scan QR tags to change the story! Featuring your yard's magical landmarks.</div>
+      <div class="subtitle">Scan QR tags to change the story!</div>
     </div>
     <div style="text-align:right">
       <div class="card" style="padding:8px;border-radius:10px;text-align:center">
@@ -435,447 +64,134 @@
 
   <div class="main">
     <div class="card">
-      <div class="selector">
-        <button class="big-icon-btn" id="prevBtn">◀</button>
-        <select id="daySelect"></select>
-        <button class="big-icon-btn" id="nextBtn">▶</button>
-      </div>
-
-      <div class="image-area" id="imageArea">
-        <img src="" alt="Forest Scene" class="scenario-image" id="scenarioImage">
-      </div>
-      
-      <div class="title" id="scenarioTitle">First Watch</div>
-      
       <div class="scenario-container">
         <div class="scenario-details">
           <label>🧰 Scenario Items</label>
-          <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
-          
+          <textarea id="itemsText" readonly></textarea>
           <label>📍 Locations</label>
-          <textarea id="locationText" readonly>Sentinel Porch (front deck), Shadow Edge (cul-de-sac)</textarea>
+          <textarea id="locationText" readonly></textarea>
         </div>
-        
         <div class="scenario-enemy-status">
-          <!-- Enemy Status Window - Moved to top right -->
-          <div class="enemy-status">
-            <h3>🛡️ Last Enemy Encountered</h3>
-            <div id="enemyStatusContent">
-              <div class="no-enemy">No enemies encountered yet</div>
+          <div>
+            <!-- Enemy Status -->
+            <div class="enemy-status">
+              <h3>🛡️ Enemy</h3>
+              <div id="enemyStatusContent"><div class="no-enemy">No enemies yet</div></div>
+            </div>
+            <!-- Weapons -->
+            <div class="enemy-status">
+              <h3>🔦 Weapons</h3>
+              <ul id="weaponsList" class="inventory-list"></ul>
             </div>
           </div>
         </div>
       </div>
-      
       <label>🎯 Mission</label>
-      <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching... The Deer is a silent predator that stalks the forest exclusively at night, its presence often signaled by unsettling noises. It fears the player's campfire and can be temporarily stunned by a flashlight.</textarea>
-
+      <textarea id="missionText" readonly></textarea>
       <div class="actions">
-        <button class="big-btn" id="startBtn">Start Mission ▶</button>
-        <button class="big-btn" id="scanBtn">Scan QR 📷</button>
+        <button class="big-btn" id="startBtn">Start ▶</button>
+        <button class="big-btn" id="scanBtn">Scan 📷</button>
       </div>
     </div>
-
-    <div class="card">
-      <div style="font-weight:800">📖 Event Log</div>
-      <ul id="eventLog" class="log-list"></ul>
-    </div>
+    <div class="card"><div style="font-weight:800">📖 Log</div><ul id="eventLog" class="log-list"></ul></div>
   </div>
-
   <aside class="side">
-    <div class="card">
-      <div style="font-weight:800">🎒 Inventory</div>
-      <ul id="inventoryList" class="inventory-list"></ul>
-    </div>
+    <div class="card"><div style="font-weight:800">🎒 Inventory</div><ul id="inventoryList" class="inventory-list"></ul></div>
   </aside>
 </div>
 
-<!-- Scanner Overlay -->
-<div class="scanner-overlay" id="scannerOverlay">
-  <div class="scanner-container">
-    <div id="overlayReader"></div>
-    <button class="close-scanner" id="closeScanner">×</button>
-  </div>
-</div>
-
-<!-- Enemy Encounter Display -->
+<!-- Enemy Encounter -->
 <div class="enemy-display" id="enemyDisplay">
-  <div class="enemy-name" id="enemyName">Enemy Encounter!</div>
-  <img class="enemy-image" id="enemyImage" src="" alt="Enemy">
-  <div class="enemy-description" id="enemyDescription">An enemy is approaching!</div>
+  <div class="enemy-name" id="enemyName"></div>
+  <img class="enemy-image" id="enemyImage">
+  <div class="enemy-description" id="enemyDescription"></div>
   <button class="close-enemy" id="closeEnemy">Continue</button>
 </div>
 
 <script>
 (() => {
-  // Scenarios based on the research document and your yard landmarks
-  const scenarios = [
-    {
-      id: 1,
-      title: "First Watch",
-      items: "Campfire Torch, Whisper Map",
-      locations: "Sentinel Porch (front deck), Shadow Edge (cul-de-sac)",
-      mission: "Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching... The Deer is a silent predator that stalks the forest exclusively at night, its presence often signaled by unsettling noises. It fears the player's campfire and can be temporarily stunned by a flashlight.",
-      image: "culdesac.jpg"
-    },
-    {
-      id: 2,
-      title: "Leap of Clouds",
-      items: "Sky Boots, Cloud Marker",
-      locations: "Cloudspring (trampoline), Sky Tower (treehouse)",
-      mission: "Do 10 jumps on the Cloudspring to attract The Owl's attention. Then climb Sky Tower and describe what you see to spot the missing children's location. Beware of its unkillable nature! The Owl is a flying monstrosity introduced after the fifth night. It is completely unkillable and serves as a persistent environmental hazard. It swoops down on players who venture too far from their camp at night.",
-      image: "trampoline.jpg"
-    },
-    {
-      id: 3,
-      title: "Council Gathering",
-      items: "Council Tokens, Voice Charm",
-      locations: "Council Ring (gazebo), Sky Tower (treehouse)",
-      mission: "Hold a council at the Council Ring. Pick 2 allies and assign them roles to defend Sky Tower from the approaching Cultists. They raid every few nights! These robed figures launch coordinated attacks on the player's camp every few nights, serving as a recurring test of the camp's defenses. They appear in various forms, including melee combatants and dangerous ranged attackers equipped with crossbows.",
-      image: "gazebo.jpg"
-    },
-    {
-      id: 4,
-      title: "Moonlit Waters",
-      items: "Star Mirror, Beacon Flash",
-      locations: "Moonlit Lake (pool), Dock",
-      mission: "Walk the dock. Use the Star Mirror to name 3 things reflected in the Moonlit Lake. The children might have seen their reflections here before disappearing. The forest was once the site of a secret research laboratory experimenting on animals. An experiment involving a deer went horribly wrong, creating the monstrous entity that now stalks the woods.",
-      image: "pool.jpg"
-    },
-    {
-      id: 5,
-      title: "Return to the Tower",
-      items: "Banner of Dawn, Victory Call",
-      locations: "Sky Tower (treehouse), Sentinel Porch (front deck)",
-      mission: "Make a loud victory signal from the Sentinel Porch. If it's strong enough, the forest retreats for the night. But beware - The Deer fears light but grows bolder each night. The Deer in the game displays a level of intelligence; it is often observed watching the player from a distance and, notably, does not attack players while they are being raided by Cultists, suggesting a possible awareness or even a tacit alliance.",
-      image: "front_deck.JPG"
-    },
-    {
-      id: 6,
-      title: "Sky Tower Watch",
-      items: "Night Lantern, Quiet Boots",
-      locations: "Sky Tower (treehouse)",
-      mission: "Climb Sky Tower and describe three stars you can see. Give each star a secret name. The Owl appears after night 5 and cannot be killed - only stunned with light! Like The Deer, its primary weakness is light; shining a flashlight on it will stun it, but it grows faster while in pursuit, making a prolonged escape impossible. Fan lore connects The Owl's behavior to the Kikiyaon, a mythical creature said to hunt at night.",
-      image: "treehouse.jpg"
-    },
-    {
-      id: 7,
-      title: "The Experiment Gone Wrong",
-      items: "Research Notes, Laboratory Key",
-      locations: "Ancient Laboratory (shed), Council Ring (gazebo)",
-      mission: "Investigate the Ancient Laboratory where the Deer was created. Find the broken cage and research notes. The Cultists are former scientists who now worship what they created! The origin of the Cultists is one of the game's central mysteries, with a popular and cohesive fan theory suggesting a scientific rather than purely occult backstory. According to this theory, the forest was once the site of a secret research laboratory experimenting on animals.",
-      image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22250%22%20viewBox%3D%220%200%20400%20250%22%3E%3Crect%20fill%3D%22%231e461e%22%20width%3D%22400%22%20height%3D%22250%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20x%3D%22120%22%20y%3D%22125%22%3EAncient%20Laboratory%3C%2Ftext%3E%3C%2Fsvg%3E"
-    }
-  ];
-
-  // Enemies with images and descriptions
   const enemies = [
-    {
-      name: "The Deer", 
-      emoji: "🦌",
-      image: "enemies/deer.png",
-      description: "A tall, thin, bipedal creature that stalks the forest at night. Fears bright light."
-    },
-    {
-      name: "The Owl", 
-      emoji: "🦉",
-      image: "enemies/owl.png",
-      description: "A flying monstrosity that appears after night 5. Completely unkillable and gets faster when chasing."
-    },
-    {
-      name: "Forest Cultists", 
-      emoji: "👤",
-      image: "enemies/cultists.png",
-      description: "Robed figures who worship The Deer. They raid your camp every few nights."
-    },
-    {
-      name: "Wolf", 
-      emoji: "🐺",
-      image: "enemies/wolf.png",
-      description: "A fierce wolf that hunts in packs. Faster and more dangerous than regular wolves."
-    },
-    {
-      name: "Bear", 
-      emoji: "🐻",
-      image: "enemies/bear.png",
-      description: "A powerful predator that guards the caves containing missing children. Very high health and damage."
-    }
-  ];
-  
-  const forageTable = [
-    {text:"🥕 Roots — +2 health",hp:+2},
-    {text:"🐇 Rabbit — +5 health",hp:+5},
-    {text:"🍓 Berries — +3 health",hp:+3},
-    {text:"🍄 Mushrooms — -5 health",hp:-5}
+    {name:"The Deer",emoji:"🦌",image:"enemies/deer.png",description:"Fears bright light."},
+    {name:"The Owl",emoji:"🦉",image:"enemies/owl.png",description:"Unkillable; only stunned by light."},
+    {name:"Forest Cultists",emoji:"👤",image:"enemies/cultists.png",description:"Raid camp every few nights."},
+    {name:"Wolf",emoji:"🐺",image:"enemies/wolf.png",description:"Hunts in packs."},
+    {name:"Bear",emoji:"🐻",image:"enemies/bear.png",description:"Strong predator."}
   ];
 
-  const daySelect=document.getElementById("daySelect"),
-        scenarioTitle=document.getElementById("scenarioTitle"),
-        itemsText=document.getElementById("itemsText"),
-        locationText=document.getElementById("locationText"),
-        missionText=document.getElementById("missionText"),
-        imageArea=document.getElementById("imageArea"),
-        scenarioImage=document.getElementById("scenarioImage"),
+  const forageTable=[{text:"🥕 Roots +2",hp:2},{text:"🍓 Berries +3",hp:3},{text:"🍄 Mushrooms -5",hp:-5}];
+
+  let inventory=JSON.parse(localStorage.getItem("inv")||"[]");
+  let weapons=JSON.parse(localStorage.getItem("weapons")||'["Flashlight"]');
+  let eventsLog=JSON.parse(localStorage.getItem("log")||"[]");
+  let health=Number(localStorage.getItem("hp")||"100");
+  let lastEnemy=null, flashlightActive=false, escapeTimer=null;
+
+  const enemyStatusContent=document.getElementById("enemyStatusContent"),
+        weaponsList=document.getElementById("weaponsList"),
         inventoryList=document.getElementById("inventoryList"),
         eventLog=document.getElementById("eventLog"),
         healthLabel=document.getElementById("healthLabel"),
         healthFill=document.getElementById("healthFill"),
-        startBtn=document.getElementById("startBtn"),
         scanBtn=document.getElementById("scanBtn"),
-        prevBtn=document.getElementById("prevBtn"),
-        nextBtn=document.getElementById("nextBtn"),
-        scannerOverlay=document.getElementById("scannerOverlay"),
-        closeScanner=document.getElementById("closeScanner"),
         enemyDisplay=document.getElementById("enemyDisplay"),
         enemyName=document.getElementById("enemyName"),
         enemyImage=document.getElementById("enemyImage"),
         enemyDescription=document.getElementById("enemyDescription"),
-        closeEnemy=document.getElementById("closeEnemy"),
-        enemyStatusContent=document.getElementById("enemyStatusContent");
+        closeEnemy=document.getElementById("closeEnemy");
 
-  // Track last enemy encountered
-  let lastEnemy = null;
-  let inventory = JSON.parse(localStorage.getItem("inv")||"[]");
-  let eventsLog = JSON.parse(localStorage.getItem("log")||"[]");
-  let health = Number(localStorage.getItem("hp")||"100");
-
-  // Populate day selector
-  scenarios.forEach(s=>{
-    const o=document.createElement("option");
-    o.value=s.id;
-    o.textContent=`Night ${s.id} — ${s.title}`;
-    daySelect.appendChild(o);
-  });
-
-  function showScenario(id){
-    const s=scenarios.find(x=>x.id==id);
-    if(!s) return;
-    scenarioTitle.textContent=s.title;
-    itemsText.value=s.items;
-    locationText.value=s.locations;
-    missionText.value=s.mission;
-    
-    // Set image with error handling
-    scenarioImage.src = s.image;
-    scenarioImage.alt = s.title;
-    scenarioImage.onerror = function() {
-      this.style.display = 'none';
-      imageArea.innerHTML = '<div class="image-placeholder">Image not available<br><span style="font-size:12px">(' + s.image + ')</span></div>';
-    };
-    scenarioImage.onload = function() {
-      this.style.display = 'block';
-      // Remove any placeholder
-      const placeholder = imageArea.querySelector('.image-placeholder');
-      if (placeholder) {
-        placeholder.remove();
-      }
-    };
-    
-    daySelect.value=id;
-    localStorage.setItem("day",id);
-  }
-
-  function updateEnemyStatus(enemy) {
-    lastEnemy = enemy;
-    
-    if (enemy) {
-      enemyStatusContent.innerHTML = `
-        <div class="enemy-status-content">
-          <img src="${enemy.image}" alt="${enemy.name}" class="enemy-status-image">
-          <div class="enemy-status-info">
-            <div class="enemy-status-name">${enemy.name} ${enemy.emoji}</div>
-            <div class="enemy-status-description">${enemy.description}</div>
-          </div>
-        </div>
-      `;
+  function updateEnemyStatus(enemy){
+    lastEnemy=enemy;
+    if(enemy){
+      enemyStatusContent.innerHTML=`<div class="enemy-status-content"><img src="${enemy.image}" class="enemy-status-image"><div class="enemy-status-name">${enemy.name} ${enemy.emoji}</div></div>`;
+      localStorage.setItem("lastEnemy",JSON.stringify(enemy));
     } else {
-      enemyStatusContent.innerHTML = '<div class="no-enemy">No enemies encountered yet</div>';
+      enemyStatusContent.innerHTML='<div class="no-enemy">No enemies yet</div>';
     }
   }
 
-  function showEnemyEncounter(enemy) {
-    enemyName.textContent = enemy.name + " " + enemy.emoji;
-    enemyImage.src = enemy.image;
-    enemyImage.alt = enemy.name;
-    enemyDescription.textContent = enemy.description;
-    
-    // Update the enemy status
-    updateEnemyStatus(enemy);
-    
-    // Show the enemy display
-    enemyDisplay.classList.add('active');
-    
-    // Auto-hide after 7 seconds
-    setTimeout(() => {
-      hideEnemyEncounter();
-    }, 7000);
-  }
-  
-  function hideEnemyEncounter() {
-    enemyDisplay.classList.remove('active');
-  }
-
-  function addEvent(t){
-    eventsLog.push(t);
-    if(eventsLog.length>10) eventsLog.shift();
-    renderLog();
-    localStorage.setItem("log",JSON.stringify(eventsLog));
-  }
-  
-  function renderLog(){
-    eventLog.innerHTML="";
-    eventsLog.forEach(e=>{
-      const li=document.createElement("li");
-      li.textContent=e;
-      eventLog.appendChild(li);
-    });
-  }
-  
-  function renderInventory(){
-    inventoryList.innerHTML="";
-    inventory.forEach(it=>{
+  function renderWeapons(){
+    weaponsList.innerHTML="";
+    weapons.forEach(w=>{
       const li=document.createElement("li");
       li.className="inventory-item";
-      li.textContent=it;
-      inventoryList.appendChild(li);
+      li.textContent=w;
+      if(w==="Flashlight"){
+        li.onclick=()=>{
+          if(li.classList.contains("disabled")) return;
+          flashlightActive=true;
+          li.classList.add("disabled");
+          addEvent("🔦 Flashlight on! Rescan in 5s.");
+          if(escapeTimer) clearTimeout(escapeTimer);
+          escapeTimer=setTimeout(()=>{flashlightActive=false;li.classList.remove("disabled");addEvent("❌ Flashlight faded.");},5000);
+        };
+      }
+      weaponsList.appendChild(li);
     });
-    localStorage.setItem("inv",JSON.stringify(inventory));
+    localStorage.setItem("weapons",JSON.stringify(weapons));
   }
-  
-  function renderHealth(){
-    healthLabel.textContent=health+"%";
-    healthFill.style.width=health+"%";
-    localStorage.setItem("hp",health);
-  }
+
+  function addEvent(t){eventsLog.push(t);if(eventsLog.length>10)eventsLog.shift();renderLog();localStorage.setItem("log",JSON.stringify(eventsLog));}
+  function renderLog(){eventLog.innerHTML="";eventsLog.forEach(e=>{const li=document.createElement("li");li.textContent=e;eventLog.appendChild(li);});}
+  function renderInventory(){inventoryList.innerHTML="";inventory.forEach(it=>{const li=document.createElement("li");li.textContent=it;li.className="inventory-item";inventoryList.appendChild(li);});localStorage.setItem("inv",JSON.stringify(inventory));}
+  function renderHealth(){healthLabel.textContent=health+"%";healthFill.style.width=health+"%";localStorage.setItem("hp",health);}
+
+  function showEnemyEncounter(enemy){enemyName.textContent=enemy.name+" "+enemy.emoji;enemyImage.src=enemy.image;enemyDescription.textContent=enemy.description;updateEnemyStatus(enemy);enemyDisplay.classList.add("active");setTimeout(hideEnemyEncounter,7000);}
+  function hideEnemyEncounter(){enemyDisplay.classList.remove("active");}
 
   function handleQR(code){
     code=code.trim().toLowerCase();
-    
-    // Close scanner immediately after successful scan
-    if (qrScanner) {
-      qrScanner.stop().then(() => {
-        qrScanner = null;
-        scannerOverlay.style.display = "none";
-      }).catch(err => {
-        console.error("Failed to stop scanner", err);
-        qrScanner = null;
-        scannerOverlay.style.display = "none";
-      });
-    }
-    
-    if(code.startsWith("item:")){
-      const item=code.split(":")[1];
-      if(!inventory.includes(item)){
-        inventory.push(item);
-        renderInventory();
-        addEvent("✨ Found "+item);
-      }
-      return;
-    }
-    if(code==="event:enemy_chase"){
-      const enemy = enemies[Math.floor(Math.random() * enemies.length)];
-      showEnemyEncounter(enemy);
-      addEvent("🌑 " + enemy.emoji + " " + enemy.name + " is approaching!");
-      return;
-    }
-    if(code==="forage"){
-      const f=forageTable[Math.floor(Math.random()*forageTable.length)];
-      health=Math.max(0,Math.min(100,health+f.hp));
-      renderHealth();
-      addEvent("🌲 Foraged: "+f.text);
-      return;
-    }
-    if(code.startsWith("set:day=")){
-      const n=parseInt(code.split("=")[1]);
-      if(!isNaN(n)) showScenario(n);
-    }
+    if(code.startsWith("item:")){const item=code.split(":")[1];if(!inventory.includes(item)){inventory.push(item);renderInventory();addEvent("✨ Found "+item);}return;}
+    if(code==="event:enemy_chase"){const enemy=enemies[Math.floor(Math.random()*enemies.length)];showEnemyEncounter(enemy);addEvent("🌑 "+enemy.emoji+" "+enemy.name+" is approaching!");if(enemy.name==="The Deer"||enemy.name==="The Owl"){if(flashlightActive){addEvent("✅ Escaped "+enemy.name+"!");flashlightActive=false;clearTimeout(escapeTimer);escapeTimer=null;renderWeapons();}else{addEvent("❌ Could not escape "+enemy.name+"!");health=Math.max(0,health-20);renderHealth();}}return;}
+    if(code==="forage"){const f=forageTable[Math.floor(Math.random()*forageTable.length)];health=Math.max(0,Math.min(100,health+f.hp));renderHealth();addEvent("🌲 Foraged: "+f.text);return;}
   }
 
-  let qrScanner=null;
-  scanBtn.addEventListener("click",async()=>{
-    scannerOverlay.style.display = "flex";
-    if(qrScanner) return;
-    qrScanner=new Html5Qrcode("overlayReader");
-    try{
-      await qrScanner.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},msg=>{
-        handleQR(msg);
-      }, undefined);
-    }catch(e){console.error(e);}
-  });
-
-  closeScanner.addEventListener("click", () => {
-    scannerOverlay.style.display = "none";
-    if (qrScanner) {
-      qrScanner.stop().catch(e => console.error(e));
-      qrScanner = null;
-    }
-  });
+  scanBtn.addEventListener("click",()=>{addEvent("📷 Scan simulated (add real QR logic)");});
 
   closeEnemy.addEventListener("click", hideEnemyEncounter);
 
-  startBtn.addEventListener("click", () => {
-    const currentScenario = scenarios.find(s => s.id == daySelect.value);
-    addEvent(`🚀 Starting mission: ${currentScenario.title}`);
-    
-    // Disable button during mission
-    startBtn.disabled = true;
-    startBtn.textContent = "Mission in progress...";
-    
-    // Simulate mission completion after delay
-    setTimeout(() => {
-      const success = Math.random() > 0.3;
-      if(success){
-        const items = ["Flashlight", "Wood", "Bandage", "Rabbit's Foot", "Wolf Pelt"];
-        const foundItem = items[Math.floor(Math.random()*items.length)];
-        if(!inventory.includes(foundItem)){
-          inventory.push(foundItem);
-          renderInventory();
-          addEvent(`✅ Mission success! Found ${foundItem}`);
-        } else {
-          addEvent("✅ Mission completed");
-        }
-      } else {
-        health = Math.max(0, health - 10);
-        renderHealth();
-        addEvent("❌ Mission failed! Lost 10% health");
-      }
-      
-      // Re-enable button
-      startBtn.disabled = false;
-      startBtn.textContent = "Start Mission ▶";
-    }, 2000);
-  });
-
-  // Day navigation
-  prevBtn.addEventListener("click", () => {
-    const currentDay = parseInt(daySelect.value);
-    if(currentDay > 1) showScenario(currentDay - 1);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    const currentDay = parseInt(daySelect.value);
-    if(currentDay < scenarios.length) showScenario(currentDay + 1);
-  });
-
-  daySelect.addEventListener("change", () => {
-    showScenario(parseInt(daySelect.value));
-  });
-
-  // Initialize
-  const d=localStorage.getItem("day")||1;
-  showScenario(d);
-  renderInventory();
-  renderLog();
-  renderHealth();
-  
-  // Initialize enemy status if we have a last enemy in localStorage
-  const savedEnemy = localStorage.getItem("lastEnemy");
-  if (savedEnemy) {
-    const enemy = JSON.parse(savedEnemy);
-    updateEnemyStatus(enemy);
-  }
-  
-  addEvent("Welcome to Susan Court Forest. Your mission begins...");
+  renderInventory();renderWeapons();renderLog();renderHealth();
+  const savedEnemy=localStorage.getItem("lastEnemy");if(savedEnemy)updateEnemyStatus(JSON.parse(savedEnemy));
+  addEvent("Welcome to Susan Court Forest. Adventure begins...");
 })();
 </script>
 </body>
