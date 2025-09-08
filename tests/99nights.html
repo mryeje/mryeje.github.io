@@ -488,7 +488,7 @@
     {
       name: "Wolf", 
       emoji: "🐺",
-      image: "enemies/wolf.png", // Changed from alpha_wolf.png to wolf.png
+      image: "enemies/wolf.png",
       description: "A fierce wolf that hunts in packs. Faster and more dangerous than regular wolves."
     },
     {
@@ -502,7 +502,7 @@
   const forageTable = [
     {text:"🥕 Roots — +2 health",hp:+2},
     {text:"🐇 Rabbit — +5 health",hp:+5},
-    {text:"🍓 Berries — +3 health",hp:+3},
+    {text:"🍓 Berriers — +3 health",hp:+3},
     {text:"🍄 Mushrooms — -5 health",hp:-5}
   ];
 
@@ -621,6 +621,19 @@
 
   function handleQR(code){
     code=code.trim().toLowerCase();
+    
+    // Close scanner immediately after successful scan
+    if (qrScanner) {
+      qrScanner.stop().then(() => {
+        qrScanner = null;
+        scannerOverlay.style.display = "none";
+      }).catch(err => {
+        console.error("Failed to stop scanner", err);
+        qrScanner = null;
+        scannerOverlay.style.display = "none";
+      });
+    }
+    
     if(code.startsWith("item:")){
       const item=code.split(":")[1];
       if(!inventory.includes(item)){
@@ -656,10 +669,8 @@
     qrScanner=new Html5Qrcode("overlayReader");
     try{
       await qrScanner.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},msg=>{
-        qrScanner.pause();
         handleQR(msg);
-        setTimeout(()=>qrScanner.resume(),1000);
-      });
+      }, undefined);
     }catch(e){console.error(e);}
   });
 
