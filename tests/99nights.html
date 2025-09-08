@@ -84,10 +84,9 @@
       flex-direction: column;
     }
     
-    .status-windows {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+    .scenario-enemy-status {
+      display: flex;
+      flex-direction: column;
     }
     
     .selector {
@@ -141,7 +140,7 @@
     .title {
       font-size: 18px;
       font-weight: 800;
-      color: var(--accent;
+      color: var(--accent);
       margin: 6px 0;
       grid-column: 1 / -1;
     }
@@ -167,7 +166,7 @@
     
     /* Reduced textarea sizes */
     #itemsText, #locationText {
-      min-height: 70px;
+      min-height: 70px; /* Reduced from 80px */
     }
     
     /* Larger mission textarea */
@@ -337,8 +336,8 @@
       font-weight: bold;
     }
     
-    /* Enemy Status Window */
-    .enemy-status, .weapons-window {
+    /* Enemy Status Window - Moved to top right */
+    .enemy-status {
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius: 12px;
       padding: 16px;
@@ -346,7 +345,7 @@
       height: 100%;
     }
     
-    .enemy-status h3, .weapons-window h3 {
+    .enemy-status h3 {
       color: var(--accent);
       margin: 0 0 12px 0;
       font-size: 16px;
@@ -355,7 +354,7 @@
       gap: 8px;
     }
     
-    .enemy-status-content, .weapons-content {
+    .enemy-status-content {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -363,8 +362,8 @@
     }
     
     .enemy-status-image {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 10px;
       object-fit: cover;
       border: 2px solid #ff5e5e;
@@ -379,60 +378,19 @@
       font-weight: bold;
       color: #ff5e5e;
       margin-bottom: 4px;
-      font-size: 14px;
+      font-size: 16px;
     }
     
-    .no-enemy, .no-weapons {
+    .enemy-status-description {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .no-enemy {
       text-align: center;
       color: var(--muted);
       font-style: italic;
       padding: 20px 10px;
-    }
-    
-    /* Weapons window styles */
-    .weapon-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.05);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-    
-    .weapon-item:hover {
-      background: rgba(255,255,255,0.1);
-    }
-    
-    .weapon-item.active {
-      background: rgba(110, 231, 183, 0.2);
-      border: 1px solid var(--accent);
-    }
-    
-    .weapon-icon {
-      font-size: 20px;
-    }
-    
-    .weapon-name {
-      flex: 1;
-      font-size: 14px;
-    }
-    
-    /* Escape timer */
-    .escape-timer {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 0, 0, 0.8);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-weight: bold;
-      z-index: 1000;
-      display: none;
     }
     
     @media (max-width: 920px) {
@@ -440,7 +398,7 @@
         grid-template-columns: 1fr;
       }
       
-      .scenario-container, .status-windows {
+      .scenario-container {
         grid-template-columns: 1fr;
       }
       
@@ -498,23 +456,12 @@
           <textarea id="locationText" readonly>Sentinel Porch (front deck), Shadow Edge (cul-de-sac)</textarea>
         </div>
         
-        <div class="status-windows">
-          <!-- Enemy Status Window -->
+        <div class="scenario-enemy-status">
+          <!-- Enemy Status Window - Moved to top right -->
           <div class="enemy-status">
-            <h3>🛡️ Enemy Status</h3>
+            <h3>🛡️ Last Enemy Encountered</h3>
             <div id="enemyStatusContent">
               <div class="no-enemy">No enemies encountered yet</div>
-            </div>
-          </div>
-          
-          <!-- Weapons Window -->
-          <div class="weapons-window">
-            <h3>⚔️ Weapons</h3>
-            <div id="weaponsContent">
-              <div class="weapon-item" data-weapon="Flashlight">
-                <span class="weapon-icon">🔦</span>
-                <span class="weapon-name">Flashlight</span>
-              </div>
             </div>
           </div>
         </div>
@@ -557,11 +504,6 @@
   <img class="enemy-image" id="enemyImage" src="" alt="Enemy">
   <div class="enemy-description" id="enemyDescription">An enemy is approaching!</div>
   <button class="close-enemy" id="closeEnemy">Continue</button>
-</div>
-
-<!-- Escape Timer -->
-<div class="escape-timer" id="escapeTimer">
-  ⚡ Escape in: <span id="escapeTime">5</span> seconds! Use flashlight and rescan QR!
 </div>
 
 <script>
@@ -632,36 +574,31 @@
       name: "The Deer", 
       emoji: "🦌",
       image: "enemies/deer.png",
-      description: "A tall, thin, bipedal creature that stalks the forest at night. Fears bright light.",
-      requiresFlashlight: true
+      description: "A tall, thin, bipedal creature that stalks the forest at night. Fears bright light."
     },
     {
       name: "The Owl", 
       emoji: "🦉",
       image: "enemies/owl.png",
-      description: "A flying monstrosity that appears after night 5. Completely unkillable and gets faster when chasing.",
-      requiresFlashlight: true
+      description: "A flying monstrosity that appears after night 5. Completely unkillable and gets faster when chasing."
     },
     {
       name: "Forest Cultists", 
       emoji: "👤",
       image: "enemies/cultists.png",
-      description: "Robed figures who worship The Deer. They raid your camp every few nights.",
-      requiresFlashlight: false
+      description: "Robed figures who worship The Deer. They raid your camp every few nights."
     },
     {
       name: "Wolf", 
       emoji: "🐺",
       image: "enemies/wolf.png",
-      description: "A fierce wolf that hunts in packs. Faster and more dangerous than regular wolves.",
-      requiresFlashlight: false
+      description: "A fierce wolf that hunts in packs. Faster and more dangerous than regular wolves."
     },
     {
       name: "Bear", 
       emoji: "🐻",
       image: "enemies/bear.png",
-      description: "A powerful predator that guards the caves containing missing children. Very high health and damage.",
-      requiresFlashlight: false
+      description: "A powerful predator that guards the caves containing missing children. Very high health and damage."
     }
   ];
   
@@ -694,19 +631,13 @@
         enemyImage=document.getElementById("enemyImage"),
         enemyDescription=document.getElementById("enemyDescription"),
         closeEnemy=document.getElementById("closeEnemy"),
-        enemyStatusContent=document.getElementById("enemyStatusContent"),
-        weaponsContent=document.getElementById("weaponsContent"),
-        escapeTimer=document.getElementById("escapeTimer"),
-        escapeTime=document.getElementById("escapeTime");
+        enemyStatusContent=document.getElementById("enemyStatusContent");
 
-  // Track game state
+  // Track last enemy encountered
   let lastEnemy = null;
-  let inventory = JSON.parse(localStorage.getItem("inv")||'["Flashlight"]');
+  let inventory = JSON.parse(localStorage.getItem("inv")||"[]");
   let eventsLog = JSON.parse(localStorage.getItem("log")||"[]");
   let health = Number(localStorage.getItem("hp")||"100");
-  let currentEnemy = null;
-  let escapeCountdown = null;
-  let flashlightActive = false;
 
   // Populate day selector
   scenarios.forEach(s=>{
@@ -753,85 +684,13 @@
           <img src="${enemy.image}" alt="${enemy.name}" class="enemy-status-image">
           <div class="enemy-status-info">
             <div class="enemy-status-name">${enemy.name} ${enemy.emoji}</div>
+            <div class="enemy-status-description">${enemy.description}</div>
           </div>
         </div>
       `;
     } else {
       enemyStatusContent.innerHTML = '<div class="no-enemy">No enemies encountered yet</div>';
     }
-  }
-
-  function updateWeaponsDisplay() {
-    weaponsContent.innerHTML = '';
-    
-    const weapons = inventory.filter(item => 
-      item === "Flashlight" || 
-      item === "Revolver" || 
-      item === "Rifle" || 
-      item === "Spear" ||
-      item === "Katana"
-    );
-    
-    if (weapons.length === 0) {
-      weaponsContent.innerHTML = '<div class="no-weapons">No weapons available</div>';
-      return;
-    }
-    
-    weapons.forEach(weapon => {
-      const weaponElement = document.createElement('div');
-      weaponElement.className = 'weapon-item';
-      weaponElement.dataset.weapon = weapon;
-      
-      let icon = '⚔️';
-      if (weapon === "Flashlight") icon = "🔦";
-      if (weapon === "Revolver") icon = "🔫";
-      if (weapon === "Rifle") icon = "🏹";
-      if (weapon === "Spear") icon = "🔱";
-      if (weapon === "Katana") icon = "🗡️";
-      
-      weaponElement.innerHTML = `
-        <span class="weapon-icon">${icon}</span>
-        <span class="weapon-name">${weapon}</span>
-      `;
-      
-      weaponElement.addEventListener('click', () => activateWeapon(weapon));
-      weaponsContent.appendChild(weaponElement);
-    });
-  }
-
-  function activateWeapon(weapon) {
-    if (weapon === "Flashlight") {
-      flashlightActive = true;
-      document.querySelectorAll('.weapon-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.weapon === "Flashlight") {
-          item.classList.add('active');
-        }
-      });
-      addEvent("🔦 Flashlight activated! Scan a QR code to use it.");
-    }
-  }
-
-  function startEscapeCountdown() {
-    let timeLeft = 5;
-    escapeTimer.style.display = 'block';
-    escapeTime.textContent = timeLeft;
-    
-    escapeCountdown = setInterval(() => {
-      timeLeft--;
-      escapeTime.textContent = timeLeft;
-      
-      if (timeLeft <= 0) {
-        clearInterval(escapeCountdown);
-        escapeTimer.style.display = 'none';
-        // Player failed to escape
-        health = Math.max(0, health - 15);
-        renderHealth();
-        addEvent(`💥 Failed to escape from ${currentEnemy.name}! Lost 15% health.`);
-        currentEnemy = null;
-        flashlightActive = false;
-      }
-    }, 1000);
   }
 
   function showEnemyEncounter(enemy) {
@@ -843,33 +702,17 @@
     // Update the enemy status
     updateEnemyStatus(enemy);
     
-    // Set current enemy
-    currentEnemy = enemy;
-    
     // Show the enemy display
     enemyDisplay.classList.add('active');
     
-    // Start escape countdown if this enemy requires flashlight
-    if (enemy.requiresFlashlight) {
-      startEscapeCountdown();
-    }
-    
-    // Auto-hide after 7 seconds if not a flashlight enemy
-    if (!enemy.requiresFlashlight) {
-      setTimeout(() => {
-        hideEnemyEncounter();
-      }, 7000);
-    }
+    // Auto-hide after 7 seconds
+    setTimeout(() => {
+      hideEnemyEncounter();
+    }, 7000);
   }
   
   function hideEnemyEncounter() {
     enemyDisplay.classList.remove('active');
-    if (escapeCountdown) {
-      clearInterval(escapeCountdown);
-      escapeTimer.style.display = 'none';
-    }
-    currentEnemy = null;
-    flashlightActive = false;
   }
 
   function addEvent(t){
@@ -897,7 +740,6 @@
       inventoryList.appendChild(li);
     });
     localStorage.setItem("inv",JSON.stringify(inventory));
-    updateWeaponsDisplay();
   }
   
   function renderHealth(){
@@ -908,29 +750,6 @@
 
   function handleQR(code){
     code=code.trim().toLowerCase();
-    
-    // Check if we're in flashlight escape mode
-    if (flashlightActive && currentEnemy && currentEnemy.requiresFlashlight) {
-      clearInterval(escapeCountdown);
-      escapeTimer.style.display = 'none';
-      addEvent(`✅ Escaped from ${currentEnemy.name} using the flashlight!`);
-      flashlightActive = false;
-      currentEnemy = null;
-      hideEnemyEncounter();
-      
-      // Close scanner after successful escape
-      if (qrScanner) {
-        qrScanner.stop().then(() => {
-          qrScanner = null;
-          scannerOverlay.style.display = "none";
-        }).catch(err => {
-          console.error("Failed to stop scanner", err);
-          qrScanner = null;
-          scannerOverlay.style.display = "none";
-        });
-      }
-      return;
-    }
     
     // Close scanner immediately after successful scan
     if (qrScanner) {
@@ -1006,7 +825,7 @@
     setTimeout(() => {
       const success = Math.random() > 0.3;
       if(success){
-        const items = ["Flashlight", "Wood", "Bandage", "Rabbit's Foot", "Wolf Pelt", "Revolver", "Rifle"];
+        const items = ["Flashlight", "Wood", "Bandage", "Rabbit's Foot", "Wolf Pelt"];
         const foundItem = items[Math.floor(Math.random()*items.length)];
         if(!inventory.includes(foundItem)){
           inventory.push(foundItem);
