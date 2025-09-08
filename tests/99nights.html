@@ -73,11 +73,28 @@
       gap: 14px;
     }
     
+    .scenario-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    
+    .scenario-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scenario-enemy-status {
+      display: flex;
+      flex-direction: column;
+    }
+    
     .selector {
       display: flex;
       gap: 8px;
       align-items: center;
       margin-bottom: 12px;
+      grid-column: 1 / -1;
     }
     
     .big-icon-btn {
@@ -104,6 +121,7 @@
       overflow: hidden;
       position: relative;
       margin-bottom: 12px;
+      grid-column: 1 / -1;
     }
     
     .scenario-image {
@@ -124,6 +142,7 @@
       font-weight: 800;
       color: var(--accent);
       margin: 6px 0;
+      grid-column: 1 / -1;
     }
     
     label {
@@ -145,9 +164,9 @@
       margin-bottom: 10px;
     }
     
-    /* Standard textarea size */
+    /* Reduced textarea sizes */
     #itemsText, #locationText {
-      min-height: 56px;
+      min-height: 70px; /* Reduced from 80px */
     }
     
     /* Larger mission textarea */
@@ -155,6 +174,7 @@
       min-height: 120px;
       font-size: 15px;
       line-height: 1.5;
+      grid-column: 1 / -1;
     }
     
     .actions {
@@ -162,6 +182,7 @@
       gap: 8px;
       flex-wrap: wrap;
       margin-top: 10px;
+      grid-column: 1 / -1;
     }
     
     .big-btn {
@@ -315,13 +336,13 @@
       font-weight: bold;
     }
     
-    /* Enemy Status Window */
+    /* Enemy Status Window - Moved to top right */
     .enemy-status {
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius: 12px;
       padding: 16px;
       box-shadow: 0 8px 20px rgba(2,6,23,0.6);
-      margin-top: 14px;
+      height: 100%;
     }
     
     .enemy-status h3 {
@@ -335,13 +356,14 @@
     
     .enemy-status-content {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 12px;
     }
     
     .enemy-status-image {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 10px;
       object-fit: cover;
       border: 2px solid #ff5e5e;
@@ -349,12 +371,14 @@
     
     .enemy-status-info {
       flex: 1;
+      text-align: center;
     }
     
     .enemy-status-name {
       font-weight: bold;
       color: #ff5e5e;
       margin-bottom: 4px;
+      font-size: 16px;
     }
     
     .enemy-status-description {
@@ -366,11 +390,15 @@
       text-align: center;
       color: var(--muted);
       font-style: italic;
-      padding: 10px;
+      padding: 20px 10px;
     }
     
     @media (max-width: 920px) {
       .app {
+        grid-template-columns: 1fr;
+      }
+      
+      .scenario-container {
         grid-template-columns: 1fr;
       }
       
@@ -416,13 +444,28 @@
       <div class="image-area" id="imageArea">
         <img src="" alt="Forest Scene" class="scenario-image" id="scenarioImage">
       </div>
-      <div class="title" id="scenarioTitle">First Watch</div>
-
-      <label>🧰 Scenario Items</label>
-      <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
       
-      <label>📍 Locations</label>
-      <textarea id="locationText" readonly>Sentinel Porch (front deck), Shadow Edge (cul-de-sac)</textarea>
+      <div class="title" id="scenarioTitle">First Watch</div>
+      
+      <div class="scenario-container">
+        <div class="scenario-details">
+          <label>🧰 Scenario Items</label>
+          <textarea id="itemsText" readonly>Campfire Torch, Whisper Map</textarea>
+          
+          <label>📍 Locations</label>
+          <textarea id="locationText" readonly>Sentinel Porch (front deck), Shadow Edge (cul-de-sac)</textarea>
+        </div>
+        
+        <div class="scenario-enemy-status">
+          <!-- Enemy Status Window - Moved to top right -->
+          <div class="enemy-status">
+            <h3>🛡️ Last Enemy Encountered</h3>
+            <div id="enemyStatusContent">
+              <div class="no-enemy">No enemies encountered yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <label>🎯 Mission</label>
       <textarea id="missionText" readonly>Patrol the Shadow Edge and call out 3 animal sounds to ward off The Deer. Return to Sentinel Porch before nightfall. The forest is watching... The Deer is a silent predator that stalks the forest exclusively at night, its presence often signaled by unsettling noises. It fears the player's campfire and can be temporarily stunned by a flashlight.</textarea>
@@ -443,14 +486,6 @@
     <div class="card">
       <div style="font-weight:800">🎒 Inventory</div>
       <ul id="inventoryList" class="inventory-list"></ul>
-    </div>
-    
-    <!-- Enemy Status Window -->
-    <div class="enemy-status">
-      <h3>🛡️ Last Enemy Encountered</h3>
-      <div id="enemyStatusContent">
-        <div class="no-enemy">No enemies encountered yet</div>
-      </div>
     </div>
   </aside>
 </div>
