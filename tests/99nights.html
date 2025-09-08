@@ -191,6 +191,12 @@
       overflow: auto;
     }
     
+    .log-list li {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 14px;
+    }
+    
     .inventory-item {
       display: flex;
       align-items: center;
@@ -309,6 +315,60 @@
       font-weight: bold;
     }
     
+    /* Enemy Status Window */
+    .enemy-status {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.6);
+      margin-top: 14px;
+    }
+    
+    .enemy-status h3 {
+      color: var(--accent);
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .enemy-status-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .enemy-status-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 2px solid #ff5e5e;
+    }
+    
+    .enemy-status-info {
+      flex: 1;
+    }
+    
+    .enemy-status-name {
+      font-weight: bold;
+      color: #ff5e5e;
+      margin-bottom: 4px;
+    }
+    
+    .enemy-status-description {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .no-enemy {
+      text-align: center;
+      color: var(--muted);
+      font-style: italic;
+      padding: 10px;
+    }
+    
     @media (max-width: 920px) {
       .app {
         grid-template-columns: 1fr;
@@ -383,6 +443,14 @@
     <div class="card">
       <div style="font-weight:800">🎒 Inventory</div>
       <ul id="inventoryList" class="inventory-list"></ul>
+    </div>
+    
+    <!-- Enemy Status Window -->
+    <div class="enemy-status">
+      <h3>🛡️ Last Enemy Encountered</h3>
+      <div id="enemyStatusContent">
+        <div class="no-enemy">No enemies encountered yet</div>
+      </div>
     </div>
   </aside>
 </div>
@@ -465,7 +533,7 @@
     }
   ];
 
-  // Enemies with images and descriptions - UPDATED PATHS
+  // Enemies with images and descriptions
   const enemies = [
     {
       name: "The Deer", 
@@ -502,7 +570,7 @@
   const forageTable = [
     {text:"🥕 Roots — +2 health",hp:+2},
     {text:"🐇 Rabbit — +5 health",hp:+5},
-    {text:"🍓 Berriers — +3 health",hp:+3},
+    {text:"🍓 Berries — +3 health",hp:+3},
     {text:"🍄 Mushrooms — -5 health",hp:-5}
   ];
 
@@ -527,7 +595,14 @@
         enemyName=document.getElementById("enemyName"),
         enemyImage=document.getElementById("enemyImage"),
         enemyDescription=document.getElementById("enemyDescription"),
-        closeEnemy=document.getElementById("closeEnemy");
+        closeEnemy=document.getElementById("closeEnemy"),
+        enemyStatusContent=document.getElementById("enemyStatusContent");
+
+  // Track last enemy encountered
+  let lastEnemy = null;
+  let inventory = JSON.parse(localStorage.getItem("inv")||"[]");
+  let eventsLog = JSON.parse(localStorage.getItem("log")||"[]");
+  let health = Number(localStorage.getItem("hp")||"100");
 
   // Populate day selector
   scenarios.forEach(s=>{
@@ -565,11 +640,32 @@
     localStorage.setItem("day",id);
   }
 
+  function updateEnemyStatus(enemy) {
+    lastEnemy = enemy;
+    
+    if (enemy) {
+      enemyStatusContent.innerHTML = `
+        <div class="enemy-status-content">
+          <img src="${enemy.image}" alt="${enemy.name}" class="enemy-status-image">
+          <div class="enemy-status-info">
+            <div class="enemy-status-name">${enemy.name} ${enemy.emoji}</div>
+            <div class="enemy-status-description">${enemy.description}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      enemyStatusContent.innerHTML = '<div class="no-enemy">No enemies encountered yet</div>';
+    }
+  }
+
   function showEnemyEncounter(enemy) {
     enemyName.textContent = enemy.name + " " + enemy.emoji;
     enemyImage.src = enemy.image;
     enemyImage.alt = enemy.name;
     enemyDescription.textContent = enemy.description;
+    
+    // Update the enemy status
+    updateEnemyStatus(enemy);
     
     // Show the enemy display
     enemyDisplay.classList.add('active');
@@ -593,11 +689,9 @@
   
   function renderLog(){
     eventLog.innerHTML="";
-    eventsLog.slice().reverse().forEach(e=>{
+    eventsLog.forEach(e=>{
       const li=document.createElement("li");
       li.textContent=e;
-      li.style.padding = "8px";
-      li.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
       eventLog.appendChild(li);
     });
   }
@@ -738,6 +832,14 @@
   renderInventory();
   renderLog();
   renderHealth();
+  
+  // Initialize enemy status if we have a last enemy in localStorage
+  const savedEnemy = localStorage.getItem("lastEnemy");
+  if (savedEnemy) {
+    const enemy = JSON.parse(savedEnemy);
+    updateEnemyStatus(enemy);
+  }
+  
   addEvent("Welcome to Susan Court Forest. Your mission begins...");
 })();
 </script>
