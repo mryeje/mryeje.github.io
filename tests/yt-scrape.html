@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Scraper UI</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 8px; margin: 5px 0; width: 100%; }
+    textarea { width: 100%; height: 300px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>YouTube Scraper UI</h2>
+  
+  <label for="url">YouTube URL:</label>
+  <input type="text" id="url" placeholder="Enter YouTube video URL">
+
+  <label for="comments">Fetch Comments:</label>
+  <input type="checkbox" id="comments" checked>
+
+  <label for="comment_limit">Max Comments:</label>
+  <input type="number" id="comment_limit" value="50" min="1">
+
+  <label for="livechat">Fetch Live Chat:</label>
+  <input type="checkbox" id="livechat">
+
+  <label for="duration">Live Chat Duration (seconds):</label>
+  <input type="number" id="duration" value="60" min="10">
+
+  <button id="scrapeBtn">Fetch Data</button>
+
+  <h3>Output:</h3>
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    const serverURL = "http://192.168.5.51:8000/scrape";
+
+    document.getElementById("scrapeBtn").addEventListener("click", async () => {
+      const url = document.getElementById("url").value.trim();
+      const fetch_comments = document.getElementById("comments").checked;
+      const comment_limit = parseInt(document.getElementById("comment_limit").value);
+      const fetch_live_chat = document.getElementById("livechat").checked;
+      const live_chat_duration = parseInt(document.getElementById("duration").value);
+
+      if (!url) {
+        alert("Please enter a YouTube URL.");
+        return;
+      }
+
+      const payload = {
+        url,
+        fetch_comments,
+        comment_limit,
+        fetch_live_chat,
+        live_chat_duration,
+        languages: ["en"]
+      };
+
+      const outputArea = document.getElementById("output");
+      outputArea.value = "Fetching...";
+
+      try {
+        const response = await fetch(serverURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          outputArea.value = "Error: " + (err.detail || response.statusText);
+          return;
+        }
+
+        const data = await response.json();
+        outputArea.value = JSON.stringify(data, null, 2);
+
+      } catch (err) {
+        outputArea.value = "Request failed: " + err;
+      }
+    });
+  </script>
+</body>
+</html>
