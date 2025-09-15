@@ -11,10 +11,39 @@
     th { background-color: #eee; }
     tr:nth-child(even) { background-color: #f2f2f2; }
     .hashtags { color: #555; font-size: 0.9em; }
+    .download-container {
+      background-color: #e8f4ff;
+      border: 1px solid #b8daff;
+      border-radius: 5px;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .download-button {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+    .download-button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
   <h1>Reddit Demand Mapper - TikTok Opportunities</h1>
+  
+  <div class="download-container">
+    <h3>Download YouTube to MP3 Converter</h3>
+    <p>Convert YouTube videos to MP3 format with our easy-to-use tool</p>
+    <a href="/bk/Youtube-to-Mp3.exe" class="download-button">Download Now</a>
+  </div>
+  
   <p>Loaded latest JSON report automatically.</p>
   <table id="opportunities-table">
     <thead>
@@ -48,7 +77,6 @@
       const opportunities = await response.json();
       const tbody = document.querySelector("#opportunities-table tbody");
       const jsonFile = "latest.json";  // Always points to latest run
-
 
       opportunities.forEach(opp => {
         const tr = document.createElement("tr");
