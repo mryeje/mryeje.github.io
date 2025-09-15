@@ -1,203 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  
-
-  <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.9.0.js"></script>
-	  
-
-<style>
-		.switch {
-		  position: relative;
-		  display: inline-block;
-		  width: 100%;
-		  height: 34px;
-		}
-
-		.switch input { 
-		  opacity: 0;
-		  width: 0;
-		  height: 0;
-		}
-
-		.slider {
-	  position: absolute;
-	  cursor: pointer;
-	  top: 0;
-	  left: 50%; /* Center the slider horizontally */
-	  transform: translateX(-50%); /* Adjust to center the slider */
-	  bottom: 0;
-	  border-radius: 34px;
-	  background-color: #ccc;
-	  -webkit-transition: .4s;
-	  transition: .4s;
-	  width: 40%; /* Set the width to 50% for half coverage */
-	  height: 40px; /* Maintain the desired height */
-	}
-		
-		
-
-		.slider:before {
-		  position: absolute;
-		  content: "";
-		  height: 26px;
-		  width: 26px;
-		  left: 4px;
-		  bottom: 4px;
-		   /* Added border-radius */
-		  border-radius: 50%;
-		  background-color: white;
-		  -webkit-transition: .4s;
-		  transition: .4s;
-		}
-			input:checked + .slider:before {
-			-webkit-transform: translateX(100%);
-			-ms-transform: translateX(100%);
-			transform: translateX(100%);
-	}
-
-		input:checked + .slider {
-		  background-color: #2196F3;
-		}
-
-		input:focus + .slider {
-		  box-shadow: 0 0 1px #2196F3;
-		}
-
-		input:checked + .slider:before {
-		  -webkit-transform: translateX(26px);
-		  -ms-transform: translateX(26px);
-		  transform: translateX(26px);
-		  left: calc(100% - 60px); /* Adjust 30px to half the width of the slider button */
-
-		}
-		
-		
-
-		/* Rounded sliders */
-		.slider.round {
-		  border-radius: 34px;
-		  
-		}
-
-		.slider.round:before {
-		  border-radius: 50%;
-		}
-		
-		.controls{
-		 position: absolute;
-		 width: 100%;
-		 bottom: 10px;
-		 margin-top: 10px;
-		 text-align: center; /* Center the toggle switches */
-		 bottom: 10px; /* Adjust as needed */
-		 z-index: 9999; /* Ensure it's above other elements */
-		 
-		 top: 82vh; /* Adjust the vertical position as needed */
-		}
-		@media (min-width: 768px) {
-		  .controls {
-			bottom: auto;
-			top: calc(80vh + 10px); /* Adjust this value as needed */
-		  }
-		#orbit {
-			position: fixed;
-			display: block;
-			margin: auto; /* Center the span */
-			width: fit-content; /* Set the width based on the content */
-			top: 0;
-			left: 0;
-			right: 0;
-			text-align: center;
-			z-index: 9999; /* Ensure it appears above other elements */
-			visibility: hidden; /* Initially hidden */
-		}
-
-		#orbit img {
-		display: inline-block; /* Ensure the images are displayed inline */
-		}
-		.iframe-container{
-		  position: relative;
-			width: 100%;
-			flex: 1;
-			display: flex;
-		}
-		#api-frame {
-		  width: 100%;
-		  height: 80vh;
-		  max-width: 100vw;
-		  border: 1;
-		  padding: 0;
-		  margin: 0;
-		  }
-			  @media only screen and (max-width: 767px) {
-            #message {
-                bottom: 10%;
-            }
-        }
-	  #message {
-			position: absolute;
-			bottom: 3%; /* Adjust as needed */
-			left: 50%;
-			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
-			font-size: 18px; /* Adjust the font size as needed */
-			transform: translateX(-50%);
-			background-color:#ccc;
-			padding: 10px;
-			border-radius: 5px;
-			z-index: 9999;
-			}
-		#hint {
-			position: absolute;
-			bottom: 1%; /* Adjust as needed */
-			left: 30%;
-			font-family: 'Roboto Condensed', sans-serif; /* Use Roboto Condensed font */
-			font-size: 18px; /* Adjust the font size as needed */
-			transform: translateX(-50%);
-			background-color:#ccc;
-			padding: 10px;
-			border-radius: 5px;
-			z-index: 9999;
-			}
-			table {
-			  width: 100%;
-			  border-collapse: collapse;
-			}
-
-			th, td {
-			  width: 33.33%; /* Divide by the number of columns for equal width */
-			  text-align: center;
-			  padding: 8px;
-			  border:none;
-			}
-			#resetcam {
-				  position: absolute;
-				  top: 20%;
-				  left: calc(15% - 75px); /* Adjust as needed */
-				  transform: translateY(-50%);
-				  background-color: #2196F3;
-				  color: white;
-				  font-size: 20px;
-				  padding: 10px 20px;
-				  border: none;
-				  border-radius: 5px;
-				  cursor: pointer;
-}
-		  
-</style>
+  <meta charset="UTF-8">
+  <title>Reddit Demand Mapper - TikTok Opportunities</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+    h1 { color: #333; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; background-color: #fff; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #eee; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .hashtags { color: #555; font-size: 0.9em; }
+  </style>
 </head>
+<body>
+  <h1>Reddit Demand Mapper - TikTok Opportunities</h1>
+  <p>Loaded latest JSON report automatically.</p>
+  <table id="opportunities-table">
+    <thead>
+      <tr>
+        <th>Theme</th>
+        <th>Content Angle</th>
+        <th>Posts Found</th>
+        <th>Avg Engagement</th>
+        <th>Total Comments</th>
+        <th>Demand Strength</th>
+        <th>Example Videos</th>
+        <th>Suggested Hashtags</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <body>
-   <span id="orbit"><img src="orbit.png"><img src="pinch.png"><img src="2fdrag.png"></span>
-    <div class="container">
-        <div class="iframe-container"><div id="hint">Click here for a list of parts--></div>
-            <iframe title="Sketchfab Viewer" src="" id="api-frame"></iframe>
-         </div><div id="message">Click a slider above to isolate a specific section</div>
-		  <button id="resetcam">Reset View</button>
-         <div class="controls" id="controls">
-           <pre id="Info"></pre>
-     </div>
-    
-    </div>
-	
-  </body>
+  <script>
+    // Find the latest JSON file in the folder
+    async function getLatestJSON() {
+      const files = ["tiktok_opportunities_20250910_120000.json", "tiktok_opportunities_20250915_090000.json"]; 
+      // Replace this with an updated list of files in the folder if you know them, or auto-generate via Python later
 
-    <script src="exp-view_js.js"></script>  
+      files.sort(); // filenames are timestamped, so sorting works
+      return files[files.length - 1];
+    }
+
+    async function loadOpportunities() {
+      const latestFile = await getLatestJSON();
+      const response = await fetch(latestFile);
+      const opportunities = await response.json();
+      const tbody = document.querySelector("#opportunities-table tbody");
+      const jsonFile = "latest.json";  // Always points to latest run
+
+
+      opportunities.forEach(opp => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${opp.theme}</td>
+          <td>${opp.content_angle}</td>
+          <td>${opp.post_count}</td>
+          <td>${opp.avg_engagement.toFixed(1)}</td>
+          <td>${opp.total_comments}</td>
+          <td>${opp.demand_strength.toFixed(1)}</td>
+          <td>${opp.example_videos.map(v => `<div>${v}</div>`).join('')}</td>
+          <td class="hashtags">${opp.hashtags.join(' ')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    loadOpportunities();
+  </script>
+</body>
+</html>
