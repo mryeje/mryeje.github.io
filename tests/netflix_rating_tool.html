@@ -132,6 +132,44 @@
             font-family: monospace;
             resize: vertical;
         }
+        .paste-bin-textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            background-color: #f8f9fa;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+        .paste-bin-textarea:focus {
+            border-color: #0056b3;
+            background-color: #ffffff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .paste-bin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .paste-bin-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .character-count {
+            font-size: 0.9em;
+            color: #666;
+            font-family: monospace;
+        }
         .copy-button {
             padding: 12px 24px;
             background-color: #28a745;
@@ -193,14 +231,43 @@
     </div>
 
     <div class="results-section" id="text-converter-section" style="display: none;">
-        <h2>Text to CSV Converter</h2>
-        <p>Paste your ratings in the format below and convert them to CSV for download:</p>
-        <textarea class="prompt-textarea" id="text-input" placeholder='- **Title:** "Movie Name"
+        <div class="paste-bin-header">
+            <h2 class="paste-bin-title">📋 Text to CSV Converter - Paste Bin</h2>
+            <div class="character-count" id="char-counter">0 characters</div>
+        </div>
+        <p>Paste your ratings in the format below. This large text area can handle extensive rating lists:</p>
+        <div style="margin-bottom: 15px;">
+            <button class="copy-button" style="background-color: #17a2b8; margin-right: 10px;" onclick="pasteFromClipboard()">📋 Paste from Clipboard</button>
+            <button class="copy-button" style="background-color: #ffc107; color: #000; margin-right: 10px;" onclick="clearTextInput()">🗑️ Clear All</button>
+            <button class="copy-button" style="background-color: #28a745;" onclick="autoFormatText()">✨ Auto-Format</button>
+        </div>
+        <textarea 
+            class="paste-bin-textarea" 
+            id="text-input" 
+            placeholder='📝 Paste your ratings here in any of these formats:
+
+Format 1 (Preferred):
+- **Title:** "Movie Name"
 **Rating:** 5
 - **Title:** "Another Movie"
-**Rating:** 3'></textarea>
-        <button class="copy-button" onclick="convertTextToCSV()">Convert to CSV & Download</button>
-        <button class="copy-button" style="background-color: #6c757d; margin-left: 10px;" onclick="toggleConverter()">Close Converter</button>
+**Rating:** 3
+
+Format 2 (Also works):
+Movie Name: 5
+Another Movie: 3
+
+Format 3 (Basic):
+Movie Name,5
+Another Movie,3
+
+💡 Tip: You can paste large amounts of text - this paste bin can handle thousands of titles!'
+            oninput="updateCharacterCount()"
+            onpaste="setTimeout(updateCharacterCount, 100)"
+        ></textarea>
+        <div style="margin-top: 15px;">
+            <button class="copy-button" onclick="convertTextToCSV()">📄 Convert to CSV & Download</button>
+            <button class="copy-button" style="background-color: #6c757d; margin-left: 10px;" onclick="toggleConverter()">❌ Close Converter</button>
+        </div>
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
@@ -241,10 +308,10 @@
     </div>
 
     <div class="results-section" id="prompt-section">
-        <h2>Custom Search Prompt</h2>
-        <p>This is a custom prompt you can use for further analysis with an AI.</p>
+        <h2>🎯 Master Entertainment Analysis Prompt</h2>
+        <p>Your comprehensive prompt combining all ratings from Netflix history, imported files, and converted text. This master prompt analyzes your complete viewing preferences across all sources.</p>
         <textarea class="prompt-textarea" id="search-prompt" readonly></textarea>
-        <button class="copy-button" onclick="copyPrompt()">Copy Prompt to Clipboard</button>
+        <button class="copy-button" onclick="copyPrompt()">📋 Copy Master Prompt to Clipboard</button>
     </div>
 </div>
 
@@ -521,36 +588,128 @@ function displayResults() {
 function generatePrompt() {
     const promptSection = document.getElementById('prompt-section');
     const promptTextarea = document.getElementById('search-prompt');
-    let promptContent = "Based on the following list of shows and movies with their corresponding ratings, please perform the following tasks:\n\n";
+    
+    const totalTitles = Object.keys(ratings).length;
+    const sources = [];
+    
+    // Determine data sources
+    if (uniqueTitles.length > 0) {
+        sources.push('Netflix viewing history');
+    }
+    if (totalTitles > uniqueTitles.length || uniqueTitles.length === 0) {
+        sources.push('imported ratings files');
+    }
+    
+    let promptContent = `**MASTER ENTERTAINMENT ANALYSIS REQUEST**
+
+Based on the comprehensive list of ${totalTitles} shows and movies with their corresponding ratings compiled from multiple sources (${sources.join(', ')}), please perform the following comprehensive analysis tasks:
+
+**📊 MY COMPLETE RATINGS DATABASE:**
+`;
+    
+    // Group ratings by score for better organization
+    const ratingGroups = {
+        5: [], 4: [], 3: [], 2: [], 1: [], 'N/A': []
+    };
     
     Object.keys(ratings).forEach(title => {
         const rating = ratings[title];
-        promptContent += `- **Title:** "${title}"\n  **Rating:** ${rating}\n`;
+        if (ratingGroups[rating]) {
+            ratingGroups[rating].push(title);
+        }
+    });
+    
+    // Add grouped ratings to prompt
+    Object.keys(ratingGroups).forEach(rating => {
+        if (ratingGroups[rating].length > 0) {
+            const ratingLabel = rating === 'N/A' ? 'Not Rated/Don\'t Remember' : 
+                                rating === '5' ? 'Amazing (5/5)' :
+                                rating === '4' ? 'Good (4/5)' :
+                                rating === '3' ? 'OK (3/5)' :
+                                rating === '2' ? 'Kinda Sucked (2/5)' : 'Hated It (1/5)';
+            
+            promptContent += `\n**${ratingLabel}:**\n`;
+            ratingGroups[rating].forEach(title => {
+                promptContent += `- "${title}"\n`;
+            });
+        }
     });
     
     promptContent += `
-\n**Task 1: Director and Writer Identification**
-For each title in the list, search for its primary writer and director. Add their names to the corresponding title entry.
 
-**Task 2: Grassroots Fan Discussion Analysis**
-For each title, and where possible, for each identified writer and director, search for dedicated fan communities on platforms like Reddit (subreddits), YouTube channels, and social media groups.
+**🎯 COMPREHENSIVE ANALYSIS TASKS:**
 
-**Task 3: Find Similar Recommendations**
-Within the comments and discussions of these fan communities, find grassroots recommendations. These are mentions of other shows or movies that fans compare to the listed titles or to other works by the same writer or director.
-    
-**Task 4: Data Consolidation and Prioritization**
-1.  Harvest a list of the top 100 most mentioned new titles.
-2.  For each suggested title, identify and list the streaming platform(s) where it can be watched.
-3.  Count the number of times each suggested title is mentioned in the discussions.
-4.  Ensure that no suggested title is already present in my original Netflix viewing history list.
-5.  Sort the final list of suggestions based on how they correlate to my original ratings. For example, suggestions related to titles I rated "5" should be at the top, followed by "4," "3," and so on.
+**Task 1: Creative Team Deep Dive**
+For each title in my ratings database:
+- Identify primary directors, writers, showrunners, and key producers
+- Cross-reference my ratings with their other works
+- Create a "creator preference matrix" showing which creative teams I consistently rate highly
 
-**Output:**
-Present the results as a well-structured list, including the suggested title, its streaming platform(s), the mention count, and a brief note on which of my original titles or creators it was linked to.
-`;
+**Task 2: Genre & Theme Pattern Analysis**
+- Analyze my ratings across different genres, themes, and content types
+- Identify my "sweet spots" (genres/themes I consistently rate 4-5)
+- Note any surprising patterns or contradictions in my preferences
+
+**Task 3: Grassroots Community Research**
+For each highly-rated title (4-5 stars) and their creative teams:
+- Search dedicated fan communities (Reddit, Discord, specialized forums)
+- Mine YouTube comments, fan channels, and social media discussions
+- Identify grassroots recommendations from genuine fans (not algorithmic suggestions)
+
+**Task 4: Cross-Platform Content Discovery**
+- Search across ALL streaming platforms (Netflix, Hulu, Disney+, HBO Max, Amazon Prime, Apple TV+, Paramount+, etc.)
+- Include international content and smaller streaming services
+- Consider theatrical releases and limited series
+
+**Task 5: Advanced Recommendation Engine**
+Create a prioritized list of 100+ new titles using this methodology:
+1. **Correlation Scoring**: Match recommendations to my highest-rated content
+2. **Creator Tracking**: Prioritize new works by my favorite creative teams
+3. **Community Validation**: Weight recommendations by grassroots fan enthusiasm
+4. **Availability Mapping**: List current streaming platform(s) for each suggestion
+5. **Freshness Factor**: Include both hidden gems and recent releases
+
+**Task 6: Meta-Analysis & Insights**
+- Identify blind spots in my viewing (unexplored genres I might enjoy)
+- Suggest "gateway content" to ease into new genres based on my preferences
+- Highlight any cult classics or critically acclaimed works I've missed
+- Note any franchise/universe content I should explore based on my ratings
+
+**📋 FINAL OUTPUT FORMAT:**
+
+**SECTION A: My Entertainment Profile**
+- Top-rated genres and themes
+- Favorite creative teams (directors, writers, etc.)
+- Content patterns and preferences
+
+**SECTION B: Priority Recommendations (Ranked 1-100+)**
+For each recommendation, include:
+- Title and brief description
+- Streaming platform(s) and availability
+- Connection to my highly-rated content
+- Fan community enthusiasm score
+- Why it matches my taste profile
+
+**SECTION C: Strategic Viewing Suggestions**
+- Genre expansion opportunities
+- Franchise/universe deep-dives
+- Hidden gems likely to become new favorites
+- "Must-watch" content I've surprisingly missed
+
+**🎬 GOAL:** Create the most personalized, comprehensive entertainment recommendation system based on ${totalTitles} data points of my actual viewing preferences, validated by genuine fan communities rather than algorithmic suggestions.
+
+**📈 DATA SOURCES TO PRIORITIZE:**
+- Organic fan discussions and recommendations
+- Creator filmographies and upcoming projects  
+- Cross-platform content availability
+- Community-driven "hidden gems" lists
+- Genre-specific enthusiast communities
+
+Please provide detailed, actionable recommendations that go beyond mainstream suggestions to uncover truly personalized entertainment discoveries.`;
+
     promptTextarea.value = promptContent;
     
-    // Show the prompt section only after all ratings are complete
+    // Show the prompt section
     promptSection.style.display = 'block';
 }
 
@@ -572,6 +731,245 @@ function copyPrompt() {
         }, 2000);
     } catch (err) {
         alert('Failed to copy. Please select the text and copy manually.');
+    }
+}
+
+function toggleConverter() {
+    const converterSection = document.getElementById('text-converter-section');
+    if (converterSection.style.display === 'none') {
+        converterSection.style.display = 'block';
+    } else {
+        converterSection.style.display = 'none';
+    }
+}
+
+function convertTextToCSV() {
+    const textInput = document.getElementById('text-input');
+    const text = textInput.value.trim();
+    
+    if (!text) {
+        alert('Please paste your ratings text first.');
+        return;
+    }
+    
+    const lines = text.split('\n');
+    let csvContent = "Title,Rating\n";
+    const convertedRatings = {};
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Look for title line in standard format
+        if (line.includes('**Title:**')) {
+            const titleMatch = line.match(/\*\*Title:\*\*\s*"([^"]+)"/);
+            if (titleMatch && i + 1 < lines.length) {
+                const title = titleMatch[1];
+                const nextLine = lines[i + 1].trim();
+                const ratingMatch = nextLine.match(/\*\*Rating:\*\*\s*(.+)/);
+                
+                if (ratingMatch) {
+                    let rating = ratingMatch[1].trim();
+                    csvContent += `"${title}",${rating}\n`;
+                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
+                }
+            }
+        }
+        // Handle other formats
+        else if (line.includes(':') && !line.includes('**')) {
+            const parts = line.split(':');
+            if (parts.length >= 2) {
+                const title = parts[0].trim().replace(/^["'\-\s*]+|["'\s*]+$/g, '');
+                const rating = parts.slice(1).join(':').trim();
+                if (title && rating) {
+                    csvContent += `"${title}",${rating}\n`;
+                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
+                }
+            }
+        }
+        else if (line.includes(',') && !line.includes('**')) {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                const title = parts[0].trim().replace(/^["'\-\s*]+|["'\s*]+$/g, '');
+                const rating = parts.slice(1).join(',').trim();
+                if (title && rating) {
+                    csvContent += `"${title}",${rating}\n`;
+                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
+                }
+            }
+        }
+    }
+    
+    if (csvContent === "Title,Rating\n") {
+        alert('No valid ratings found. Please check your text format.');
+        return;
+    }
+    
+    // Add converted ratings to the main ratings object
+    Object.assign(ratings, convertedRatings);
+    
+    // Download the CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "converted_ratings.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Update display and generate master prompt
+    displayResults();
+    generatePrompt();
+    
+    // Show success message
+    const convertedCount = Object.keys(convertedRatings).length;
+    const totalCount = Object.keys(ratings).length;
+    alert(`Successfully converted ${convertedCount} ratings to CSV and integrated into master list!\n\nTotal titles now: ${totalCount}`);
+    
+    // Hide the converter after successful conversion
+    toggleConverter();
+}
+
+async function pasteFromClipboard() {
+    const textInput = document.getElementById('text-input');
+    
+    try {
+        // Try to use the modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            const clipboardText = await navigator.clipboard.readText();
+            textInput.value = clipboardText;
+            updateCharacterCount();
+            
+            // Show success feedback
+            const pasteButton = event.target;
+            const originalText = pasteButton.textContent;
+            pasteButton.textContent = '📋 Pasted!';
+            pasteButton.style.backgroundColor = '#138496';
+            
+            setTimeout(() => {
+                pasteButton.textContent = originalText;
+                pasteButton.style.backgroundColor = '#17a2b8';
+            }, 1500);
+        } else {
+            // Fallback for older browsers
+            textInput.focus();
+            document.execCommand('paste');
+            setTimeout(updateCharacterCount, 100);
+            alert('Text pasted! If nothing appeared, try using Ctrl+V (Windows) or Cmd+V (Mac) manually.');
+        }
+    } catch (err) {
+        // If clipboard access is denied or fails
+        textInput.focus();
+        alert('Unable to access clipboard automatically. Please use Ctrl+V (Windows) or Cmd+V (Mac) to paste your text.');
+    }
+}
+
+function clearTextInput() {
+    const textInput = document.getElementById('text-input');
+    textInput.value = '';
+    textInput.focus();
+    updateCharacterCount();
+    
+    // Show feedback
+    const clearButton = event.target;
+    const originalText = clearButton.textContent;
+    clearButton.textContent = '🗑️ Cleared!';
+    clearButton.style.backgroundColor = '#e0a800';
+    
+    setTimeout(() => {
+        clearButton.textContent = originalText;
+        clearButton.style.backgroundColor = '#ffc107';
+    }, 1500);
+}
+
+function updateCharacterCount() {
+    const textInput = document.getElementById('text-input');
+    const charCounter = document.getElementById('char-counter');
+    const length = textInput.value.length;
+    
+    if (length === 0) {
+        charCounter.textContent = '0 characters';
+    } else if (length < 1000) {
+        charCounter.textContent = `${length} characters`;
+    } else if (length < 1000000) {
+        charCounter.textContent = `${length} characters (${(length/1000).toFixed(1)}K)`;
+    } else {
+        charCounter.textContent = `${length} characters (${(length/1000000).toFixed(1)}M)`;
+    }
+    
+    // Change color based on content length
+    if (length === 0) {
+        charCounter.style.color = '#666';
+    } else if (length < 1000) {
+        charCounter.style.color = '#28a745';
+    } else if (length < 10000) {
+        charCounter.style.color = '#ffc107';
+    } else {
+        charCounter.style.color = '#dc3545';
+    }
+}
+
+function autoFormatText() {
+    const textInput = document.getElementById('text-input');
+    let text = textInput.value.trim();
+    
+    if (!text) {
+        alert('Please paste some text first to auto-format.');
+        return;
+    }
+    
+    // Try to detect and convert different formats to the standard format
+    const lines = text.split('\n');
+    let formattedText = '';
+    let formatDetected = false;
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        // Format: "Title: Rating" or "Title,Rating"
+        if (line.includes(':') && !line.includes('**Title:**')) {
+            const parts = line.split(':');
+            if (parts.length >= 2) {
+                const title = parts[0].trim().replace(/^["']|["']$/g, '');
+                const rating = parts.slice(1).join(':').trim();
+                formattedText += `- **Title:** "${title}"\n**Rating:** ${rating}\n`;
+                formatDetected = true;
+            }
+        }
+        // Format: "Title,Rating"
+        else if (line.includes(',') && !line.includes('**Title:**')) {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                const title = parts[0].trim().replace(/^["']|["']$/g, '');
+                const rating = parts.slice(1).join(',').trim();
+                formattedText += `- **Title:** "${title}"\n**Rating:** ${rating}\n`;
+                formatDetected = true;
+            }
+        }
+        // Already in correct format or unrecognized - keep as is
+        else {
+            formattedText += line + '\n';
+        }
+    }
+    
+    if (formatDetected) {
+        textInput.value = formattedText.trim();
+        updateCharacterCount();
+        
+        // Show success feedback
+        const formatButton = event.target;
+        const originalText = formatButton.textContent;
+        formatButton.textContent = '✨ Formatted!';
+        formatButton.style.backgroundColor = '#1e7e34';
+        
+        setTimeout(() => {
+            formatButton.textContent = originalText;
+            formatButton.style.backgroundColor = '#28a745';
+        }, 2000);
+    } else {
+        alert('No formatting needed - text appears to already be in the correct format or no recognizable patterns found.');
     }
 }
 
