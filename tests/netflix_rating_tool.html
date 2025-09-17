@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Viewing History Rater</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #E50914;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+        }
+        .file-input-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 40px 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 90%;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .title-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .rating-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .rating-button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .rating-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .rating-button.hated { background-color: #d9534f; }
+        .rating-button.sucked { background-color: #f0ad4e; }
+        .rating-button.ok { background-color: #5bc0de; }
+        .rating-button.good { background-color: #5cb85c; }
+        .rating-button.amazing { background-color: #0275d8; }
+        .rating-button.dont-remember { background-color: #6c757d; }
+        .results-section {
+            margin-top: 40px;
+            border-top: 2px solid #ccc;
+            padding-top: 20px;
+            display: none;
+        }
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        #results-table th, #results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        #results-table th {
+            background-color: #f2f2f2;
+        }
+        .download-button {
+            padding: 12px 24px;
+            background-color: #E50914;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            margin: 20px auto;
+        }
+        .prompt-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .rating-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Netflix Viewing History Rater</h1>
+    <div class="file-input-container">
+        <p>Upload your Netflix viewing history CSV file to rate your shows and movies.</p>
+        <input type="file" id="csvFile" accept=".csv" />
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-title" class="title-name"></div>
+            <div id="modal-buttons" class="rating-buttons">
+                <button class="rating-button hated" data-rating="Hated it">Hated it</button>
+                <button class="rating-button sucked" data-rating="Kinda Sucked">Kinda Sucked</button>
+                <button class="rating-button ok" data-rating="OK">OK</button>
+                <button class="rating-button good" data-rating="Good">Good</button>
+                <button class="rating-button amazing" data-rating="Amazing">Amazing</button>
+                <button class="rating-button dont-remember" data-rating="Don't Remember">Don't Remember</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-section" id="results-section">
+        <h2>Your Ratings</h2>
+        <p>Your ratings have been captured. You can download the results as a CSV file below.</p>
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button class="download-button" onclick="downloadCSV()">Download Ratings CSV</button>
+    </div>
+
+    <div class="results-section" id="prompt-section">
+        <h2>Custom Search Prompt</h2>
+        <p>This is a custom prompt you can use for further analysis with an AI.</p>
+        <textarea class="prompt-textarea" id="search-prompt" readonly></textarea>
+    </div>
+</div>
+
+<script>
+document.getElementById('csvFile').addEventListener('change', handleFileSelect);
+document.getElementById('modal-buttons').addEventListener('click', handleRatingClick);
+
+const ratings = {};
+let uniqueTitles = [];
+let currentTitleIndex = 0;
+
+const ratingMap = {
+    'Hated it': 1,
+    'Kinda Sucked': 2,
+    'OK': 3,
+    'Good': 4,
+    'Amazing': 5,
+    "Don't Remember": 'N/A'
+};
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => processCSV(e.target.result);
+        reader.readAsText(file);
+    }
+}
+
+function processCSV(text) {
+    const lines = text.split('\n');
+    const titlesSet = new Set();
+    
+    // Simple parsing, assuming 'Title' is the first column in the CSV as per the file snippet
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim() === '') continue;
+        
+        let title;
+        // Handle titles with commas inside quotes, which is common in Netflix history
+        if (line.startsWith('"')) {
+            const firstQuoteIndex = line.indexOf('"') + 1;
+            const secondQuoteIndex = line.indexOf('"', firstQuoteIndex);
+            if (secondQuoteIndex !== -1) {
+                title = line.substring(firstQuoteIndex, secondQuoteIndex);
+            }
+        } else {
+            title = line.split(',')[0].trim();
+        }
+
+        if (title) {
+            const cleanTitle = getCleanTitle(title);
+            if (cleanTitle) {
+                titlesSet.add(cleanTitle);
+            }
+        }
+    }
+    
+    uniqueTitles = Array.from(titlesSet);
+    currentTitleIndex = 0;
+    
+    if (uniqueTitles.length > 0) {
+        document.getElementById('modal-overlay').style.display = 'flex';
+        showCurrentTitle();
+    } else {
+        alert('No titles found in the CSV file.');
+    }
+}
+
+function getCleanTitle(title) {
+    const colonIndex = title.indexOf(':');
+    if (colonIndex !== -1) {
+        return title.substring(0, colonIndex).trim();
+    }
+    return title.trim();
+}
+
+function showCurrentTitle() {
+    if (currentTitleIndex < uniqueTitles.length) {
+        const title = uniqueTitles[currentTitleIndex];
+        document.getElementById('modal-title').textContent = title;
+    } else {
+        document.getElementById('modal-overlay').style.display = 'none';
+        displayResults();
+        generatePrompt();
+    }
+}
+
+function handleRatingClick(event) {
+    const button = event.target.closest('.rating-button');
+    if (button) {
+        const title = uniqueTitles[currentTitleIndex];
+        const rating = button.dataset.rating;
+        const numericRating = ratingMap[rating];
+        ratings[title] = numericRating;
+        
+        currentTitleIndex++;
+        showCurrentTitle();
+    }
+}
+
+function displayResults() {
+    const resultsSection = document.getElementById('results-section');
+    const tableBody = resultsSection.querySelector('tbody');
+    tableBody.innerHTML = '';
+    
+    const ratedTitles = Object.keys(ratings);
+    ratedTitles.forEach(title => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${title}</td><td>${ratings[title]}</td>`;
+        tableBody.appendChild(row);
+    });
+    
+    resultsSection.style.display = 'block';
+}
+
+function generatePrompt() {
+    const promptSection = document.getElementById('prompt-section');
+    const promptTextarea = document.getElementById('search-prompt');
+    let promptContent = "Based on the following list of shows and movies with their corresponding ratings, please perform the following tasks:\n\n";
+    
+    Object.keys(ratings).forEach(title => {
+        const rating = ratings[title];
+        promptContent += `- **Title:** "${title}"\n  **Rating:** ${rating}\n`;
+    });
+    
+    promptContent += `
+\n**Task 1: Director and Writer Identification**
+For each title in the list, search for its primary writer and director. Add their names to the corresponding title entry.
+
+**Task 2: Grassroots Fan Discussion Analysis**
+For each title, and where possible, for each identified writer and director, search for dedicated fan communities on platforms like Reddit (subreddits), YouTube channels, and social media groups.
+
+**Task 3: Find Similar Recommendations**
+Within the comments and discussions of these fan communities, find grassroots recommendations. These are mentions of other shows or movies that fans compare to the listed titles or to other works by the same writer or director.
+    
+**Task 4: Data Consolidation and Prioritization**
+1.  Harvest a list of the top 100 most mentioned new titles.
+2.  For each suggested title, identify and list the streaming platform(s) where it can be watched.
+3.  Count the number of times each suggested title is mentioned in the discussions.
+4.  Ensure that no suggested title is already present in my original Netflix viewing history list.
+5.  Sort the final list of suggestions based on how they correlate to my original ratings. For example, suggestions related to titles I rated "5" should be at the top, followed by "4," "3," and so on.
+
+**Output:**
+Present the results as a well-structured list, including the suggested title, its streaming platform(s), the mention count, and a brief note on which of my original titles or creators it was linked to.
+`;
+    promptTextarea.value = promptContent;
+    
+    // Show the prompt section only after all ratings are complete
+    promptSection.style.display = 'block';
+}
+
+function downloadCSV() {
+    let csvContent = "Title,Rating\n";
+    
+    Object.keys(ratings).forEach(title => {
+        const rating = ratings[title];
+        csvContent += `"${title}",${rating}\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "netflix_ratings.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
