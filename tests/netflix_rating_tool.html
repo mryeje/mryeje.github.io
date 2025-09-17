@@ -187,8 +187,24 @@
 <div class="container">
     <h1>Netflix Viewing History Rater</h1>
     <div class="file-input-container">
-        <p>Upload your Netflix viewing history CSV file to rate your shows and movies.</p>
-        <input type="file" id="csvFile" accept=".csv" />
+        <p>Upload your Netflix viewing history CSV file to rate your shows and movies, or upload existing ratings files.</p>
+        <input type="file" id="csvFile" accept=".csv,.txt" />
+        <p style="margin-top: 10px;"><em>Supports: Netflix CSV files, TXT files with ratings, or CSV exports from previous sessions</em></p>
+    </div>
+
+    <div class="results-section" id="text-converter-section" style="display: none;">
+        <h2>Text to CSV Converter</h2>
+        <p>Paste your ratings in the format below and convert them to CSV for download:</p>
+        <textarea class="prompt-textarea" id="text-input" placeholder='- **Title:** "Movie Name"
+**Rating:** 5
+- **Title:** "Another Movie"
+**Rating:** 3'></textarea>
+        <button class="copy-button" onclick="convertTextToCSV()">Convert to CSV & Download</button>
+        <button class="copy-button" style="background-color: #6c757d; margin-left: 10px;" onclick="toggleConverter()">Close Converter</button>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <button class="copy-button" style="background-color: #17a2b8;" onclick="toggleConverter()">Show Text to CSV Converter</button>
     </div>
 
     <div class="modal-overlay" id="modal-overlay">
@@ -228,12 +244,17 @@
         <h2>Custom Search Prompt</h2>
         <p>This is a custom prompt you can use for further analysis with an AI.</p>
         <textarea class="prompt-textarea" id="search-prompt" readonly></textarea>
+        <button class="copy-button" onclick="copyPrompt()">Copy Prompt to Clipboard</button>
     </div>
 </div>
 
 <script>
 document.getElementById('csvFile').addEventListener('change', handleFileSelect);
 document.getElementById('modal-buttons').addEventListener('click', handleRatingClick);
+
+// Load state from localStorage on page load
+window.addEventListener('load', loadState);
+window.addEventListener('beforeunload', saveState);
 
 const ratings = {};
 let uniqueTitles = [];
@@ -248,16 +269,160 @@ const ratingMap = {
     "Don't Remember": 'N/A'
 };
 
+function saveState() {
+    const state = {
+        ratings: ratings,
+        uniqueTitles: uniqueTitles,
+        currentTitleIndex: currentTitleIndex,
+        timestamp: Date.now()
+    };
+    sessionStorage.setItem('netflixRaterState', JSON.stringify(state));
+}
+
+function loadState() {
+    const savedState = sessionStorage.getItem('netflixRaterState');
+    if (savedState) {
+        try {
+            const state = JSON.parse(savedState);
+            // Only restore if it's less than 1 hour old
+            if (Date.now() - state.timestamp < 3600000) {
+                Object.assign(ratings, state.ratings);
+                uniqueTitles = state.uniqueTitles || [];
+                currentTitleIndex = state.currentTitleIndex || 0;
+                
+                if (uniqueTitles.length > 0 && currentTitleIndex < uniqueTitles.length) {
+                    if (confirm('It looks like you were in the middle of rating your Netflix titles. Would you like to continue where you left off?')) {
+                        document.getElementById('modal-overlay').style.display = 'flex';
+                        showCurrentTitle();
+                        return;
+                    }
+                } else if (Object.keys(ratings).length > 0) {
+                    // They had completed rating, show results
+                    displayResults();
+                    generatePrompt();
+                }
+            }
+        } catch (e) {
+            console.log('Could not restore previous state');
+        }
+    }
+}
+
 function handleFileSelect(event) {
     const file = event.target.files[0];
     if (file) {
+        // Clear previous state when uploading new file
+        sessionStorage.removeItem('netflixRaterState');
+        Object.keys(ratings).forEach(key => delete ratings[key]);
+        uniqueTitles = [];
+        currentTitleIndex = 0;
+        
         const reader = new FileReader();
-        reader.onload = (e) => processCSV(e.target.result);
+        reader.onload = (e) => {
+            if (file.name.toLowerCase().endsWith('.txt')) {
+                processTXT(e.target.result);
+            } else if (file.name.toLowerCase().endsWith('.csv')) {
+                // Check if it's a ratings CSV (has Title,Rating format) or Netflix history CSV
+                const content = e.target.result;
+                const lines = content.split('\n');
+                if (lines[0] && lines[0].toLowerCase().includes('title') && lines[0].toLowerCase().includes('rating')) {
+                    processRatingsCSV(content);
+                } else {
+                    processNetflixCSV(content);
+                }
+            }
+        };
         reader.readAsText(file);
     }
 }
 
-function processCSV(text) {
+function processTXT(text) {
+    const lines = text.split('\n');
+    const extractedRatings = {};
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Look for title line
+        if (line.includes('**Title:**')) {
+            const titleMatch = line.match(/\*\*Title:\*\*\s*"([^"]+)"/);
+            if (titleMatch && i + 1 < lines.length) {
+                const title = titleMatch[1];
+                const nextLine = lines[i + 1].trim();
+                const ratingMatch = nextLine.match(/\*\*Rating:\*\*\s*(.+)/);
+                
+                if (ratingMatch) {
+                    let rating = ratingMatch[1].trim();
+                    // Convert text ratings to numbers if needed
+                    if (rating === 'N/A' || rating === "Don't Remember") {
+                        rating = 'N/A';
+                    } else {
+                        rating = parseInt(rating) || rating;
+                    }
+                    extractedRatings[title] = rating;
+                }
+            }
+        }
+    }
+    
+    if (Object.keys(extractedRatings).length > 0) {
+        Object.assign(ratings, extractedRatings);
+        displayResults();
+        generatePrompt();
+        alert(`Successfully imported ${Object.keys(extractedRatings).length} rated titles from text file.`);
+    } else {
+        alert('No valid ratings found in the text file. Please check the format.');
+    }
+}
+
+function processRatingsCSV(text) {
+    const lines = text.split('\n');
+    const extractedRatings = {};
+    
+    // Skip header row
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line === '') continue;
+        
+        let title, rating;
+        
+        // Handle quoted titles with commas
+        if (line.startsWith('"')) {
+            const firstQuoteIndex = line.indexOf('"') + 1;
+            const secondQuoteIndex = line.indexOf('"', firstQuoteIndex);
+            if (secondQuoteIndex !== -1) {
+                title = line.substring(firstQuoteIndex, secondQuoteIndex);
+                const remainingLine = line.substring(secondQuoteIndex + 1);
+                rating = remainingLine.split(',')[1]?.trim();
+            }
+        } else {
+            const parts = line.split(',');
+            title = parts[0]?.trim();
+            rating = parts[1]?.trim();
+        }
+        
+        if (title && rating) {
+            // Convert rating to appropriate format
+            if (rating === 'N/A' || rating === "Don't Remember") {
+                rating = 'N/A';
+            } else {
+                rating = parseInt(rating) || rating;
+            }
+            extractedRatings[title] = rating;
+        }
+    }
+    
+    if (Object.keys(extractedRatings).length > 0) {
+        Object.assign(ratings, extractedRatings);
+        displayResults();
+        generatePrompt();
+        alert(`Successfully imported ${Object.keys(extractedRatings).length} rated titles from CSV file.`);
+    } else {
+        alert('No valid ratings found in the CSV file.');
+    }
+}
+
+function processNetflixCSV(text) {
     const lines = text.split('\n');
     const titlesSet = new Set();
     
@@ -292,6 +457,7 @@ function processCSV(text) {
     if (uniqueTitles.length > 0) {
         document.getElementById('modal-overlay').style.display = 'flex';
         showCurrentTitle();
+        saveState();
     } else {
         alert('No titles found in the CSV file.');
     }
@@ -309,10 +475,9 @@ function showCurrentTitle() {
     if (currentTitleIndex < uniqueTitles.length) {
         const title = uniqueTitles[currentTitleIndex];
         document.getElementById('modal-title').textContent = title;
+        document.getElementById('progress-counter').textContent = `${currentTitleIndex + 1} of ${uniqueTitles.length}`;
     } else {
-        document.getElementById('modal-overlay').style.display = 'none';
-        displayResults();
-        generatePrompt();
+        finishRating();
     }
 }
 
@@ -325,8 +490,17 @@ function handleRatingClick(event) {
         ratings[title] = numericRating;
         
         currentTitleIndex++;
+        saveState();
         showCurrentTitle();
     }
+}
+
+function finishRating() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    displayResults();
+    generatePrompt();
+    // Clear the session storage since we're done
+    sessionStorage.removeItem('netflixRaterState');
 }
 
 function displayResults() {
@@ -378,6 +552,27 @@ Present the results as a well-structured list, including the suggested title, it
     
     // Show the prompt section only after all ratings are complete
     promptSection.style.display = 'block';
+}
+
+function copyPrompt() {
+    const promptTextarea = document.getElementById('search-prompt');
+    promptTextarea.select();
+    promptTextarea.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        document.execCommand('copy');
+        const copyButton = document.querySelector('.copy-button');
+        const originalText = copyButton.textContent;
+        copyButton.textContent = 'Copied!';
+        copyButton.style.backgroundColor = '#218838';
+        
+        setTimeout(() => {
+            copyButton.textContent = originalText;
+            copyButton.style.backgroundColor = '#28a745';
+        }, 2000);
+    } catch (err) {
+        alert('Failed to copy. Please select the text and copy manually.');
+    }
 }
 
 function downloadCSV() {
