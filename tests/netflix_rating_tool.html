@@ -3,995 +3,1164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix Viewing History Rater</title>
+    <title>YouTube Viewing History Rating App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-        }
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 20px auto;
-            background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
         h1 {
-            color: #E50914;
-            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        p {
-            text-align: center;
+        
+        .upload-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            transition: all 0.3s ease;
         }
-        .file-input-container {
-            text-align: center;
-            margin-bottom: 20px;
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
         }
-        .modal-overlay {
+        
+        .file-input {
+            margin: 20px 0;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .options {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: #f8f9ff;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-group:hover {
+            background: #e8f2ff;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .modal {
+            display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        .modal h2 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.8em;
+        }
+        
+        .progress {
+            margin: 20px 0;
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .title-display {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            border-left: 5px solid #667eea;
+        }
+        
+        .rating-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .rating-btn {
+            padding: 12px 20px;
+            border: 2px solid;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .rating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-hated { border-color: #dc3545; color: #dc3545; }
+        .btn-hated:hover { background: #dc3545; color: white; }
+        
+        .btn-ok { border-color: #ffc107; color: #ffc107; }
+        .btn-ok:hover { background: #ffc107; color: white; }
+        
+        .btn-good { border-color: #28a745; color: #28a745; }
+        .btn-good:hover { background: #28a745; color: white; }
+        
+        .btn-awesome { border-color: #007bff; color: #007bff; }
+        .btn-awesome:hover { background: #007bff; color: white; }
+        
+        .btn-unknown { border-color: #6c757d; color: #6c757d; }
+        .btn-unknown:hover { background: #6c757d; color: white; }
+        
+        .btn-enough { 
+            border-color: #fd7e14; 
+            color: #fd7e14; 
+            margin-top: 20px;
+            padding: 15px 30px;
+        }
+        .btn-enough:hover { background: #fd7e14; color: white; }
+        
+        .btn-back {
+            border-color: #6c757d;
+            color: #6c757d;
+            margin-top: 20px;
+            padding: 12px 25px;
+            margin-right: 15px;
+        }
+        .btn-back:hover { background: #6c757d; color: white; }
+        .btn-back:disabled { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .modal-controls {
+            display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 40px 20px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 90%;
-            min-height: 250px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .title-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .rating-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            flex-wrap: wrap;
             gap: 10px;
             margin-top: 20px;
         }
-        .rating-button {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .rating-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .rating-button.hated { background-color: #d9534f; }
-        .rating-button.sucked { background-color: #f0ad4e; }
-        .rating-button.ok { background-color: #5bc0de; }
-        .rating-button.good { background-color: #5cb85c; }
-        .rating-button.amazing { background-color: #0275d8; }
-        .rating-button.dont-remember { background-color: #6c757d; }
-        .results-section {
-            margin-top: 40px;
-            border-top: 2px solid #ccc;
-            padding-top: 20px;
-            display: none;
-        }
-        #results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        #results-table th, #results-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
+        
+        .results {
+            margin-top: 30px;
             text-align: left;
         }
-        #results-table th {
-            background-color: #f2f2f2;
-        }
-        .download-button {
-            padding: 12px 24px;
-            background-color: #E50914;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            margin: 20px auto;
-        }
-        .prompt-textarea {
+        
+        .results textarea {
             width: 100%;
-            min-height: 200px;
-            padding: 15px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: monospace;
-            resize: vertical;
-        }
-        .paste-bin-textarea {
-            width: 100%;
-            min-height: 400px;
+            height: 400px;
             padding: 20px;
-            box-sizing: border-box;
-            border: 2px dashed #007bff;
-            border-radius: 8px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
             resize: vertical;
-            background-color: #f8f9fa;
-            transition: border-color 0.3s ease, background-color 0.3s ease;
         }
-        .paste-bin-textarea:focus {
-            border-color: #0056b3;
-            background-color: #ffffff;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-        .paste-bin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .paste-bin-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
-        }
-        .character-count {
-            font-size: 0.9em;
-            color: #666;
-            font-family: monospace;
-        }
-        .copy-button {
-            padding: 12px 24px;
-            background-color: #28a745;
+        
+        .copy-btn {
+            margin-top: 15px;
+            background: #28a745;
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 10px auto;
-            display: block;
         }
-        .copy-button:hover {
-            background-color: #218838;
+        
+        .copy-btn:hover {
+            background: #218838;
         }
-        .enough-button {
-            padding: 12px 24px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 10px;
-            font-size: 0.9em;
-        }
-        .enough-button:hover {
-            background-color: #5a6268;
-        }
-        .modal-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .progress-counter {
-            font-size: 0.9em;
-            color: #666;
-        }
-        /* Mobile responsiveness */
-        @media (max-width: 600px) {
-            .container {
-                width: 95%;
-            }
-            .modal-content {
-                padding: 20px;
-            }
-            .rating-buttons {
-                grid-template-columns: 1fr;
-            }
+
+        .warning-banner {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>YouTube History Rating App</h1>
+			<div class="instructions-section">
+		<button class="btn btn-primary" onclick="toggleInstructions()">Show Instructions</button>
+		<div id="instructionsContent" style="display: none; text-align: left; margin-top: 20px;">
+			<p>This tool helps you generate a detailed research prompt from your YouTube viewing history.</p>
+			<ol>
+				<li><b>Step 1: Get Your Prompt</b><br>Export your YouTube viewing history as a CSV file and upload it using the "Choose CSV File" button. The tool will identify unique movie and TV show titles.</li>
+				<li><b>Step 2: Start Rating</b><br>Click "Start Ratings" to begin. Rate each title as Hated (0), Ok (1), Good (2), or Awesome (4). Click "That's Enough" at any time to finish.</li>
+				<li><b>Step 3: Begin "Deep Research"</b><br>The tool will generate a structured research prompt based on your ratings. Start a new deep research session, select the "Deep Research" option in the prompt bar of Gemini or the tools menu of ChatGPTCopy. Paste it in and go.</li>
+				<li><b>Step 4: Use the AI's Answer</b><br>Take the AI's response at the bottom of the results (RECOMMENDED TITLES FOR RECURSIVE PROCESSING:)Copy that list and go back to this page with it.</li>
+				<li><b>Step 5: Add Research Results</b><br>Use the "Add Research Results" button to paste in a clean list of titles from the AI's recommendations. The app will then allow you to rate those new titles, further refining your taste profile.</li>
+			</ol>
+			<p>Use the "Save Progress" and "Load Progress" buttons to save your ratings and continue later.</p>
+		</div>
+	</div>
 
-<div class="container">
-    <h1>Netflix Viewing History Rater</h1>
-    <div class="file-input-container">
-        <p>Upload your Netflix viewing history CSV file to rate your shows and movies, or upload existing ratings files.</p>
-        <input type="file" id="csvFile" accept=".csv,.txt" />
-        <p style="margin-top: 10px;"><em>Supports: Netflix CSV files, TXT files with ratings, or CSV exports from previous sessions</em></p>
-    </div>
+	<script>
+		function toggleInstructions() {
+			const content = document.getElementById('instructionsContent');
+			const button = document.querySelector('.instructions-section button');
+			if (content.style.display === 'none') {
+				content.style.display = 'block';
+				button.textContent = 'Hide Instructions';
+			} else {
+				content.style.display = 'none';
+				button.textContent = 'Show Instructions';
+			}
+		}
+	</script>
 
-    <div class="results-section" id="text-converter-section" style="display: none;">
-        <div class="paste-bin-header">
-            <h2 class="paste-bin-title">📋 Text to CSV Converter - Paste Bin</h2>
-            <div class="character-count" id="char-counter">0 characters</div>
+	<style>
+		.instructions-section {
+			margin-bottom: 30px;
+			padding: 20px;
+			border: 2px dashed #ddd;
+			border-radius: 15px;
+			transition: all 0.3s ease;
+		}
+		.instructions-section:hover {
+			border-color: #667eea;
+			background: #f8f9ff;
+		}
+	</style>
+        <div id="sessionWarning" class="warning-banner">
+            ⚠️ Rating session in progress! Your progress will be lost if you refresh the page.
         </div>
-        <p>Paste your ratings in the format below. This large text area can handle extensive rating lists:</p>
-        <div style="margin-bottom: 15px;">
-            <button class="copy-button" style="background-color: #17a2b8; margin-right: 10px;" onclick="pasteFromClipboard()">📋 Paste from Clipboard</button>
-            <button class="copy-button" style="background-color: #ffc107; color: #000; margin-right: 10px;" onclick="clearTextInput()">🗑️ Clear All</button>
-            <button class="copy-button" style="background-color: #28a745;" onclick="autoFormatText()">✨ Auto-Format</button>
+        
+        <div class="upload-section">
+            <h3>Upload Your YouTube Viewing History CSV</h3>
+            <p>Export your YouTube viewing history and upload the CSV file here</p>
+            <div class="file-input">
+                <input type="file" id="csvFile" accept=".csv" />
+                <label for="csvFile" class="file-label">Choose CSV File</label>
+            </div>
+            <div id="fileStatus"></div>
         </div>
-        <textarea 
-            class="paste-bin-textarea" 
-            id="text-input" 
-            placeholder='📝 Paste your ratings here in any of these formats:
-
-Format 1 (Preferred):
-- **Title:** "Movie Name"
-**Rating:** 5
-- **Title:** "Another Movie"
-**Rating:** 3
-
-Format 2 (Also works):
-Movie Name: 5
-Another Movie: 3
-
-Format 3 (Basic):
-Movie Name,5
-Another Movie,3
-
-💡 Tip: You can paste large amounts of text - this paste bin can handle thousands of titles!'
-            oninput="updateCharacterCount()"
-            onpaste="setTimeout(updateCharacterCount, 100)"
-        ></textarea>
-        <div style="margin-top: 15px;">
-            <button class="copy-button" onclick="convertTextToCSV()">📄 Convert to CSV & Download</button>
-            <button class="copy-button" style="background-color: #6c757d; margin-left: 10px;" onclick="toggleConverter()">❌ Close Converter</button>
+        
+        <div class="options">
+            <div class="checkbox-group">
+                <input type="checkbox" id="tvTitles" checked>
+                <label for="tvTitles">TV Titles</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="movieTitles" checked>
+                <label for="movieTitles">Movie Titles</label>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" id="startRating" disabled>Start Ratings</button>
+        
+        <div class="upload-section" id="saveLoadSection" style="margin-top: 30px;">
+            <h3>💾 Save/Load Rating Progress</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
+                <button class="btn" style="background: #17a2b8; color: white;" onclick="saveRatingsToFile()" id="saveButton" disabled>Save Progress</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="file" id="loadRatingsFile" accept=".json" style="display: none;" />
+                    <label for="loadRatingsFile" class="btn" style="background: #28a745; color: white; cursor: pointer;">Load Progress</label>
+                </div>
+            </div>
+            <div id="saveLoadStatus"></div>
+        </div>
+        
+        <div class="upload-section" id="recursiveSection" style="display: none;">
+            <h3>🔍 Add Research Results (Recursive Mode)</h3>
+            <p>Paste the recommended titles from your research results here, one per line</p>
+            <div style="margin: 20px 0;">
+                <textarea id="recursiveTitles" placeholder="Enter new titles here, one per line:&#10;The Matrix&#10;Inception&#10;Blade Runner&#10;..." 
+                          style="width: 100%; height: 200px; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+            <button class="btn btn-primary" id="addRecursiveTitles" onclick="addRecursiveTitles()">Add & Rate New Titles</button>
+            <button class="btn" style="background: #6c757d; color: white; margin-left: 10px;" onclick="hideRecursiveSection()">Cancel</button>
+        </div>
+        
+        <div id="resultsSection" class="results" style="display: none;">
+            <h3>Generated Research Prompt:</h3>
+            <textarea id="promptOutput" readonly></textarea>
+            <button class="btn copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+            <button class="btn" style="background: #17a2b8; color: white;" onclick="saveRatingsToFile()">Save Final Results</button>
+            <button class="btn btn-primary" onclick="showRecursiveSection()">Add Research Results</button>
+            <button class="btn btn-primary" onclick="resetApp()">Start Over</button>
         </div>
     </div>
-
-    <div style="text-align: center; margin: 20px 0;">
-        <button class="copy-button" style="background-color: #17a2b8;" onclick="toggleConverter()">Show Text to CSV Converter</button>
-    </div>
-
-    <div class="modal-overlay" id="modal-overlay">
+    
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="modal">
         <div class="modal-content">
-            <div class="modal-controls">
-                <div class="progress-counter" id="progress-counter"></div>
-                <button class="enough-button" onclick="finishRating()">That's Enough</button>
+            <div class="progress" id="progressText"></div>
+            <h2>Rate This Title:</h2>
+            <div class="title-display" id="currentTitle"></div>
+            <div class="rating-buttons">
+                <button class="rating-btn btn-hated" onclick="rateTitle(0)">Hated (0)</button>
+                <button class="rating-btn btn-ok" onclick="rateTitle(1)">Ok (1)</button>
+                <button class="rating-btn btn-good" onclick="rateTitle(2)">Good (2)</button>
+                <button class="rating-btn btn-awesome" onclick="rateTitle(4)">Awesome (4)</button>
+                <button class="rating-btn btn-unknown" onclick="rateTitle(0)">Don't Know (0)</button>
             </div>
-            <div id="modal-title" class="title-name"></div>
-            <div id="modal-buttons" class="rating-buttons">
-                <button class="rating-button hated" data-rating="Hated it">Hated it</button>
-                <button class="rating-button sucked" data-rating="Kinda Sucked">Kinda Sucked</button>
-                <button class="rating-button ok" data-rating="OK">OK</button>
-                <button class="rating-button good" data-rating="Good">Good</button>
-                <button class="rating-button amazing" data-rating="Amazing">Amazing</button>
-                <button class="rating-button dont-remember" data-rating="Don't Remember">Don't Remember</button>
+            <div class="modal-controls">
+                <button class="rating-btn btn-back" id="backButton" onclick="goBack()" disabled>← Back</button>
+                <button class="rating-btn btn-enough" onclick="finishRating()">That's Enough</button>
             </div>
         </div>
     </div>
 
-    <div class="results-section" id="results-section">
-        <h2>Your Ratings</h2>
-        <p>Your ratings have been captured. You can download the results as a CSV file below.</p>
-        <table id="results-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button class="download-button" onclick="downloadCSV()">Download Ratings CSV</button>
-    </div>
+    <script>
+        let csvData = [];
+        let uniqueTitles = [];
+        let currentTitleIndex = 0;
+        let ratedTitles = {};
+        let ratingHistory = []; // Track rating history for back functionality
+        let isRatingInProgress = false;
+        let originalRatedTitles = {}; // Keep track of original ratings
+        let recursiveMode = false; // Track if we're in recursive mode
+        
+        // Browser refresh protection
+        window.addEventListener('beforeunload', function (e) {
+            if (isRatingInProgress) {
+                e.preventDefault();
+                e.returnValue = 'You have ratings in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
 
-    <div class="results-section" id="prompt-section">
-        <h2>🎯 Master Entertainment Analysis Prompt</h2>
-        <p>Your comprehensive prompt combining all ratings from Netflix history, imported files, and converted text. This master prompt analyzes your complete viewing preferences across all sources.</p>
-        <textarea class="prompt-textarea" id="search-prompt" readonly></textarea>
-        <button class="copy-button" onclick="copyPrompt()">📋 Copy Master Prompt to Clipboard</button>
-    </div>
-</div>
+        // Save and restore session state
+        function saveSessionState() {
+            const state = {
+                csvData,
+                uniqueTitles,
+                currentTitleIndex,
+                ratedTitles,
+                ratingHistory,
+                isRatingInProgress,
+                originalRatedTitles,
+                recursiveMode
+            };
+            sessionStorage.setItem('ratingAppState', JSON.stringify(state));
+        }
 
-<script>
-document.getElementById('csvFile').addEventListener('change', handleFileSelect);
-document.getElementById('modal-buttons').addEventListener('click', handleRatingClick);
-
-// Load state from localStorage on page load
-window.addEventListener('load', loadState);
-window.addEventListener('beforeunload', saveState);
-
-const ratings = {};
-let uniqueTitles = [];
-let currentTitleIndex = 0;
-
-const ratingMap = {
-    'Hated it': 1,
-    'Kinda Sucked': 2,
-    'OK': 3,
-    'Good': 4,
-    'Amazing': 5,
-    "Don't Remember": 'N/A'
-};
-
-function saveState() {
-    const state = {
-        ratings: ratings,
-        uniqueTitles: uniqueTitles,
-        currentTitleIndex: currentTitleIndex,
-        timestamp: Date.now()
-    };
-    sessionStorage.setItem('netflixRaterState', JSON.stringify(state));
-}
-
-function loadState() {
-    const savedState = sessionStorage.getItem('netflixRaterState');
-    if (savedState) {
-        try {
-            const state = JSON.parse(savedState);
-            // Only restore if it's less than 1 hour old
-            if (Date.now() - state.timestamp < 3600000) {
-                Object.assign(ratings, state.ratings);
+        function restoreSessionState() {
+            const savedState = sessionStorage.getItem('ratingAppState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                csvData = state.csvData || [];
                 uniqueTitles = state.uniqueTitles || [];
                 currentTitleIndex = state.currentTitleIndex || 0;
-                
-                if (uniqueTitles.length > 0 && currentTitleIndex < uniqueTitles.length) {
-                    if (confirm('It looks like you were in the middle of rating your Netflix titles. Would you like to continue where you left off?')) {
-                        document.getElementById('modal-overlay').style.display = 'flex';
-                        showCurrentTitle();
-                        return;
+                ratedTitles = state.ratedTitles || {};
+                ratingHistory = state.ratingHistory || [];
+                isRatingInProgress = state.isRatingInProgress || false;
+                originalRatedTitles = state.originalRatedTitles || {};
+                recursiveMode = state.recursiveMode || false;
+
+                if (isRatingInProgress && uniqueTitles.length > 0) {
+                    document.getElementById('sessionWarning').style.display = 'block';
+                    // Restore UI state
+                    if (csvData.length > 0) {
+                        const statusText = recursiveMode ? 
+                            'Session restored - Continue rating new research titles' : 
+                            'Session restored - Continue rating where you left off';
+                        document.getElementById('fileStatus').innerHTML = `<div class="status success">${statusText}</div>`;
+                        document.getElementById('startRating').disabled = false;
+                        document.getElementById('startRating').textContent = 'Continue Ratings';
                     }
-                } else if (Object.keys(ratings).length > 0) {
-                    // They had completed rating, show results
-                    displayResults();
-                    generatePrompt();
-                }
-            }
-        } catch (e) {
-            console.log('Could not restore previous state');
-        }
-    }
-}
-
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        // Clear previous state when uploading new file
-        sessionStorage.removeItem('netflixRaterState');
-        Object.keys(ratings).forEach(key => delete ratings[key]);
-        uniqueTitles = [];
-        currentTitleIndex = 0;
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (file.name.toLowerCase().endsWith('.txt')) {
-                processTXT(e.target.result);
-            } else if (file.name.toLowerCase().endsWith('.csv')) {
-                // Check if it's a ratings CSV (has Title,Rating format) or Netflix history CSV
-                const content = e.target.result;
-                const lines = content.split('\n');
-                if (lines[0] && lines[0].toLowerCase().includes('title') && lines[0].toLowerCase().includes('rating')) {
-                    processRatingsCSV(content);
-                } else {
-                    processNetflixCSV(content);
-                }
-            }
-        };
-        reader.readAsText(file);
-    }
-}
-
-function processTXT(text) {
-    const lines = text.split('\n');
-    const extractedRatings = {};
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        
-        // Look for title line
-        if (line.includes('**Title:**')) {
-            const titleMatch = line.match(/\*\*Title:\*\*\s*"([^"]+)"/);
-            if (titleMatch && i + 1 < lines.length) {
-                const title = titleMatch[1];
-                const nextLine = lines[i + 1].trim();
-                const ratingMatch = nextLine.match(/\*\*Rating:\*\*\s*(.+)/);
-                
-                if (ratingMatch) {
-                    let rating = ratingMatch[1].trim();
-                    // Convert text ratings to numbers if needed
-                    if (rating === 'N/A' || rating === "Don't Remember") {
-                        rating = 'N/A';
-                    } else {
-                        rating = parseInt(rating) || rating;
-                    }
-                    extractedRatings[title] = rating;
                 }
             }
         }
-    }
-    
-    if (Object.keys(extractedRatings).length > 0) {
-        Object.assign(ratings, extractedRatings);
-        displayResults();
-        generatePrompt();
-        alert(`Successfully imported ${Object.keys(extractedRatings).length} rated titles from text file.`);
-    } else {
-        alert('No valid ratings found in the text file. Please check the format.');
-    }
-}
 
-function processRatingsCSV(text) {
-    const lines = text.split('\n');
-    const extractedRatings = {};
-    
-    // Skip header row
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === '') continue;
+        // Initialize on page load
+        window.addEventListener('load', restoreSessionState);
         
-        let title, rating;
-        
-        // Handle quoted titles with commas
-        if (line.startsWith('"')) {
-            const firstQuoteIndex = line.indexOf('"') + 1;
-            const secondQuoteIndex = line.indexOf('"', firstQuoteIndex);
-            if (secondQuoteIndex !== -1) {
-                title = line.substring(firstQuoteIndex, secondQuoteIndex);
-                const remainingLine = line.substring(secondQuoteIndex + 1);
-                rating = remainingLine.split(',')[1]?.trim();
+        // File upload handler for CSV
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    Papa.parse(event.target.result, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            csvData = results.data;
+                            processTitles();
+                        }
+                    });
+                };
+                reader.readAsText(file);
             }
-        } else {
-            const parts = line.split(',');
-            title = parts[0]?.trim();
-            rating = parts[1]?.trim();
-        }
+        });
         
-        if (title && rating) {
-            // Convert rating to appropriate format
-            if (rating === 'N/A' || rating === "Don't Remember") {
-                rating = 'N/A';
-            } else {
-                rating = parseInt(rating) || rating;
-            }
-            extractedRatings[title] = rating;
-        }
-    }
-    
-    if (Object.keys(extractedRatings).length > 0) {
-        Object.assign(ratings, extractedRatings);
-        displayResults();
-        generatePrompt();
-        alert(`Successfully imported ${Object.keys(extractedRatings).length} rated titles from CSV file.`);
-    } else {
-        alert('No valid ratings found in the CSV file.');
-    }
-}
-
-function processNetflixCSV(text) {
-    const lines = text.split('\n');
-    const titlesSet = new Set();
-    
-    // Simple parsing, assuming 'Title' is the first column in the CSV as per the file snippet
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.trim() === '') continue;
-        
-        let title;
-        // Handle titles with commas inside quotes, which is common in Netflix history
-        if (line.startsWith('"')) {
-            const firstQuoteIndex = line.indexOf('"') + 1;
-            const secondQuoteIndex = line.indexOf('"', firstQuoteIndex);
-            if (secondQuoteIndex !== -1) {
-                title = line.substring(firstQuoteIndex, secondQuoteIndex);
-            }
-        } else {
-            title = line.split(',')[0].trim();
-        }
-
-        if (title) {
-            const cleanTitle = getCleanTitle(title);
-            if (cleanTitle) {
-                titlesSet.add(cleanTitle);
-            }
-        }
-    }
-    
-    uniqueTitles = Array.from(titlesSet);
-    currentTitleIndex = 0;
-    
-    if (uniqueTitles.length > 0) {
-        document.getElementById('modal-overlay').style.display = 'flex';
-        showCurrentTitle();
-        saveState();
-    } else {
-        alert('No titles found in the CSV file.');
-    }
-}
-
-function getCleanTitle(title) {
-    const colonIndex = title.indexOf(':');
-    if (colonIndex !== -1) {
-        return title.substring(0, colonIndex).trim();
-    }
-    return title.trim();
-}
-
-function showCurrentTitle() {
-    if (currentTitleIndex < uniqueTitles.length) {
-        const title = uniqueTitles[currentTitleIndex];
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('progress-counter').textContent = `${currentTitleIndex + 1} of ${uniqueTitles.length}`;
-    } else {
-        finishRating();
-    }
-}
-
-function handleRatingClick(event) {
-    const button = event.target.closest('.rating-button');
-    if (button) {
-        const title = uniqueTitles[currentTitleIndex];
-        const rating = button.dataset.rating;
-        const numericRating = ratingMap[rating];
-        ratings[title] = numericRating;
-        
-        currentTitleIndex++;
-        saveState();
-        showCurrentTitle();
-    }
-}
-
-function finishRating() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    displayResults();
-    generatePrompt();
-    // Clear the session storage since we're done
-    sessionStorage.removeItem('netflixRaterState');
-}
-
-function displayResults() {
-    const resultsSection = document.getElementById('results-section');
-    const tableBody = resultsSection.querySelector('tbody');
-    tableBody.innerHTML = '';
-    
-    const ratedTitles = Object.keys(ratings);
-    ratedTitles.forEach(title => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${title}</td><td>${ratings[title]}</td>`;
-        tableBody.appendChild(row);
-    });
-    
-    resultsSection.style.display = 'block';
-}
-
-function generatePrompt() {
-    const promptSection = document.getElementById('prompt-section');
-    const promptTextarea = document.getElementById('search-prompt');
-    
-    const totalTitles = Object.keys(ratings).length;
-    const sources = [];
-    
-    // Determine data sources
-    if (uniqueTitles.length > 0) {
-        sources.push('Netflix viewing history');
-    }
-    if (totalTitles > uniqueTitles.length || uniqueTitles.length === 0) {
-        sources.push('imported ratings files');
-    }
-    
-    let promptContent = `**MASTER ENTERTAINMENT ANALYSIS REQUEST**
-
-Based on the comprehensive list of ${totalTitles} shows and movies with their corresponding ratings compiled from multiple sources (${sources.join(', ')}), please perform the following comprehensive analysis tasks:
-
-**📊 MY COMPLETE RATINGS DATABASE:**
-`;
-    
-    // Group ratings by score for better organization
-    const ratingGroups = {
-        5: [], 4: [], 3: [], 2: [], 1: [], 'N/A': []
-    };
-    
-    Object.keys(ratings).forEach(title => {
-        const rating = ratings[title];
-        if (ratingGroups[rating]) {
-            ratingGroups[rating].push(title);
-        }
-    });
-    
-    // Add grouped ratings to prompt
-    Object.keys(ratingGroups).forEach(rating => {
-        if (ratingGroups[rating].length > 0) {
-            const ratingLabel = rating === 'N/A' ? 'Not Rated/Don\'t Remember' : 
-                                rating === '5' ? 'Amazing (5/5)' :
-                                rating === '4' ? 'Good (4/5)' :
-                                rating === '3' ? 'OK (3/5)' :
-                                rating === '2' ? 'Kinda Sucked (2/5)' : 'Hated It (1/5)';
+        function processTitles() {
+            const statusDiv = document.getElementById('fileStatus');
             
-            promptContent += `\n**${ratingLabel}:**\n`;
-            ratingGroups[rating].forEach(title => {
-                promptContent += `- "${title}"\n`;
+            if (csvData.length === 0) {
+                statusDiv.innerHTML = '<div class="status error">No data found in CSV file</div>';
+                return;
+            }
+            
+            // Extract unique titles (looking for common YouTube title patterns)
+            const titleSet = new Set();
+            const titleColumn = findTitleColumn();
+            
+            if (!titleColumn) {
+                statusDiv.innerHTML = '<div class="status error">Could not find title column in CSV</div>';
+                return;
+            }
+            
+            csvData.forEach(row => {
+                let title = row[titleColumn];
+                if (title && title.trim()) {
+                    // Clean up title - remove episode info, season info, etc.
+                    title = cleanTitle(title.trim());
+                    if (title.length > 0) {
+                        titleSet.add(title);
+                    }
+                }
             });
-        }
-    });
-    
-    promptContent += `
-
-**🎯 COMPREHENSIVE ANALYSIS TASKS:**
-
-**Task 1: Creative Team Deep Dive**
-For each title in my ratings database:
-- Identify primary directors, writers, showrunners, and key producers
-- Cross-reference my ratings with their other works
-- Create a "creator preference matrix" showing which creative teams I consistently rate highly
-
-**Task 2: Genre & Theme Pattern Analysis**
-- Analyze my ratings across different genres, themes, and content types
-- Identify my "sweet spots" (genres/themes I consistently rate 4-5)
-- Note any surprising patterns or contradictions in my preferences
-
-**Task 3: Grassroots Community Research**
-For each highly-rated title (4-5 stars) and their creative teams:
-- Search dedicated fan communities (Reddit, Discord, specialized forums)
-- Mine YouTube comments, fan channels, and social media discussions
-- Identify grassroots recommendations from genuine fans (not algorithmic suggestions)
-
-**Task 4: Cross-Platform Content Discovery**
-- Search across ALL streaming platforms (Netflix, Hulu, Disney+, HBO Max, Amazon Prime, Apple TV+, Paramount+, etc.)
-- Include international content and smaller streaming services
-- Consider theatrical releases and limited series
-
-**Task 5: Advanced Recommendation Engine**
-Create a prioritized list of 100+ new titles using this methodology:
-1. **Correlation Scoring**: Match recommendations to my highest-rated content
-2. **Creator Tracking**: Prioritize new works by my favorite creative teams
-3. **Community Validation**: Weight recommendations by grassroots fan enthusiasm
-4. **Availability Mapping**: List current streaming platform(s) for each suggestion
-5. **Freshness Factor**: Include both hidden gems and recent releases
-
-**Task 6: Meta-Analysis & Insights**
-- Identify blind spots in my viewing (unexplored genres I might enjoy)
-- Suggest "gateway content" to ease into new genres based on my preferences
-- Highlight any cult classics or critically acclaimed works I've missed
-- Note any franchise/universe content I should explore based on my ratings
-
-**📋 FINAL OUTPUT FORMAT:**
-
-**SECTION A: My Entertainment Profile**
-- Top-rated genres and themes
-- Favorite creative teams (directors, writers, etc.)
-- Content patterns and preferences
-
-**SECTION B: Priority Recommendations (Ranked 1-100+)**
-For each recommendation, include:
-- Title and brief description
-- Streaming platform(s) and availability
-- Connection to my highly-rated content
-- Fan community enthusiasm score
-- Why it matches my taste profile
-
-**SECTION C: Strategic Viewing Suggestions**
-- Genre expansion opportunities
-- Franchise/universe deep-dives
-- Hidden gems likely to become new favorites
-- "Must-watch" content I've surprisingly missed
-
-**🎬 GOAL:** Create the most personalized, comprehensive entertainment recommendation system based on ${totalTitles} data points of my actual viewing preferences, validated by genuine fan communities rather than algorithmic suggestions.
-
-**📈 DATA SOURCES TO PRIORITIZE:**
-- Organic fan discussions and recommendations
-- Creator filmographies and upcoming projects  
-- Cross-platform content availability
-- Community-driven "hidden gems" lists
-- Genre-specific enthusiast communities
-
-Please provide detailed, actionable recommendations that go beyond mainstream suggestions to uncover truly personalized entertainment discoveries.`;
-
-    promptTextarea.value = promptContent;
-    
-    // Show the prompt section
-    promptSection.style.display = 'block';
-}
-
-function copyPrompt() {
-    const promptTextarea = document.getElementById('search-prompt');
-    promptTextarea.select();
-    promptTextarea.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-        document.execCommand('copy');
-        const copyButton = document.querySelector('.copy-button');
-        const originalText = copyButton.textContent;
-        copyButton.textContent = 'Copied!';
-        copyButton.style.backgroundColor = '#218838';
-        
-        setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.style.backgroundColor = '#28a745';
-        }, 2000);
-    } catch (err) {
-        alert('Failed to copy. Please select the text and copy manually.');
-    }
-}
-
-function toggleConverter() {
-    const converterSection = document.getElementById('text-converter-section');
-    if (converterSection.style.display === 'none') {
-        converterSection.style.display = 'block';
-    } else {
-        converterSection.style.display = 'none';
-    }
-}
-
-function convertTextToCSV() {
-    const textInput = document.getElementById('text-input');
-    const text = textInput.value.trim();
-    
-    if (!text) {
-        alert('Please paste your ratings text first.');
-        return;
-    }
-    
-    const lines = text.split('\n');
-    let csvContent = "Title,Rating\n";
-    const convertedRatings = {};
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        
-        // Look for title line in standard format
-        if (line.includes('**Title:**')) {
-            const titleMatch = line.match(/\*\*Title:\*\*\s*"([^"]+)"/);
-            if (titleMatch && i + 1 < lines.length) {
-                const title = titleMatch[1];
-                const nextLine = lines[i + 1].trim();
-                const ratingMatch = nextLine.match(/\*\*Rating:\*\*\s*(.+)/);
-                
-                if (ratingMatch) {
-                    let rating = ratingMatch[1].trim();
-                    csvContent += `"${title}",${rating}\n`;
-                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
-                }
-            }
-        }
-        // Handle other formats
-        else if (line.includes(':') && !line.includes('**')) {
-            const parts = line.split(':');
-            if (parts.length >= 2) {
-                const title = parts[0].trim().replace(/^["'\-\s*]+|["'\s*]+$/g, '');
-                const rating = parts.slice(1).join(':').trim();
-                if (title && rating) {
-                    csvContent += `"${title}",${rating}\n`;
-                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
-                }
-            }
-        }
-        else if (line.includes(',') && !line.includes('**')) {
-            const parts = line.split(',');
-            if (parts.length >= 2) {
-                const title = parts[0].trim().replace(/^["'\-\s*]+|["'\s*]+$/g, '');
-                const rating = parts.slice(1).join(',').trim();
-                if (title && rating) {
-                    csvContent += `"${title}",${rating}\n`;
-                    convertedRatings[title] = rating === 'N/A' ? 'N/A' : (parseInt(rating) || rating);
-                }
-            }
-        }
-    }
-    
-    if (csvContent === "Title,Rating\n") {
-        alert('No valid ratings found. Please check your text format.');
-        return;
-    }
-    
-    // Add converted ratings to the main ratings object
-    Object.assign(ratings, convertedRatings);
-    
-    // Download the CSV
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "converted_ratings.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Update display and generate master prompt
-    displayResults();
-    generatePrompt();
-    
-    // Show success message
-    const convertedCount = Object.keys(convertedRatings).length;
-    const totalCount = Object.keys(ratings).length;
-    alert(`Successfully converted ${convertedCount} ratings to CSV and integrated into master list!\n\nTotal titles now: ${totalCount}`);
-    
-    // Hide the converter after successful conversion
-    toggleConverter();
-}
-
-async function pasteFromClipboard() {
-    const textInput = document.getElementById('text-input');
-    
-    try {
-        // Try to use the modern clipboard API first
-        if (navigator.clipboard && navigator.clipboard.readText) {
-            const clipboardText = await navigator.clipboard.readText();
-            textInput.value = clipboardText;
-            updateCharacterCount();
             
-            // Show success feedback
-            const pasteButton = event.target;
-            const originalText = pasteButton.textContent;
-            pasteButton.textContent = '📋 Pasted!';
-            pasteButton.style.backgroundColor = '#138496';
+            uniqueTitles = Array.from(titleSet).sort();
+            
+            statusDiv.innerHTML = `<div class="status success">Found ${uniqueTitles.length} unique titles</div>`;
+            document.getElementById('startRating').disabled = false;
+            document.getElementById('startRating').textContent = 'Start Ratings';
+            document.getElementById('saveButton').disabled = false;
+            
+            // Clear any previous session state when new file is uploaded
+            sessionStorage.removeItem('ratingAppState');
+            document.getElementById('sessionWarning').style.display = 'none';
+            isRatingInProgress = false;
+            recursiveMode = false;
+            originalRatedTitles = {};
+            
+            // Hide recursive section and show original sections
+            document.getElementById('recursiveSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+        }
+        
+        function findTitleColumn() {
+            // Common column names for YouTube viewing history
+            const possibleColumns = ['Title', 'title', 'Video Title', 'video title', 'Name', 'name'];
+            
+            for (let col of possibleColumns) {
+                if (csvData[0] && csvData[0].hasOwnProperty(col)) {
+                    return col;
+                }
+            }
+            
+            // If no exact match, try the first column that has string data
+            if (csvData[0]) {
+                const columns = Object.keys(csvData[0]);
+                return columns[0]; // Default to first column
+            }
+            
+            return null;
+        }
+        
+        function cleanTitle(title) {
+            // More aggressive cleaning to extract just the main show/movie title
+            
+            // First, handle the most common pattern: "Main Title: Subtitle" or "Main Title: Season X: Episode"
+            // Find the first colon and check what comes after it
+            const colonIndex = title.indexOf(':');
+            if (colonIndex !== -1) {
+                const beforeColon = title.substring(0, colonIndex).trim();
+                const afterColon = title.substring(colonIndex + 1).trim();
+                
+                // If what comes after the colon looks like episode/season info OR episode titles, keep only what's before
+                if (/^(Season\s+\d+|Episode\s+\d+|S\d+E\d+|Ep\s*\d+|\d+\.|Part\s+\d+)/i.test(afterColon) ||
+                    /Season\s+\d+:/i.test(afterColon) ||
+                    // If there's a substantial base title (even 1 word) and afterColon doesn't look like a subtitle of the main work
+                    // (i.e., it's likely an episode title), keep only the base title
+                    (beforeColon.length > 0 && afterColon.length > 0 && 
+                     !afterColon.match(/^(The\s+|A\s+|An\s+)?(Movie|Film|Documentary|Series|Show|Complete|Full)/i))) {
+                    title = beforeColon;
+                }
+            }
+            
+            // Remove season/episode patterns at the end with various separators
+            title = title.replace(/\s*[-\|]\s*Season\s+\d+.*$/i, '');
+            title = title.replace(/\s*[-\|]\s*Episode\s+\d+.*$/i, '');
+            title = title.replace(/\s*[-\|]\s*S\d+E\d+.*$/i, '');
+            title = title.replace(/\s*[-\|]\s*Part\s+\d+.*$/i, '');
+            title = title.replace(/\s*[-\|]\s*Ep\s*\d+.*$/i, '');
+            
+            // Remove season info in parentheses
+            title = title.replace(/\s*\(Season\s+\d+[^)]*\).*$/i, '');
+            title = title.replace(/\s*\(Episode\s+\d+[^)]*\).*$/i, '');
+            title = title.replace(/\s*\(Part\s+\d+[^)]*\).*$/i, '');
+            
+            // Remove bracketed content at the end
+            title = title.replace(/\s*\[.*?\].*$/i, '');
+            
+            // Remove trailing episode numbers and patterns
+            title = title.replace(/\s*\d+\.\s*.*$/i, '');
+            title = title.replace(/\s*#\d+.*$/i, '');
+            title = title.replace(/\s*Episode\s+\d+.*$/i, '');
+            
+            // Clean up any double spaces or trailing punctuation
+            title = title.replace(/\s+/g, ' ');
+            title = title.replace(/[:\-\|]\s*$/i, '');
+            
+            return title.trim();
+        }
+        
+        function isMovieTitle(title) {
+            // Check if title has TV show patterns (Season/Episode indicators)
+            const tvPatterns = [
+                /Season\s+\d+/i,
+                /Episode\s+\d+/i,
+                /S\d+E\d+/i,
+                /Chapter\s+\d+/i,
+                /Part\s+\d+.*:/i, // "Part 1: Episode Title" format
+                /Volume\s+\d+/i,
+                /Season\s+\d+:/i,
+                /:.*Season\s+\d+/i
+            ];
+            
+            // If it has TV patterns, it's definitely not a movie
+            if (tvPatterns.some(pattern => pattern.test(title))) {
+                return false;
+            }
+            
+            // Check for movie-specific keywords
+            const movieKeywords = ['movie', 'film', 'trailer', 'official trailer', 'full movie', 'cinema'];
+            const lowerTitle = title.toLowerCase();
+            
+            // If it has movie keywords, it's a movie
+            if (movieKeywords.some(keyword => lowerTitle.includes(keyword))) {
+                return true;
+            }
+            
+            // Check for known movie patterns from your Netflix data
+            const knownMovies = [
+                'The Lord of the Rings',
+                'The Adam Project',
+                'The Christmas Chronicles',
+                'Justice League',
+                'The Witcher: Sirens of the Deep',
+                'Rebel Moon',
+                'Jake Paul vs. Mike Tyson',
+                'Man of Steel',
+                'Enola Holmes',
+                'Spider-Man',
+                'Premonition',
+                'Year One',
+                'The Mummy',
+                'The Angry Birds Movie',
+                'Tenet',
+                'Tides',
+                'Troll',
+                'Fall',
+                'The Karate Kid',
+                'Shazam!',
+                'King Kong',
+                'The Hunger Games',
+                'Terminator',
+                'Captain America',
+                'Hereditary',
+                'Next Gen',
+                'Big Daddy',
+                'Avengers',
+                'I Am Mother',
+                'Back to the Future',
+                'IO',
+                'Mowgli',
+                'Dumplin\''
+            ];
+            
+            // Check if title starts with any known movie titles
+            return knownMovies.some(movie => title.toLowerCase().startsWith(movie.toLowerCase()));
+        }
+        
+        function isTVTitle(title) {
+            // If it's identified as a movie, it's not TV
+            if (isMovieTitle(title)) {
+                return false;
+            }
+            
+            // Check for TV show patterns
+            const tvPatterns = [
+                /Season\s+\d+/i,
+                /Episode\s+\d+/i,
+                /S\d+E\d+/i,
+                /Chapter\s+\d+/i,
+                /Part\s+\d+.*:/i,
+                /Volume\s+\d+/i,
+                /Limited Series/i,
+                /:.*Season\s+\d+/i,
+                /:.*Episode/i,
+                /:.*Chapter/i
+            ];
+            
+            // If it has TV patterns, it's definitely TV
+            if (tvPatterns.some(pattern => pattern.test(title))) {
+                return true;
+            }
+            
+            // Check for TV-specific keywords
+            const tvKeywords = ['series', 'show', 'season', 'episode', 'pilot'];
+            const lowerTitle = title.toLowerCase();
+            
+            if (tvKeywords.some(keyword => lowerTitle.includes(keyword))) {
+                return true;
+            }
+            
+            // Default: if it's not clearly a movie and doesn't have obvious TV patterns,
+            // assume it's TV (since most content tends to be episodic)
+            return true;
+        }
+        
+        function startRating() {
+            // Filter titles based on checkboxes
+            const includeTv = document.getElementById('tvTitles').checked;
+            const includeMovies = document.getElementById('movieTitles').checked;
+            
+            let filteredTitles = uniqueTitles.filter(title => {
+                const isMovie = isMovieTitle(title);
+                const isTV = isTVTitle(title);
+                
+                if (includeMovies && isMovie) return true;
+                if (includeTv && isTV) return true;
+                return false;
+            });
+            
+            if (filteredTitles.length === 0) {
+                alert('No titles match your selected criteria. Please check at least one option.');
+                return;
+            }
+            
+            // Only reset if starting fresh, not continuing
+            if (!isRatingInProgress) {
+                uniqueTitles = filteredTitles;
+                currentTitleIndex = 0;
+                ratedTitles = {};
+                ratingHistory = [];
+                
+                // Store original ratings if this is the first run
+                if (!recursiveMode) {
+                    originalRatedTitles = {};
+                }
+            }
+            
+            isRatingInProgress = true;
+            document.getElementById('sessionWarning').style.display = 'block';
+            saveSessionState();
+            
+            showNextTitle();
+        }
+        
+        function showRecursiveSection() {
+            document.getElementById('recursiveSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('recursiveTitles').focus();
+        }
+        
+        function hideRecursiveSection() {
+            document.getElementById('recursiveSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('recursiveTitles').value = '';
+        }
+        
+        function addRecursiveTitles() {
+            const newTitlesText = document.getElementById('recursiveTitles').value.trim();
+            
+            if (!newTitlesText) {
+                alert('Please enter some titles to rate.');
+                return;
+            }
+            
+            // Parse the input - split by lines and clean up
+            const newTitles = newTitlesText
+                .split('\n')
+                .map(title => title.trim())
+                .filter(title => title.length > 0)
+                .filter((title, index, arr) => arr.indexOf(title) === index); // Remove duplicates
+            
+            if (newTitles.length === 0) {
+                alert('No valid titles found. Please check your input.');
+                return;
+            }
+            
+            // Store current ratings as original if this is the first recursive run
+            if (!recursiveMode) {
+                originalRatedTitles = {...ratedTitles};
+            }
+            
+            // Filter out titles that have already been rated
+            const unratedNewTitles = newTitles.filter(title => !ratedTitles.hasOwnProperty(title));
+            
+            if (unratedNewTitles.length === 0) {
+                alert('All these titles have already been rated. Try adding some new titles.');
+                return;
+            }
+            
+            // Add new titles to the rating queue
+            uniqueTitles = [...uniqueTitles, ...unratedNewTitles];
+            
+            // Set up for recursive rating
+            recursiveMode = true;
+            currentTitleIndex = uniqueTitles.length - unratedNewTitles.length; // Start from first new title
+            ratingHistory = [];
+            
+            // Hide recursive section
+            document.getElementById('recursiveSection').style.display = 'none';
+            document.getElementById('recursiveTitles').value = '';
+            
+            // Show status
+            const statusDiv = document.getElementById('fileStatus');
+            statusDiv.innerHTML = `<div class="status success">Added ${unratedNewTitles.length} new titles for rating. Starting recursive rating session...</div>`;
+            
+            // Start rating the new titles
+            isRatingInProgress = true;
+            document.getElementById('sessionWarning').style.display = 'block';
+            saveSessionState();
+            
+            showNextTitle();
+        }
+        
+        function showNextTitle() {
+            if (currentTitleIndex >= uniqueTitles.length) {
+                finishRating();
+                return;
+            }
+            
+            const modal = document.getElementById('ratingModal');
+            const progressText = document.getElementById('progressText');
+            const titleDisplay = document.getElementById('currentTitle');
+            const backButton = document.getElementById('backButton');
+            
+            // Show different progress text for recursive mode
+            if (recursiveMode && originalRatedTitles && Object.keys(originalRatedTitles).length > 0) {
+                const originalCount = Object.keys(originalRatedTitles).length;
+                const currentInNewBatch = currentTitleIndex - originalCount + 1;
+                const totalNewTitles = uniqueTitles.length - originalCount;
+                progressText.textContent = `New Title ${Math.max(1, currentInNewBatch)} of ${totalNewTitles} (Total Progress: ${currentTitleIndex + 1}/${uniqueTitles.length})`;
+            } else {
+                progressText.textContent = `${currentTitleIndex + 1} of ${uniqueTitles.length}`;
+            }
+            
+            titleDisplay.textContent = uniqueTitles[currentTitleIndex];
+            
+            // Enable/disable back button
+            backButton.disabled = currentTitleIndex === 0;
+            
+            modal.style.display = 'block';
+            saveSessionState();
+        }
+        
+        function rateTitle(rating) {
+            const title = uniqueTitles[currentTitleIndex];
+            
+            // Save current state to history before moving forward
+            ratingHistory.push({
+                index: currentTitleIndex,
+                title: title,
+                rating: ratedTitles[title] // Previous rating (if any)
+            });
+            
+            ratedTitles[title] = rating;
+            currentTitleIndex++;
+            
+            saveSessionState();
+            showNextTitle();
+        }
+        
+        function goBack() {
+            if (ratingHistory.length === 0) return;
+            
+            const lastState = ratingHistory.pop();
+            
+            // Restore previous state
+            currentTitleIndex = lastState.index;
+            
+            // Remove current rating and restore previous one
+            const currentTitle = uniqueTitles[currentTitleIndex];
+            if (lastState.rating !== undefined) {
+                ratedTitles[currentTitle] = lastState.rating;
+            } else {
+                delete ratedTitles[currentTitle];
+            }
+            
+            saveSessionState();
+            showNextTitle();
+        }
+        
+        function finishRating() {
+            document.getElementById('ratingModal').style.display = 'none';
+            isRatingInProgress = false;
+            document.getElementById('sessionWarning').style.display = 'none';
+            
+            // Clear session state
+            sessionStorage.removeItem('ratingAppState');
+            
+            // Filter out 0 ratings and unrated titles
+            const validRatings = {};
+            for (let title in ratedTitles) {
+                if (ratedTitles[title] > 0) {
+                    validRatings[title] = ratedTitles[title];
+                }
+            }
+            
+            generatePrompt(validRatings);
+        }
+        
+        function generatePrompt(ratings) {
+            const titlesList = Object.keys(ratings).map(title => 
+                `${title} (Rating: ${ratings[title]})`
+            ).join('\n');
+            
+            const recursiveList = Object.keys(ratings).join('\n');
+            
+            // Show different messages based on whether this is recursive mode
+            const headerText = recursiveMode ? 
+                "**My Updated Rated Titles (Original + New Research Results):**" : 
+                "**My Rated Titles:**";
+            
+            const iterationNote = recursiveMode ? 
+                "\n\n**ITERATION NOTE:** This is an expanded list that includes both original titles and newly discovered titles from previous research iterations. Use this complete list for the next round of research to find even more refined recommendations." : 
+                "";
+            
+            const prompt = `${headerText}
+${titlesList}${iterationNote}
+
+**Task 1: Director and Writer Identification**
+For each title in the list, search for its primary writer and director. Add their names to the corresponding title entry.
+
+**Task 2: Grassroots Fan Discussion Analysis**
+For each title, and where possible, for each identified writer and director, search for dedicated fan communities on platforms like Reddit (subreddits), YouTube channels, and social media groups.
+
+**Task 3: Find Similar Recommendations**
+Within the comments and discussions of these fan communities, find grassroots recommendations. These are mentions of other shows or movies that fans compare to the listed titles or to other works by the same writer or director.
+    
+**Task 4: Data Consolidation and Prioritization**
+1. Harvest a list of the top 100 most mentioned new titles.
+2. For each suggested title, identify and list the streaming platform(s) where it can be watched.
+3. Count the number of times each suggested title is mentioned in the discussions.
+4. Ensure that no suggested title is already present in my original viewing history list.
+5. Sort the final list of suggestions based on how they correlate to my original ratings. For example, suggestions related to titles I rated "4" should be at the top, followed by "2," "1," and so on.
+
+**Output:**
+Present the results as a well-structured list, including the suggested title, its streaming platform(s), the mention count, and a brief note on which of my original titles or creators it was linked to.
+
+**IMPORTANT: Recursive Processing Instructions**
+At the end of your response, provide a clean list titled "RECOMMENDED TITLES FOR RECURSIVE PROCESSING:" containing only the title names (one per line, no additional information) of all recommended titles. This list will be fed back into the rating system to capture any titles the user may have watched on other platforms, allowing for iterative refinement of recommendations.
+
+**Recursive List Template:**
+RECOMMENDED TITLES FOR RECURSIVE PROCESSING:
+${recursiveList}
+
+**Note:** The above recursive list contains the original titles for reference. Replace this section with the new recommended titles from your research.`;
+
+            document.getElementById('promptOutput').value = prompt;
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+        
+        function copyPrompt() {
+            const textarea = document.getElementById('promptOutput');
+            textarea.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.background = '#28a745';
             
             setTimeout(() => {
-                pasteButton.textContent = originalText;
-                pasteButton.style.backgroundColor = '#17a2b8';
-            }, 1500);
-        } else {
-            // Fallback for older browsers
-            textInput.focus();
-            document.execCommand('paste');
-            setTimeout(updateCharacterCount, 100);
-            alert('Text pasted! If nothing appeared, try using Ctrl+V (Windows) or Cmd+V (Mac) manually.');
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
         }
-    } catch (err) {
-        // If clipboard access is denied or fails
-        textInput.focus();
-        alert('Unable to access clipboard automatically. Please use Ctrl+V (Windows) or Cmd+V (Mac) to paste your text.');
-    }
-}
-
-function clearTextInput() {
-    const textInput = document.getElementById('text-input');
-    textInput.value = '';
-    textInput.focus();
-    updateCharacterCount();
-    
-    // Show feedback
-    const clearButton = event.target;
-    const originalText = clearButton.textContent;
-    clearButton.textContent = '🗑️ Cleared!';
-    clearButton.style.backgroundColor = '#e0a800';
-    
-    setTimeout(() => {
-        clearButton.textContent = originalText;
-        clearButton.style.backgroundColor = '#ffc107';
-    }, 1500);
-}
-
-function updateCharacterCount() {
-    const textInput = document.getElementById('text-input');
-    const charCounter = document.getElementById('char-counter');
-    const length = textInput.value.length;
-    
-    if (length === 0) {
-        charCounter.textContent = '0 characters';
-    } else if (length < 1000) {
-        charCounter.textContent = `${length} characters`;
-    } else if (length < 1000000) {
-        charCounter.textContent = `${length} characters (${(length/1000).toFixed(1)}K)`;
-    } else {
-        charCounter.textContent = `${length} characters (${(length/1000000).toFixed(1)}M)`;
-    }
-    
-    // Change color based on content length
-    if (length === 0) {
-        charCounter.style.color = '#666';
-    } else if (length < 1000) {
-        charCounter.style.color = '#28a745';
-    } else if (length < 10000) {
-        charCounter.style.color = '#ffc107';
-    } else {
-        charCounter.style.color = '#dc3545';
-    }
-}
-
-function autoFormatText() {
-    const textInput = document.getElementById('text-input');
-    let text = textInput.value.trim();
-    
-    if (!text) {
-        alert('Please paste some text first to auto-format.');
-        return;
-    }
-    
-    // Try to detect and convert different formats to the standard format
-    const lines = text.split('\n');
-    let formattedText = '';
-    let formatDetected = false;
-    
-    for (let line of lines) {
-        line = line.trim();
-        if (!line) continue;
         
-        // Format: "Title: Rating" or "Title,Rating"
-        if (line.includes(':') && !line.includes('**Title:**')) {
-            const parts = line.split(':');
-            if (parts.length >= 2) {
-                const title = parts[0].trim().replace(/^["']|["']$/g, '');
-                const rating = parts.slice(1).join(':').trim();
-                formattedText += `- **Title:** "${title}"\n**Rating:** ${rating}\n`;
-                formatDetected = true;
+        function resetApp() {
+            csvData = [];
+            uniqueTitles = [];
+            currentTitleIndex = 0;
+            ratedTitles = {};
+            ratingHistory = [];
+            isRatingInProgress = false;
+            originalRatedTitles = {};
+            recursiveMode = false;
+            
+            document.getElementById('csvFile').value = '';
+            document.getElementById('fileStatus').innerHTML = '';
+            document.getElementById('startRating').disabled = true;
+            document.getElementById('startRating').textContent = 'Start Ratings';
+            document.getElementById('saveButton').disabled = true;
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('recursiveSection').style.display = 'none';
+            document.getElementById('recursiveTitles').value = '';
+            document.getElementById('tvTitles').checked = true;
+            document.getElementById('movieTitles').checked = true;
+            document.getElementById('sessionWarning').style.display = 'none';
+            document.getElementById('saveLoadStatus').innerHTML = '';
+            
+            // Clear session state
+            sessionStorage.removeItem('ratingAppState');
+        }
+        
+        // Event listeners
+        document.getElementById('startRating').addEventListener('click', startRating);
+        
+        // File upload handler for loading ratings
+        document.getElementById('loadRatingsFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const savedData = JSON.parse(event.target.result);
+                        loadRatingsFromFile(savedData);
+                    } catch (error) {
+                        showSaveLoadStatus('Invalid save file format', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        function saveRatingsToFile() {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const saveData = {
+                version: "1.0",
+                timestamp: new Date().toISOString(),
+                csvData: csvData,
+                uniqueTitles: uniqueTitles,
+                currentTitleIndex: currentTitleIndex,
+                ratedTitles: ratedTitles,
+                ratingHistory: ratingHistory,
+                isRatingInProgress: isRatingInProgress,
+                originalRatedTitles: originalRatedTitles,
+                recursiveMode: recursiveMode,
+                totalTitles: uniqueTitles.length,
+                completedRatings: Object.keys(ratedTitles).length
+            };
+            
+            const dataStr = JSON.stringify(saveData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `youtube-ratings-${timestamp.substring(0, 19)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showSaveLoadStatus('Ratings saved successfully!', 'success');
+        }
+        
+        function loadRatingsFromFile(savedData) {
+            try {
+                // Validate the save file structure
+                if (!savedData.version || !savedData.uniqueTitles || !savedData.ratedTitles) {
+                    throw new Error('Invalid save file structure');
+                }
+                
+                // Restore all the data
+                csvData = savedData.csvData || [];
+                uniqueTitles = savedData.uniqueTitles || [];
+                currentTitleIndex = savedData.currentTitleIndex || 0;
+                ratedTitles = savedData.ratedTitles || {};
+                ratingHistory = savedData.ratingHistory || [];
+                isRatingInProgress = savedData.isRatingInProgress || false;
+                originalRatedTitles = savedData.originalRatedTitles || {};
+                recursiveMode = savedData.recursiveMode || false;
+                
+                // Update UI
+                const completedCount = Object.keys(ratedTitles).length;
+                const totalCount = uniqueTitles.length;
+                
+                let statusMessage = `Loaded save file: ${completedCount} ratings completed`;
+                if (savedData.timestamp) {
+                    const saveDate = new Date(savedData.timestamp).toLocaleString();
+                    statusMessage += ` (saved ${saveDate})`;
+                }
+                
+                document.getElementById('fileStatus').innerHTML = `<div class="status success">${statusMessage}</div>`;
+                
+                // Enable appropriate buttons
+                document.getElementById('startRating').disabled = false;
+                document.getElementById('saveButton').disabled = false;
+                
+                if (isRatingInProgress) {
+                    document.getElementById('startRating').textContent = 'Continue Ratings';
+                    document.getElementById('sessionWarning').style.display = 'block';
+                } else {
+                    document.getElementById('startRating').textContent = 'Resume/Restart Ratings';
+                }
+                
+                // If there are completed ratings, show options
+                if (completedCount > 0) {
+                    if (currentTitleIndex >= totalCount) {
+                        // Session was completed, show results
+                        const validRatings = {};
+                        for (let title in ratedTitles) {
+                            if (ratedTitles[title] > 0) {
+                                validRatings[title] = ratedTitles[title];
+                            }
+                        }
+                        generatePrompt(validRatings);
+                    }
+                }
+                
+                // Save to session storage
+                saveSessionState();
+                
+                showSaveLoadStatus('Progress loaded successfully!', 'success');
+                
+                // Reset file input
+                document.getElementById('loadRatingsFile').value = '';
+                
+            } catch (error) {
+                showSaveLoadStatus('Error loading save file: ' + error.message, 'error');
             }
         }
-        // Format: "Title,Rating"
-        else if (line.includes(',') && !line.includes('**Title:**')) {
-            const parts = line.split(',');
-            if (parts.length >= 2) {
-                const title = parts[0].trim().replace(/^["']|["']$/g, '');
-                const rating = parts.slice(1).join(',').trim();
-                formattedText += `- **Title:** "${title}"\n**Rating:** ${rating}\n`;
-                formatDetected = true;
+        
+        function showSaveLoadStatus(message, type) {
+            const statusDiv = document.getElementById('saveLoadStatus');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            // Clear status after 5 seconds
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('ratingModal');
+            if (event.target == modal) {
+                // Don't allow closing modal by clicking outside during rating
             }
         }
-        // Already in correct format or unrecognized - keep as is
-        else {
-            formattedText += line + '\n';
-        }
-    }
-    
-    if (formatDetected) {
-        textInput.value = formattedText.trim();
-        updateCharacterCount();
-        
-        // Show success feedback
-        const formatButton = event.target;
-        const originalText = formatButton.textContent;
-        formatButton.textContent = '✨ Formatted!';
-        formatButton.style.backgroundColor = '#1e7e34';
-        
-        setTimeout(() => {
-            formatButton.textContent = originalText;
-            formatButton.style.backgroundColor = '#28a745';
-        }, 2000);
-    } else {
-        alert('No formatting needed - text appears to already be in the correct format or no recognizable patterns found.');
-    }
-}
-
-function downloadCSV() {
-    let csvContent = "Title,Rating\n";
-    
-    Object.keys(ratings).forEach(title => {
-        const rating = ratings[title];
-        csvContent += `"${title}",${rating}\n`;
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "netflix_ratings.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-</script>
-
+    </script>
 </body>
 </html>
