@@ -262,6 +262,18 @@
             box-shadow: none;
         }
         
+        .btn-filter {
+            border-color: #dc3545;
+            color: #dc3545;
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 14px;
+        }
+        .btn-filter:hover { 
+            background: #dc3545; 
+            color: white; 
+        }
+        
         .modal-controls {
             display: flex;
             justify-content: center;
@@ -308,53 +320,38 @@
             font-weight: 600;
             display: none;
         }
+
+        .instructions-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        .instructions-section:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Netflix History Rating App</h1>
-			<div class="instructions-section">
-		<button class="btn btn-primary" onclick="toggleInstructions()">Show Instructions</button>
-		<div id="instructionsContent" style="display: none; text-align: left; margin-top: 20px;">
-			<p>This tool helps you generate a detailed research prompt from your Netflix viewing history.</p>
-			<ol>
-				<li><b>Step 1: Get Your Prompt</b><br>Export your Netflix viewing history as a CSV file and upload it using the "Choose CSV File" button. The tool will identify unique movie and TV show titles. <a href="https://help.netflix.com/en/node/101917">Click here to see how to download your view history</a></li>
-				<li><b>Step 2: Start Rating</b><br>Click "Start Ratings" to begin. Rate each title as Hated (0), Ok (1), Good (2), or Awesome (4). Click "That's Enough" at any time to finish.</li>
-				<li><b>Step 3: Begin "Deep Research"</b><br>The tool will generate a structured research prompt based on your ratings. Start a new deep research session, select the "Deep Research" option in the prompt bar of Gemini or the tools menu of ChatGPTCopy. Paste it in and go.</li>
-				<li><b>Step 4: Use the AI's Answer</b><br>Take the AI's response at the bottom of the results (RECOMMENDED TITLES FOR RECURSIVE PROCESSING:)Copy that list and go back to this page with it.</li>
-				<li><b>Step 5: Add Research Results</b><br>Use the "Add Research Results" button to paste in a clean list of titles from the AI's recommendations. The app will then allow you to rate those new titles, further refining your taste profile.</li>
-			</ol>
-			<p>Use the "Save Progress" and "Load Progress" buttons to save your ratings and continue later.</p>
-		</div>
-	</div>
+        <div class="instructions-section">
+            <button class="btn btn-primary" onclick="toggleInstructions()">Show Instructions</button>
+            <div id="instructionsContent" style="display: none; text-align: left; margin-top: 20px;">
+                <p>This tool helps you generate a detailed research prompt from your Netflix viewing history.</p>
+                <ol>
+                    <li><b>Step 1: Get Your Prompt</b><br>Export your Netflix viewing history as a CSV file and upload it using the "Choose CSV File" button. The tool will identify unique movie and TV show titles. <a href="https://help.netflix.com/en/node/101917">Click here to see how to download your view history</a></li>
+                    <li><b>Step 2: Start Rating</b><br>Click "Start Ratings" to begin. Rate each title as Hated (0), Ok (1), Good (2), or Awesome (4). Click "That's Enough" at any time to finish.</li>
+                    <li><b>Step 3: Begin "Deep Research"</b><br>The tool will generate a structured research prompt based on your ratings. Start a new deep research session, select the "Deep Research" option in the prompt bar of Gemini or the tools menu of ChatGPTCopy. Paste it in and go.</li>
+                    <li><b>Step 4: Use the AI's Answer</b><br>Take the AI's response at the bottom of the results (RECOMMENDED TITLES FOR RECURSIVE PROCESSING:)Copy that list and go back to this page with it.</li>
+                    <li><b>Step 5: Add Research Results</b><br>Use the "Add Research Results" button to paste in a clean list of titles from the AI's recommendations. The app will then allow you to rate those new titles, further refining your taste profile.</li>
+                </ol>
+                <p>Use the "Save Progress" and "Load Progress" buttons to save your ratings and continue later.</p>
+            </div>
+        </div>
 
-	<script>
-		function toggleInstructions() {
-			const content = document.getElementById('instructionsContent');
-			const button = document.querySelector('.instructions-section button');
-			if (content.style.display === 'none') {
-				content.style.display = 'block';
-				button.textContent = 'Hide Instructions';
-			} else {
-				content.style.display = 'none';
-				button.textContent = 'Show Instructions';
-			}
-		}
-	</script>
-
-	<style>
-		.instructions-section {
-			margin-bottom: 30px;
-			padding: 20px;
-			border: 2px dashed #ddd;
-			border-radius: 15px;
-			transition: all 0.3s ease;
-		}
-		.instructions-section:hover {
-			border-color: #667eea;
-			background: #f8f9ff;
-		}
-	</style>
         <div id="sessionWarning" class="warning-banner">
             ⚠️ Rating session in progress! Your progress will be lost if you refresh the page.
         </div>
@@ -428,6 +425,10 @@
                 <button class="rating-btn btn-awesome" onclick="rateTitle(4)">Awesome (4)</button>
                 <button class="rating-btn btn-unknown" onclick="rateTitle(0)">Don't Know (0)</button>
             </div>
+            <div id="filterButtons" class="rating-buttons" style="display: none;">
+                <button class="rating-btn btn-filter" id="notMovieBtn" onclick="filterTitle('notMovie')" style="display: none;">Not a Movie</button>
+                <button class="rating-btn btn-filter" id="notTvBtn" onclick="filterTitle('notTv')" style="display: none;">Not TV</button>
+            </div>
             <div class="modal-controls">
                 <button class="rating-btn btn-back" id="backButton" onclick="goBack()" disabled>← Back</button>
                 <button class="rating-btn btn-enough" onclick="finishRating()">That's Enough</button>
@@ -444,6 +445,18 @@
         let isRatingInProgress = false;
         let originalRatedTitles = {}; // Keep track of original ratings
         let recursiveMode = false; // Track if we're in recursive mode
+        
+        function toggleInstructions() {
+            const content = document.getElementById('instructionsContent');
+            const button = document.querySelector('.instructions-section button');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = 'Hide Instructions';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Show Instructions';
+            }
+        }
         
         // Browser refresh protection
         window.addEventListener('beforeunload', function (e) {
@@ -857,6 +870,9 @@
             const progressText = document.getElementById('progressText');
             const titleDisplay = document.getElementById('currentTitle');
             const backButton = document.getElementById('backButton');
+            const filterButtons = document.getElementById('filterButtons');
+            const notMovieBtn = document.getElementById('notMovieBtn');
+            const notTvBtn = document.getElementById('notTvBtn');
             
             // Show different progress text for recursive mode
             if (recursiveMode && originalRatedTitles && Object.keys(originalRatedTitles).length > 0) {
@@ -873,8 +889,49 @@
             // Enable/disable back button
             backButton.disabled = currentTitleIndex === 0;
             
+            // Show filter buttons only in recursive mode when appropriate checkboxes are unchecked
+            if (recursiveMode) {
+                const includeTv = document.getElementById('tvTitles').checked;
+                const includeMovies = document.getElementById('movieTitles').checked;
+                
+                // Show "Not TV" button when movies are unchecked (you only want movies, so filter out TV)
+                const showNotTv = includeMovies === false;
+                // Show "Not a Movie" button when TV is unchecked (you only want TV, so filter out movies)
+                const showNotMovie = includeTv === false;
+                
+                if (showNotMovie || showNotTv) {
+                    filterButtons.style.display = 'flex';
+                    notMovieBtn.style.display = showNotMovie ? 'inline-block' : 'none';
+                    notTvBtn.style.display = showNotTv ? 'inline-block' : 'none';
+                } else {
+                    filterButtons.style.display = 'none';
+                }
+            } else {
+                filterButtons.style.display = 'none';
+            }
+            
             modal.style.display = 'block';
             saveSessionState();
+        }
+        
+        function filterTitle(filterType) {
+            const title = uniqueTitles[currentTitleIndex];
+            
+            // Save current state to history before moving forward
+            ratingHistory.push({
+                index: currentTitleIndex,
+                title: title,
+                rating: ratedTitles[title], // Previous rating (if any)
+                filtered: true,
+                filterType: filterType
+            });
+            
+            // Mark title as filtered (we'll exclude it from final results)
+            ratedTitles[title] = -1; // Use -1 to indicate filtered title
+            currentTitleIndex++;
+            
+            saveSessionState();
+            showNextTitle();
         }
         
         function rateTitle(rating) {
@@ -922,7 +979,7 @@
             // Clear session state
             sessionStorage.removeItem('ratingAppState');
             
-            // Filter out 0 ratings and unrated titles
+            // Filter out 0 ratings, unrated titles, and filtered titles (-1)
             const validRatings = {};
             for (let title in ratedTitles) {
                 if (ratedTitles[title] > 0) {
