@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Viewing History Rating App</title>
+    <title>Netflix Viewing History Rating App</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -360,8 +360,8 @@
         </div>
         
         <div class="upload-section">
-            <h3>Upload Your YouTube Viewing History CSV</h3>
-            <p>Export your YouTube viewing history and upload the CSV file here</p>
+            <h3>Upload Your Netflix Viewing History CSV</h3>
+            <p>Export your Netflix viewing history and upload the CSV file here</p>
             <div class="file-input">
                 <input type="file" id="csvFile" accept=".csv" />
                 <label for="csvFile" class="file-label">Choose CSV File</label>
@@ -527,7 +527,7 @@
                 return;
             }
             
-            // Extract unique titles (looking for common YouTube title patterns)
+            // Extract unique titles (looking for common Netflix title patterns)
             const titleSet = new Set();
             const titleColumn = findTitleColumn();
             
@@ -567,7 +567,7 @@
         }
         
         function findTitleColumn() {
-            // Common column names for YouTube viewing history
+            // Common column names for Netflix viewing history
             const possibleColumns = ['Title', 'title', 'Video Title', 'video title', 'Name', 'name'];
             
             for (let col of possibleColumns) {
@@ -956,7 +956,7 @@ ${titlesList}${iterationNote}
 For each title in the list, search for its primary writer and director. Add their names to the corresponding title entry.
 
 **Task 2: Grassroots Fan Discussion Analysis**
-For each title, and where possible, for each identified writer and director, search for dedicated fan communities on platforms like Reddit (subreddits), YouTube channels, and social media groups.
+For each title, and where possible, for each identified writer and director, search for dedicated fan communities on platforms like Reddit (subreddits), Netflix channels, and social media groups.
 
 **Task 3: Find Similar Recommendations**
 Within the comments and discussions of these fan communities, find grassroots recommendations. These are mentions of other shows or movies that fans compare to the listed titles or to other works by the same writer or director.
@@ -1069,7 +1069,7 @@ ${recursiveList}
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = `youtube-ratings-${timestamp.substring(0, 19)}.json`;
+            link.download = `Netflix-ratings-${timestamp.substring(0, 19)}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
