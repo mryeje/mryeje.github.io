@@ -1,45 +1,146 @@
-{"openapi":"3.1.0","info":{"title":"Local L2S Processor (FastAPI wrapper - flexible calls)","version":"0.1.0"},"paths":{"/process":{"post":{"summary":"Process","operationId":"process_process_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProcessRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProcessResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}}},"components":{"schemas":{"Clip":{"properties":{"id":{"type":"string","title":"Id"},"label":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Label"},"start":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"}],"title":"Start"},"end":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"}],"title":"End"},"follow_crop":{"anyOf":[{"$ref":"#/components/schemas/FollowCrop"},{"type":"null"}]},"overlay":{"anyOf":[{"$ref":"#/components/schemas/Overlay"},{"type":"null"}]}},"type":"object","required":["id","start","end"],"title":"Clip"},"FollowCrop":{"properties":{"method":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Method","default":"follow"},"smooth_sigma":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Smooth Sigma","default":0.0},"confidence":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Confidence","default":0.25}},"type":"object","title":"FollowCrop"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"Overlay":{"properties":{"main_text":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Main Text"},"overlay_text":{"anyOf":[{"items":{"$ref":"#/components/schemas/OverlayTextItem"},"type":"array"},{"type":"null"}],"title":"Overlay Text","default":[]}},"type":"object","title":"Overlay"},"OverlayTextItem":{"properties":{"text":{"type":"string","title":"Text"},"start":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"},{"type":"null"}],"title":"Start"},"end":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"},{"type":"null"}],"title":"End"},"placement":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Placement"}},"type":"object","required":["text"],"title":"OverlayTextItem"},"ProcessOutput":{"properties":{"clips":{"items":{"type":"string"},"type":"array","title":"Clips","default":[]},"thumbnails":{"items":{"type":"string"},"type":"array","title":"Thumbnails","default":[]},"srts":{"items":{"type":"string"},"type":"array","title":"Srts","default":[]},"stabilized":{"items":{"type":"string"},"type":"array","title":"Stabilized","default":[]},"overlay_queue":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Overlay Queue"}},"type":"object","title":"ProcessOutput"},"ProcessRequest":{"properties":{"recipe":{"$ref":"#/components/schemas/Recipe"},"skip_overlays":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Skip Overlays","default":false},"use_cache":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Use Cache","default":true},"debug":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Debug","default":false}},"type":"object","required":["recipe"],"title":"ProcessRequest"},"ProcessResponse":{"properties":{"status":{"type":"string","title":"Status"},"message":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Message"},"output":{"$ref":"#/components/schemas/ProcessOutput"},"errors":{"anyOf":[{"items":{"type":"string"},"type":"array"},{"type":"null"}],"title":"Errors"}},"type":"object","required":["status","output"],"title":"ProcessResponse"},"Recipe":{"properties":{"src":{"type":"string","maxLength":2083,"minLength":1,"format":"uri","title":"Src"},"clips":{"items":{"$ref":"#/components/schemas/Clip"},"type":"array","title":"Clips"},"global_overlays":{"anyOf":[{"type":"object"},{"type":"null"}],"title":"Global Overlays"}},"type":"object","required":["src","clips"],"title":"Recipe"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"}}}}
-Chat
+{
+  "openapi": "3.0.1",
+  "info": { "title": "Video Processing Plugin", "version": "1.0.1" },
+  "servers": [{ "url": "https://6be028c12f53.ngrok-free.app" }],
+  "paths": {
+    "/process": {
+      "post": {
+        "operationId": "process_process_post",
+        "summary": "Submit a Recipe for processing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "src": { "type": "string", "description": "file:// local path or http(s) URL to the media file (required at top level)" },
+                  "style_profile": { "type": "string" },
+                  "generate_thumbnails": { "type": "boolean" },
+                  "add_text_overlay": { "type": "boolean" },
+                  "multi_platform": { "type": "boolean" },
+                  "platforms": { "type": "array", "items": { "type": "string" } },
 
-New Conversation
+                  "clips": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "label": { "type": "string" },
 
-🤓 Explain a complex thing
+                        "start": { "type": "number", "description": "clip start in seconds (numeric) - REQUIRED for processing" },
+                        "end": { "type": "number", "description": "clip end in seconds (numeric)" },
+                        "clip_duration": { "type": "number", "description": "optional duration in seconds (end = start + duration if provided)" },
 
-Explain Artificial Intelligence so that I can explain it to my six-year-old child.
+                        /* Canonical overlay instruction object the runner expects */
+                        "overlay_instructions": {
+                          "type": "object",
+                          "properties": {
+                            "placement": { "type": "string" },
+                            "font": { "type": "string" },
+                            "size": { "type": "string" },
+                            "style": { "type": "string" },
+                            "effects": {
+                              "type": "array",
+                              "items": { "type": "string" },
+                              "description": "Preferred: effects array. Builder may also emit single 'effect' key."
+                            },
+                            "effect": { "type": "string" },
+                            "color": { "type": "string", "description": "Hex color recommended (#rrggbb)" },
+                            "background": { "type": "string" },
+                            "timing": { "type": "string", "enum": ["clip_relative", "source_absolute"], "description": "How overlay start/end should be interpreted" },
+                            "overlay_text": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "text": { "type": "string" },
+                                  "start": { "type": "number", "description": "seconds; clip-relative if timing=clip_relative or clip.start present" },
+                                  "end": { "type": "number" },
+                                  "placement": { "type": "string" },
+                                  "font": { "type": "string" },
+                                  "size": { "type": "string" },
+                                  "style": { "type": "string" },
+                                  "effects": { "type": "array", "items": { "type": "string" } },
+                                  "effect": { "type": "string" },
+                                  "color": { "type": "string" },
+                                  "background": { "type": "string" }
+                                }
+                              }
+                            }
+                          }
+                        },
 
-  https://6be028c12f53.ngrok-free.app    
-🧠 Get suggestions and create new ideas
+                        /* Backward-compatible flattened overlay array (some builders produce this) */
+                        "overlay_text": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "text": { "type": "string" },
+                              "start": { "type": "number" },
+                              "end": { "type": "number" },
+                              "placement": { "type": "string" }
+                            }
+                          }
+                        },
 
-Please give me the best 10 travel ideas around the world
+                        /* Canonical numeric subtitle format (preferred by runner) */
+                        "srt_for_clip": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "start": { "type": "number" },
+                              "end": { "type": "number" },
+                              "text": { "type": "string" }
+                            }
+                          },
+                          "description": "Preferred: numeric clip-relative subtitles (0.0 = clip start)"
+                        },
 
+                        /* Backward-compatible 'subtitles' string-time format */
+                        "subtitles": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "from": { "type": "string", "description": "HH:MM:SS,mmm" },
+                              "to": { "type": "string", "description": "HH:MM:SS,mmm" },
+                              "text": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
 
-💭 Translate, summarize, fix grammar and more…
-
-Translate "I love you" French
-
-
-GPT-4o Mini
-Hello, how can I help you today?
-GPT-4o Mini
-coin image
-10
-Upgrade
-
-
-
-
-{"openapi":"3.1.0","info":{"title":"Local L2S Processor (FastAPI wrapper - flexible calls)","version":"0.1.0"},"paths":{"/process":{"post":{"summary":"Process","operationId":"process_process_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProcessRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProcessResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}}},"components":{"schemas":{"Clip":{"properties":{"id":{"type":"string","title":"Id"},"label":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Label"},"start":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"}],"title":"Start"},"end":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"}],"title":"End"},"follow_crop":{"anyOf":[{"$ref":"#/components/schemas/FollowCrop"},{"type":"null"}]},"overlay":{"anyOf":[{"$ref":"#/components/schemas/Overlay"},{"type":"null"}]}},"type":"object","required":["id","start","end"],"title":"Clip"},"FollowCrop":{"properties":{"method":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Method","default":"follow"},"smooth_sigma":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Smooth Sigma","default":0.0},"confidence":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Confidence","default":0.25}},"type":"object","title":"FollowCrop"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"Overlay":{"properties":{"main_text":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Main Text"},"overlay_text":{"anyOf":[{"items":{"$ref":"#/components/schemas/OverlayTextItem"},"type":"array"},{"type":"null"}],"title":"Overlay Text","default":[]}},"type":"object","title":"Overlay"},"OverlayTextItem":{"properties":{"text":{"type":"string","title":"Text"},"start":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"},{"type":"null"}],"title":"Start"},"end":{"anyOf":[{"type":"integer"},{"type":"number"},{"type":"string"},{"type":"null"}],"title":"End"},"placement":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Placement"}},"type":"object","required":["text"],"title":"OverlayTextItem"},"ProcessOutput":{"properties":{"clips":{"items":{"type":"string"},"type":"array","title":"Clips","default":[]},"thumbnails":{"items":{"type":"string"},"type":"array","title":"Thumbnails","default":[]},"srts":{"items":{"type":"string"},"type":"array","title":"Srts","default":[]},"stabilized":{"items":{"type":"string"},"type":"array","title":"Stabilized","default":[]},"overlay_queue":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Overlay Queue"}},"type":"object","title":"ProcessOutput"},"ProcessRequest":{"properties":{"recipe":{"$ref":"#/components/schemas/Recipe"},"skip_overlays":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Skip Overlays","default":false},"use_cache":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Use Cache","default":true},"debug":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Debug","default":false}},"type":"object","required":["recipe"],"title":"ProcessRequest"},"ProcessResponse":{"properties":{"status":{"type":"string","title":"Status"},"message":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Message"},"output":{"$ref":"#/components/schemas/ProcessOutput"},"errors":{"anyOf":[{"items":{"type":"string"},"type":"array"},{"type":"null"}],"title":"Errors"}},"type":"object","required":["status","output"],"title":"ProcessResponse"},"Recipe":{"properties":{"src":{"type":"string","maxLength":2083,"minLength":1,"format":"uri","title":"Src"},"clips":{"items":{"$ref":"#/components/schemas/Clip"},"type":"array","title":"Clips"},"global_overlays":{"anyOf":[{"type":"object"},{"type":"null"}],"title":"Global Overlays"}},"type":"object","required":["src","clips"],"title":"Recipe"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"}}}}
-
-
-
-
-
-Powered by AITOPIA 
-Chat
-Ask
-Search
-Write
-Image
-ChatFile
-Vision
-Full Page
+                  "thumbnail_strategy": { "type": "string", "enum": ["start", "middle", "end"] },
+                  "export_srt": { "type": "boolean" }
+                },
+                "required": ["src", "clips"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Processing job accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "job_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
