@@ -14,7 +14,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "src": { "type": "string", "description": "file:// local path or http(s) URL to the media file (required at top level)" },
+                  "src": { "type": "string", "description": "https://0c28744a4c9a.ngrok-free.app " },
                   "style_profile": { "type": "string" },
                   "generate_thumbnails": { "type": "boolean" },
                   "add_text_overlay": { "type": "boolean" },
